@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables — NEVER commit real keys
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Vercel
+.vercel
+
+# GCP / service account credentials
+*.pem
+*.key
+*credentials*.json
+*service-account*.json
+*gcp-key*.json
+*secret*.json
+
+# OS
+.DS_Store
+Thumbs.db

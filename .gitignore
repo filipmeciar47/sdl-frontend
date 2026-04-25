@@ -1,0 +1,26 @@
+node_modules/
+dist/
+
+# Environment — never commit real keys
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Vercel
+.vercel
+
+# GCP credentials
+*.pem
+*.key
+*credentials*.json
+*service-account*.json
+*gcp-key*.json
+*secret*.json
+
+# Extracted KB (temp build artifact)
+kb_extracted.txt
+
+# OS
+.DS_Store
+Thumbs.db
