@@ -10,3 +10,5 @@ node_modules/
 *secret*.json
 .DS_Store
 Thumbs.db
+
+.vercel

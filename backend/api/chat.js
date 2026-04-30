@@ -1322,7 +1322,7 @@ module.exports = async function handler(req, res) {
 
     const response = await client.messages.create(
       {
-        model: "claude-sonnet-4-5-20251001",
+        model: "claude-sonnet-4-6",
         max_tokens: 4096,
         system: systemContent,
         messages: messages,
