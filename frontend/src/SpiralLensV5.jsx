@@ -12,12 +12,11 @@ const LEVELS = [
   { id: 'turquoise', name: 'TYRKYSOVÁ', motto: 'Celostné vedomie',    polarity: 'deny',    hex: '#2DD4BF', glow: 'rgba(45,212,191,0.6)'   },
 ];
 
-// Two fixed rows
 const HEIGHT  = 460;
-const ROW_TOP = 110;   // express row Y (center of icon)
-const ROW_BOT = 310;   // deny row Y (center of icon)
-const ICO_MAIN = 64;   // primary icon (ICONS set) diameter
-const ICO_AXIS = 44;   // secondary icon (AXIS_ICONS set) diameter
+const ROW_TOP = 110;
+const ROW_BOT = 310;
+const ICO_MAIN = 64;
+const ICO_AXIS = 44;
 
 function polyPath(pts) {
   if (pts.length < 2) return '';
@@ -26,7 +25,12 @@ function polyPath(pts) {
   return d;
 }
 
-export default function SpiralLensV5({ icons = {}, axisIcons = {}, activeKeys = [], pendingKeys = [], onLevelClick }) {
+export default function SpiralLensV5({
+  icons = {}, axisIcons = {},
+  activeKeys = [], pendingKeys = [],
+  onLevelClick,
+  integrated = false,
+}) {
   const [hover, setHover] = useState(null);
   const containerRef = useRef(null);
   const [width, setWidth] = useState(860);
@@ -44,27 +48,31 @@ export default function SpiralLensV5({ icons = {}, axisIcons = {}, activeKeys = 
 
   const active  = useMemo(() => new Set(activeKeys),  [activeKeys]);
   const pending = useMemo(() => new Set(pendingKeys),  [pendingKeys]);
+  // "selected" = clicked (pending or active)
   const selected = useMemo(() => new Set([...activeKeys, ...pendingKeys]), [activeKeys, pendingKeys]);
+
+  // In integrated mode: expand to all levels up to the highest selected index
+  const connected = useMemo(() => {
+    if (!integrated || selected.size === 0) return selected;
+    let maxIdx = -1;
+    LEVELS.forEach((lv, i) => { if (selected.has(lv.id)) maxIdx = i; });
+    if (maxIdx === -1) return selected;
+    return new Set(LEVELS.slice(0, maxIdx + 1).map(lv => lv.id));
+  }, [selected, integrated]);
 
   const slot = width / LEVELS.length;
 
-  // For each level:
-  // - ICONS (first set) is at the zigzag anchor: express→ROW_TOP, deny→ROW_BOT
-  // - AXIS_ICONS (second set) is at the opposite row: express→ROW_BOT, deny→ROW_TOP
   const items = useMemo(() => LEVELS.map((lv, i) => {
     const cx = (i + 0.5) * slot;
-    const iconsY  = lv.polarity === 'express' ? ROW_TOP : ROW_BOT;
-    const axisY   = lv.polarity === 'express' ? ROW_BOT : ROW_TOP;
+    const iconsY = lv.polarity === 'express' ? ROW_TOP : ROW_BOT;
+    const axisY  = lv.polarity === 'express' ? ROW_BOT : ROW_TOP;
     return { lv, cx, iconsY, axisY };
   }), [slot]);
 
-  // Zigzag anchors = ICONS positions (express@top, deny@bottom)
-  const allAnchors = items.map(it => ({ x: it.cx, y: it.iconsY }));
-
-  // Selected zigzag (only lit levels)
-  const selItems   = items.filter(it => selected.has(it.lv.id));
-  const selAnchors = selItems.map(it => ({ x: it.cx, y: it.iconsY, isPending: !active.has(it.lv.id) }));
-  const N = selItems.length;
+  // Zigzag uses ICONS anchors for connected levels only
+  const connItems   = items.filter(it => connected.has(it.lv.id));
+  const connAnchors = connItems.map(it => ({ x: it.cx, y: it.iconsY }));
+  const N = connItems.length;
   const outerToInner = Array.from({ length: N }, (_, i) => N - 1 - i);
 
   return (
@@ -93,74 +101,65 @@ export default function SpiralLensV5({ icons = {}, axisIcons = {}, activeKeys = 
           </filter>
         </defs>
 
-        {/* Background zigzag — all 8 ICONS anchors, always dim */}
-        <path
-          d={polyPath(allAnchors)}
-          fill="none" stroke="rgba(255,255,255,0.07)"
-          strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-          strokeDasharray="4 7"
-        />
-
-        {/* Glowing zigzag — selected levels only */}
+        {/* Glowing zigzag — connected levels only (solid, no dashes) */}
         {N >= 2 && (
           <>
             <g style={{ mixBlendMode: 'screen' }}>
-              {selItems.map((it, k) => (
-                <path key={`halo-${it.lv.id}`} d={polyPath(selAnchors.slice(k))}
+              {connItems.map((it, k) => (
+                <path key={`halo-${it.lv.id}`} d={polyPath(connAnchors.slice(k))}
                   fill="none" stroke={it.lv.hex}
                   strokeWidth={11 + k * 13} strokeLinecap="round" strokeLinejoin="round"
-                  strokeOpacity={pending.has(it.lv.id) && !active.has(it.lv.id) ? "0.2" : "0.38"}
+                  strokeOpacity="0.38"
                   filter="url(#slv5-halo)" />
               ))}
             </g>
             <g>
               {outerToInner.map(k => {
-                const it = selItems[k];
-                const isPend = pending.has(it.lv.id) && !active.has(it.lv.id);
+                const it = connItems[k];
                 return (
-                  <path key={`band-${it.lv.id}`} d={polyPath(selAnchors.slice(k))}
+                  <path key={`band-${it.lv.id}`} d={polyPath(connAnchors.slice(k))}
                     fill="none" stroke={it.lv.hex}
                     strokeWidth={11 + k * 13} strokeLinecap="round" strokeLinejoin="round"
-                    strokeOpacity={isPend ? "0.42" : "0.85"}
-                    strokeDasharray={isPend ? "8 5" : undefined}
+                    strokeOpacity="0.85"
                     filter="url(#slv5-band)" />
                 );
               })}
             </g>
             <g style={{ mixBlendMode: 'screen' }}>
-              <path d={polyPath(selAnchors)} fill="none" stroke="#ffffff"
+              <path d={polyPath(connAnchors)} fill="none" stroke="#ffffff"
                 strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
                 strokeOpacity="0.6" filter="url(#slv5-core)" />
             </g>
           </>
         )}
 
-        {/* Sparks at selected ICONS anchors */}
-        {selAnchors.map((a, idx) => (
+        {/* Sparks at connected ICONS anchors */}
+        {connAnchors.map((a, idx) => (
           <circle key={`spark-${idx}`} cx={a.x} cy={a.y} r="2.5"
-            fill="#fff" opacity={a.isPending ? "0.4" : "0.85"} />
+            fill="#fff" opacity="0.85" />
         ))}
-        {/* Dim dots at non-selected ICONS anchors */}
-        {allAnchors.map((a, idx) => {
-          if (selected.has(LEVELS[idx].id)) return null;
-          return <circle key={`dot-${idx}`} cx={a.x} cy={a.y} r="1.5" fill="rgba(255,255,255,0.15)" />;
-        })}
       </svg>
 
-      {/* Render each level: ICONS at zigzag row, AXIS_ICONS at opposite row */}
+      {/* Render each level */}
       {items.map(({ lv, cx, iconsY, axisY }) => {
         const isHover   = hover === lv.id;
         const isActive  = active.has(lv.id);
-        const isPending = pending.has(lv.id);
-        const isSel     = isActive || isPending;
-        const isLit     = isHover || isSel;
+        const isSel     = selected.has(lv.id);  // clicked (pending or active)
+        const isConn    = connected.has(lv.id); // in zigzag
 
         const src1 = icons[lv.id];
         const src2 = axisIcons[lv.id];
 
+        // Glow intensity: hover > selected > base
+        const glowOpacity = isHover ? 0.72 : isSel ? 0.88 : 0.28;
+        const imgOpacity  = isHover ? 1    : isSel ? 1    : 0.82;
+        const glowBlur    = isHover ? 8    : isSel ? 12   : 4;
+        const axisOpacity = isHover ? 0.95 : isSel ? 0.85 : 0.55;
+        const axisGlowBlur = isHover ? 8   : isSel ? 8    : 2;
+
         return (
           <React.Fragment key={lv.id}>
-            {/* ICONS badge — at zigzag anchor row, with label */}
+            {/* ICONS badge — at zigzag anchor row */}
             <div
               onMouseEnter={() => setHover(lv.id)}
               onMouseLeave={() => setHover(null)}
@@ -173,51 +172,52 @@ export default function SpiralLensV5({ icons = {}, axisIcons = {}, activeKeys = 
                 cursor: 'pointer',
                 zIndex: isHover ? 50 : 10,
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
-                transform: isHover ? 'scale(1.1)' : 'scale(1)',
-                transition: 'transform 0.25s cubic-bezier(.2,.7,.2,1)',
+                transform: isHover ? 'scale(1.08)' : 'scale(1)',
+                transition: 'transform 0.22s cubic-bezier(.2,.7,.2,1)',
               }}
             >
               <div style={{ position: 'relative', width: ICO_MAIN, height: ICO_MAIN }}>
                 <div style={{
                   position: 'absolute', inset: -(ICO_MAIN * 0.22),
                   background: `radial-gradient(circle, ${lv.hex}99 0%, ${lv.glow} 30%, transparent 65%)`,
-                  opacity: isLit ? 1 : 0.18,
-                  transition: 'opacity 0.25s', pointerEvents: 'none', filter: 'blur(5px)',
+                  opacity: glowOpacity,
+                  transition: 'opacity 0.22s', pointerEvents: 'none', filter: 'blur(5px)',
                 }} />
                 {src1 && (
                   <img src={src1} alt={lv.name} style={{
                     position: 'relative', width: '100%', height: '100%',
                     borderRadius: '50%', objectFit: 'cover',
-                    filter: `drop-shadow(0 0 ${isLit ? 12 : 3}px ${lv.glow})`,
-                    opacity: isLit ? 1 : 0.32,
-                    transition: 'filter 0.25s, opacity 0.25s',
+                    filter: `drop-shadow(0 0 ${glowBlur}px ${lv.glow})`,
+                    opacity: imgOpacity,
+                    transition: 'filter 0.22s, opacity 0.22s',
                   }} />
                 )}
+                {/* Ring: solid for active, thinner for pending-only */}
                 {isActive && (
                   <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `2px solid ${lv.hex}`, boxShadow: `0 0 12px ${lv.glow}`, pointerEvents: 'none' }} />
                 )}
-                {isPending && !isActive && (
-                  <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `2px dashed ${lv.hex}`, opacity: 0.7, pointerEvents: 'none' }} />
+                {!isActive && isSel && (
+                  <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `1.5px solid ${lv.hex}bb`, pointerEvents: 'none' }} />
                 )}
               </div>
-              {/* Label under ICONS badge */}
+              {/* Label */}
               <div style={{ marginTop: 5, textAlign: 'center' }}>
                 <div style={{
                   fontSize: 8, letterSpacing: '0.18em', fontWeight: 600, textTransform: 'uppercase',
-                  color: isLit ? lv.hex : 'rgba(200,190,178,0.32)',
-                  textShadow: isLit ? `0 0 8px ${lv.glow}` : 'none',
-                  transition: 'color 0.25s', whiteSpace: 'nowrap',
+                  color: (isHover || isSel) ? lv.hex : 'rgba(200,190,178,0.55)',
+                  textShadow: (isHover || isSel) ? `0 0 8px ${lv.glow}` : 'none',
+                  transition: 'color 0.22s', whiteSpace: 'nowrap',
                 }}>{lv.name}</div>
                 <div style={{
                   marginTop: 1, fontSize: 7.5,
                   fontFamily: "'Playfair Display', Georgia, serif", fontStyle: 'italic',
-                  color: isLit ? 'rgba(220,210,200,0.8)' : 'rgba(200,190,178,0.18)',
-                  transition: 'color 0.25s', whiteSpace: 'nowrap',
+                  color: (isHover || isSel) ? 'rgba(220,210,200,0.85)' : 'rgba(200,190,178,0.4)',
+                  transition: 'color 0.22s', whiteSpace: 'nowrap',
                 }}>{lv.motto}</div>
               </div>
             </div>
 
-            {/* AXIS_ICONS badge — at opposite row, no label, clickable too */}
+            {/* AXIS_ICONS badge — opposite row, no label */}
             {src2 && (
               <div
                 onMouseEnter={() => setHover(lv.id)}
@@ -229,16 +229,16 @@ export default function SpiralLensV5({ icons = {}, axisIcons = {}, activeKeys = 
                   top: axisY - ICO_AXIS / 2,
                   width: ICO_AXIS, height: ICO_AXIS,
                   cursor: 'pointer', zIndex: isHover ? 50 : 10,
-                  transform: isHover ? 'scale(1.1)' : 'scale(1)',
-                  transition: 'transform 0.25s cubic-bezier(.2,.7,.2,1)',
+                  transform: isHover ? 'scale(1.08)' : 'scale(1)',
+                  transition: 'transform 0.22s cubic-bezier(.2,.7,.2,1)',
                 }}
               >
                 <img src={src2} alt={lv.name} style={{
                   width: '100%', height: '100%',
                   borderRadius: '50%', objectFit: 'cover',
-                  filter: `drop-shadow(0 0 ${isLit ? 8 : 2}px ${lv.glow})`,
-                  opacity: isLit ? 0.82 : 0.2,
-                  transition: 'filter 0.25s, opacity 0.25s',
+                  filter: `drop-shadow(0 0 ${axisGlowBlur}px ${lv.glow})`,
+                  opacity: axisOpacity,
+                  transition: 'filter 0.22s, opacity 0.22s',
                 }} />
               </div>
             )}

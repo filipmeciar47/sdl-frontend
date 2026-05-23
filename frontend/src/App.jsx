@@ -551,6 +551,7 @@ export default function App() {
                 axisIcons={AXIS_ICONS}
                 activeKeys={Object.keys(colorChats)}
                 pendingKeys={Array.from(pendingLevels)}
+                integrated={integrated}
                 onLevelClick={key => {
                   if (colorChats[key]) { scrollToChat(key); return; }
                   setPendingLevels(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
