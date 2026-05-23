@@ -573,6 +573,7 @@ export default function App() {
             {viewMode === "icons" ? (
               <SpiralLensV5
                 icons={ICONS}
+                axisIcons={AXIS_ICONS}
                 activeKeys={Object.keys(colorChats)}
                 pendingKeys={Array.from(pendingLevels)}
                 onLevelClick={key => {
