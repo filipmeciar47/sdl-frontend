@@ -537,10 +537,10 @@ export default function App() {
               <div style={{ width: "100%", paddingBottom: "100%", opacity: 0.85, position: "relative" }}>
                 <img src={MANDALA} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", borderRadius: "50%", display: "block" }} />
               </div>
-              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 0, right: -8, display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 10, padding: "7px 12px", color: "rgba(255,255,255,0.6)", fontFamily: "DM Sans,sans-serif", fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", backdropFilter: "blur(6px)", transition: "all 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.12)"; e.currentTarget.style.color="rgba(255,255,255,0.9)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.06)"; e.currentTarget.style.color="rgba(255,255,255,0.6)"; }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 0, left: -8, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                 </svg>
                 Tutorial
