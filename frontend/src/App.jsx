@@ -533,14 +533,21 @@ export default function App() {
 
         {!topicSet ? (
           <div style={{ maxWidth: 600, margin: "0 auto" }}>
-            <div style={{ width: "min(260px, 55vw)", height: "min(260px, 55vw)", margin: "0 auto 32px", opacity: 0.85 }}>
-              <img src={MANDALA} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", display: "block" }} />
+            <div style={{ position: "relative", width: "min(260px, 55vw)", margin: "0 auto 32px" }}>
+              <div style={{ width: "100%", paddingBottom: "100%", opacity: 0.85, position: "relative" }}>
+                <img src={MANDALA} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", borderRadius: "50%", display: "block" }} />
+              </div>
+              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 0, right: -8, display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 10, padding: "7px 12px", color: "rgba(255,255,255,0.6)", fontFamily: "DM Sans,sans-serif", fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", backdropFilter: "blur(6px)", transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.12)"; e.currentTarget.style.color="rgba(255,255,255,0.9)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.06)"; e.currentTarget.style.color="rgba(255,255,255,0.6)"; }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+                Tutorial
+              </button>
             </div>
             <textarea value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Zadajte tému, problém, otázku alebo situáciu..." />
             <button className="btn" onClick={startAnalysis} disabled={!topic.trim()}>Preskúmať</button>
-            <div style={{ textAlign: "center", marginTop: 16 }}>
-              <button onClick={() => setTutorialOpen(true)} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "6px 22px", color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans,sans-serif", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer" }}>Tutorial</button>
-            </div>
           </div>
         ) : (
           <>
