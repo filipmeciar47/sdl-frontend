@@ -382,64 +382,39 @@ export default function App() {
 
   function exportConversation() {
     const timestamp = new Date().toLocaleString("sk-SK");
-    let md = "# Spiral Dynamics Lens — Export\n";
-    md += "**Téma:** " + topicSet + "\n";
-    md += "**Dátum:** " + timestamp + "\n\n";
-    md += "---\n\n";
-
-    // Individual perspectives
     const chatKeys = LEVELS.filter(l => colorChats[l.key]).map(l => l.key);
+    const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+    let body = "";
     if (chatKeys.length > 0) {
-      md += "## Perspektívy úrovní\n\n";
       chatKeys.forEach(key => {
-        const l = LEVEL_MAP[key];
-        const chat = colorChats[key];
+        const l = LEVEL_MAP[key]; const chat = colorChats[key];
         const axisLabel = l.axis === "express" ? "Express-self" : "Deny-self";
-        md += "### " + l.name + " — " + l.sub + " (" + axisLabel + ")\n\n";
+        body += '<div class="section"><h2 style="color:' + l.clr + '">' + esc(l.name) + ' — ' + esc(l.sub) + '</h2><p class="axis">' + axisLabel + '</p>';
         chat.messages.forEach(m => {
           if (m.role === "error") return;
-          if (m.role === "user") md += "> **Otázka:** " + m.content + "\n\n";
-          else md += m.content + "\n\n";
+          if (m.role === "user") body += '<div class="q"><strong>Otázka:</strong> ' + esc(m.content) + '</div>';
+          else body += '<div class="a">' + esc(m.content) + '</div>';
         });
-        md += "---\n\n";
+        body += '</div>';
       });
     }
-
-    // Conflicts
-    if (conflictResult) {
-      md += "## Napätia medzi perspektívami\n\n";
-      md += conflictResult + "\n\n";
-      md += "---\n\n";
-    }
-
-    // Reflection
-    if (reflection) {
-      md += "## Vzorec explorácie (Express-self / Deny-self)\n\n";
-      md += reflection + "\n\n";
-      md += "---\n\n";
-    }
-
-    // Yellow integrative
+    if (conflictResult) body += '<div class="section"><h2>Napätia medzi perspektívami</h2><div class="a">' + esc(conflictResult) + '</div></div>';
+    if (reflection) body += '<div class="section"><h2>Vzorec explorácie</h2><div class="a">' + esc(reflection) + '</div></div>';
     if (mainChat.length > 0) {
-      md += "## Integratívny dialóg (Žltá)\n\n";
+      body += '<div class="section"><h2>Integratívny dialóg</h2>';
       mainChat.forEach(m => {
-        if (m.role === "user") md += "> **Otázka:** " + m.content + "\n\n";
-        else md += m.content + "\n\n";
+        if (m.role === "user") body += '<div class="q"><strong>Otázka:</strong> ' + esc(m.content) + '</div>';
+        else body += '<div class="a">' + esc(m.content) + '</div>';
       });
-      md += "---\n\n";
+      body += '</div>';
     }
-
-    md += "*Vygenerované aplikáciou Spiral Dynamics Lens*\n";
-
-    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "spiral-dynamics-" + topicSet.replace(/[^a-záčďéíľňóŕšťúýž0-9]/gi, "_").substring(0, 40) + ".md";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const css = 'body{font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:32px;color:#1a1a1a;font-size:13px;line-height:1.7}h1{font-size:20px;margin-bottom:4px}.meta{color:#666;font-size:11px;margin-bottom:32px}.section{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #e5e5e5}h2{font-size:15px;margin-bottom:4px}.axis{font-size:10px;color:#888;margin:0 0 12px;text-transform:uppercase;letter-spacing:.1em}.q{background:#f5f5f5;border-left:3px solid #ccc;padding:8px 12px;margin:10px 0;font-style:italic;font-size:12px}.a{margin:10px 0;white-space:pre-wrap}.footer{text-align:center;font-size:10px;color:#aaa;margin-top:40px}@media print{body{padding:0}}';
+    const html = '<!DOCTYPE html><html lang="sk"><head><meta charset="UTF-8"><title>Spiral Dynamics — ' + esc(topicSet) + '</title><style>' + css + '</style></head><body><h1>Spiral Dynamics Lens</h1><div class="meta"><strong>Téma:</strong> ' + esc(topicSet) + ' &nbsp;·&nbsp; ' + timestamp + '</div>' + body + '<div class="footer">Vygenerované aplikáciou Spiral Dynamics Lens</div></body></html>';
+    const win = window.open("", "_blank");
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    setTimeout(() => win.print(), 400);
   }
 
   async function sendMain() {
