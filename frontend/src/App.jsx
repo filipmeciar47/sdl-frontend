@@ -538,6 +538,9 @@ export default function App() {
             </div>
             <textarea value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Zadajte tému, problém, otázku alebo situáciu..." />
             <button className="btn" onClick={startAnalysis} disabled={!topic.trim()}>Preskúmať</button>
+            <div style={{ textAlign: "center", marginTop: 16 }}>
+              <button onClick={() => setTutorialOpen(true)} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "6px 22px", color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans,sans-serif", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer" }}>Tutorial</button>
+            </div>
           </div>
         ) : (
           <>
