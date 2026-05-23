@@ -93,7 +93,7 @@ export default function App() {
   const [mainInput, setMainInput] = useState("");
   const [mainLoading, setMainLoading] = useState(false);
   const [integratedContext, setIntegratedContext] = useState("");
-  const [viewMode, setViewMode] = useState("mandala");
+  const [viewMode, setViewMode] = useState("icons");
   const [pendingLevels, setPendingLevels] = useState(new Set());
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const mainEndRef = useRef(null);
@@ -554,20 +554,20 @@ export default function App() {
             <div className="topic-bar">{"„"}{topicSet}{"”"}</div>
 
             {/* View mode toggle */}
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: 16, position: "relative" }}>
-              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: 0, background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "4px 14px", color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans,sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer" }}>Tutorial</button>
-              {["mandala", "icons"].map(mode => (
-                <button key={mode} onClick={() => setViewMode(mode)} style={{
-                  padding: "5px 18px", borderRadius: 99,
-                  border: viewMode === mode ? "1px solid rgba(250,204,21,0.45)" : "1px solid rgba(255,255,255,0.1)",
-                  background: viewMode === mode ? "rgba(250,204,21,0.1)" : "transparent",
-                  color: viewMode === mode ? "#FACC15" : "rgba(255,255,255,0.35)",
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 10, letterSpacing: "0.25em",
-                  textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s",
-                }}>
-                  {mode === "mandala" ? "Mandala" : "Ikony"}
-                </button>
-              ))}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 16, position: "relative" }}>
+              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: 0, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+                Tutorial
+              </button>
+              <span style={{ opacity: viewMode === "icons" ? 1 : 0.4, fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#fff" }}>Ikony</span>
+              <div className={"toggle" + (viewMode === "mandala" ? " on" : "")} onClick={() => setViewMode(viewMode === "mandala" ? "icons" : "mandala")}>
+                <div className="toggle-dot" />
+              </div>
+              <span style={{ opacity: viewMode === "mandala" ? 1 : 0.4, fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#fff" }}>Mandala</span>
             </div>
 
             {viewMode === "icons" ? (
