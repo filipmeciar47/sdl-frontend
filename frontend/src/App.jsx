@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import SpiralLensV5 from "./SpiralLensV5";
+import SpiralMandala from "./SpiralMandala";
 
 const ICONS = {
   beige: "data:image/png;base64,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",
@@ -83,7 +84,6 @@ function AxisIco({ k, size = 28 }) {
 export default function App() {
   const [topic, setTopic] = useState("");
   const [topicSet, setTopicSet] = useState("");
-  const [hovered, setHovered] = useState(null);
   const [integrated, setIntegrated] = useState(false);
   const [colorChats, setColorChats] = useState({});
   const [colorLoading, setColorLoading] = useState({});
@@ -124,28 +124,6 @@ export default function App() {
     return null;
   }
   const reflection = getReflection();
-
-  function handleMandalaClick(e) {
-    if (!topicSet) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const cx = rect.width / 2, cy = rect.height / 2;
-    const x = e.clientX - rect.left - cx, y = e.clientY - rect.top - cy;
-    const dist = Math.sqrt(x * x + y * y) / (rect.width / 2) / 0.96;
-    const clicked = LEVELS.find(l => dist >= l.r0 && dist < l.r1);
-    if (!clicked) return;
-    if (integrated) {
-      const innerKeys = LEVELS.filter(l => l.r1 <= clicked.r1 && !colorChats[l.key]).map(l => l.key);
-      if (innerKeys.length === 0) return;
-      setPendingLevels(prev => { const n = new Set(prev); innerKeys.forEach(k => n.add(k)); return n; });
-    } else {
-      if (colorChats[clicked.key]) { scrollToChat(clicked.key); return; }
-      setPendingLevels(prev => {
-        const n = new Set(prev);
-        n.has(clicked.key) ? n.delete(clicked.key) : n.add(clicked.key);
-        return n;
-      });
-    }
-  }
 
   function runAnalysis() {
     const pendingKeys = Array.from(pendingLevels).filter(k => !colorChats[k]);
@@ -201,14 +179,6 @@ export default function App() {
       });
   }
 
-  function handleMandalaHover(e) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const cx = rect.width / 2, cy = rect.height / 2;
-    const x = e.clientX - rect.left - cx, y = e.clientY - rect.top - cy;
-    const dist = Math.sqrt(x * x + y * y) / (rect.width / 2) / 0.96;
-    const h = LEVELS.find(l => dist >= l.r0 && dist < l.r1);
-    setHovered(h ? h.key : null);
-  }
 
   function openOrFocusChat(key) {
     setExplored(prev => ({ ...prev, [key]: true }));
@@ -439,7 +409,6 @@ export default function App() {
     setMainChat([]); setMainInput(""); setIntegratedContext(""); setConflictResult(""); setConflictHistory([]); setConflictInput("");
   }
 
-  const hoveredLevel = hovered ? LEVEL_MAP[hovered] : null;
 
   useEffect(() => {
     const handleMsg = (e) => { if (e.data && e.data.type === 'TUTORIAL_CLOSE') setTutorialOpen(false); };
@@ -558,50 +527,15 @@ export default function App() {
                 }}
               />
             ) : (
-            <div className="mandala-wrap" onClick={handleMandalaClick} onMouseMove={handleMandalaHover} onMouseLeave={() => setHovered(null)}>
-              <img src={MANDALA} alt="Spiral Dynamics Mandala" />
-              <svg className="mandala-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-                <defs>
-                  <filter id="glow"><feGaussianBlur stdDeviation="1" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
-                </defs>
-                {LEVELS.map(l => {
-                  const isActive = !!colorChats[l.key];
-                  const isPending = pendingLevels.has(l.key);
-                  const isHov = hovered === l.key;
-                  const isHovInner = integrated && hovered && l.r1 <= LEVEL_MAP[hovered].r1;
-                  const isActiveInner = integrated && Object.keys(colorChats).some(k => LEVEL_MAP[k] && l.r1 <= LEVEL_MAP[k].r1);
-                  const hovShow = isHov || isHovInner;
-                  const persShow = !hovShow && (integrated ? isActiveInner : isActive);
-                  if (!hovShow && !persShow && !isPending) return null;
-                  const midR = ((l.r0 + l.r1) / 2) * 48;
-                  const sw = (l.r1 - l.r0) * 48;
-                  return (
-                    <g key={"hl-"+l.key}>
-                      {isPending && !hovShow && (
-                        <circle cx="50" cy="50" r={midR} fill="none" stroke={l.clr} strokeWidth={sw}
-                          strokeOpacity="0.35" strokeDasharray="2 2"
-                          style={{ mixBlendMode: "screen", pointerEvents: "none" }} />
-                      )}
-                      {(hovShow || persShow) && (
-                        <circle cx="50" cy="50" r={midR} fill="none" stroke={l.clr} strokeWidth={sw}
-                          strokeOpacity={hovShow ? 0.45 : 0.15}
-                          style={{ mixBlendMode: "screen", pointerEvents: "none", filter: hovShow ? "url(#glow)" : "none" }} />
-                      )}
-                      {hovShow && <circle cx="50" cy="50" r={midR} fill="none" stroke="#ffffff" strokeWidth={sw * 0.5}
-                        strokeOpacity="0.1" style={{ mixBlendMode: "overlay", pointerEvents: "none" }} />}
-                    </g>
-                  );
-                })}
-              </svg>
-              {hoveredLevel && (
-                <div className="mandala-hover" style={{ background: hoveredLevel.bg, color: hoveredLevel.clr, border: "1px solid " + hoveredLevel.clr + "40" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 8, background: hoveredLevel.clr + "20", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <Ico k={hovered} size={30} />
-                  </div>
-                  {hoveredLevel.name} {"\u2014"} {hoveredLevel.sub}
-                </div>
-              )}
-            </div>
+            <SpiralMandala
+              mandalaSrc="/assets/mandala.png"
+              mode={integrated ? 'integrative' : 'single'}
+              onSelectionChange={(levels) => {
+                if (!topicSet) return;
+                setPendingLevels(new Set(levels.map(l => l.key).filter(k => !colorChats[k])));
+              }}
+              onDeselect={() => setPendingLevels(new Set())}
+            />
             )}
 
             <div className="toggle-wrap">
