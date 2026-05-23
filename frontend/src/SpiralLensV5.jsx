@@ -1,6 +1,4 @@
 // SpiralLensV5.jsx — icon view pre SDL App
-// Adaptácia: transparentné pozadie, base64 ikony z App.jsx (icons prop),
-// controlled (activeKeys + onLevelClick), express/deny zigzag
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 
 const LEVELS = [
@@ -17,7 +15,7 @@ const LEVELS = [
 const ICON_SIZE = 76;
 const HEIGHT    = 460;
 const CY        = HEIGHT / 2;
-const OFFSET    = 88; // polovina amplitúdy zigzagu
+const OFFSET    = 88;
 
 function anchorY(polarity) {
   return polarity === 'express' ? CY - OFFSET : CY + OFFSET;
@@ -30,7 +28,7 @@ function polyPath(pts) {
   return d;
 }
 
-export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick }) {
+export default function SpiralLensV5({ icons = {}, activeKeys = [], pendingKeys = [], onLevelClick }) {
   const [hover, setHover]   = useState(null);
   const containerRef        = useRef(null);
   const [width, setWidth]   = useState(860);
@@ -46,8 +44,12 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
     return () => obs.disconnect();
   }, []);
 
-  const active = useMemo(() => new Set(activeKeys), [activeKeys]);
-  const slot   = width / LEVELS.length;
+  const active  = useMemo(() => new Set(activeKeys),  [activeKeys]);
+  const pending = useMemo(() => new Set(pendingKeys),  [pendingKeys]);
+  // Combined: all items that have any visual state (active or pending)
+  const lit     = useMemo(() => new Set([...activeKeys, ...pendingKeys]), [activeKeys, pendingKeys]);
+
+  const slot = width / LEVELS.length;
 
   const items = useMemo(() => LEVELS.map((lv, i) => ({
     lv,
@@ -55,9 +57,10 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
     cy: anchorY(lv.polarity),
   })), [slot]);
 
-  const activeItems = items.filter(it => active.has(it.lv.id));
-  const N           = activeItems.length;
-  const anchors     = activeItems.map(it => ({ x: it.cx, y: it.cy }));
+  // Zigzag uses ALL selected items (active + pending)
+  const litItems     = items.filter(it => lit.has(it.lv.id));
+  const N            = litItems.length;
+  const anchors      = litItems.map(it => ({ x: it.cx, y: it.cy, isPending: !active.has(it.lv.id) }));
   const outerToInner = Array.from({ length: N }, (_, i) => N - 1 - i);
 
   return (
@@ -71,7 +74,7 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
         fontFamily: "'DM Sans', Georgia, sans-serif",
       }}
     >
-      {/* Zónové labely */}
+      {/* Zone labels */}
       <div style={{
         position: 'absolute', top: 10, left: 0, right: 0, textAlign: 'center',
         fontSize: 9, letterSpacing: '0.38em',
@@ -87,7 +90,7 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
         DENY · MY
       </div>
 
-      {/* Zigzag SVG */}
+      {/* Zigzag SVG — draws for all lit items */}
       <svg
         width={width} height={HEIGHT}
         style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3 }}
@@ -104,9 +107,9 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
           </filter>
         </defs>
 
-        {/* 1. Ambientné halo */}
+        {/* 1. Ambient halo */}
         <g style={{ mixBlendMode: 'screen' }}>
-          {activeItems.map((it, k) => (
+          {litItems.map((it, k) => (
             <path
               key={`halo-${it.lv.id}`}
               d={polyPath(anchors.slice(k))}
@@ -114,16 +117,17 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
               stroke={it.lv.hex}
               strokeWidth={13 + k * 15}
               strokeLinecap="round" strokeLinejoin="round"
-              strokeOpacity="0.42"
+              strokeOpacity={pending.has(it.lv.id) && !active.has(it.lv.id) ? "0.22" : "0.42"}
               filter="url(#slv5-halo)"
             />
           ))}
         </g>
 
-        {/* 2. Farebné pásy (vonku → dnu) */}
+        {/* 2. Color bands (outer → inner) */}
         <g>
           {outerToInner.map(k => {
-            const it = activeItems[k];
+            const it = litItems[k];
+            const isPend = pending.has(it.lv.id) && !active.has(it.lv.id);
             return (
               <path
                 key={`band-${it.lv.id}`}
@@ -132,14 +136,15 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
                 stroke={it.lv.hex}
                 strokeWidth={13 + k * 15}
                 strokeLinecap="round" strokeLinejoin="round"
-                strokeOpacity="0.88"
+                strokeOpacity={isPend ? "0.45" : "0.88"}
+                strokeDasharray={isPend ? "8 5" : undefined}
                 filter="url(#slv5-band)"
               />
             );
           })}
         </g>
 
-        {/* 3. Biele jadro */}
+        {/* 3. White core */}
         {N >= 2 && (
           <g style={{ mixBlendMode: 'screen' }}>
             <path
@@ -154,19 +159,21 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
           </g>
         )}
 
-        {/* Iskry na kotevných bodoch */}
+        {/* Sparks at anchor points */}
         {anchors.map((a, idx) => (
-          <circle key={`spark-${idx}`} cx={a.x} cy={a.y} r="2.5" fill="#fff" opacity="0.85" />
+          <circle key={`spark-${idx}`} cx={a.x} cy={a.y} r="2.5"
+            fill="#fff" opacity={a.isPending ? "0.45" : "0.85"} />
         ))}
       </svg>
 
       {/* Badges */}
       {items.map(({ lv, cx, cy }) => {
-        const isHover  = hover === lv.id;
-        const isActive = active.has(lv.id);
-        const lit      = isHover || isActive;
-        const src      = icons[lv.id];
-        const badgeTop = cy - ICON_SIZE / 2;
+        const isHover   = hover === lv.id;
+        const isActive  = active.has(lv.id);
+        const isPending = pending.has(lv.id);
+        const isLit     = isHover || isActive || isPending;
+        const src       = icons[lv.id];
+        const badgeTop  = cy - ICON_SIZE / 2;
 
         return (
           <div
@@ -188,13 +195,12 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
               transition: 'transform 0.28s cubic-bezier(.2,.7,.2,1)',
             }}
           >
-            {/* Ikona s glow */}
             <div style={{ position: 'relative', width: ICON_SIZE, height: ICON_SIZE }}>
               <div style={{
                 position: 'absolute',
                 inset: -(ICON_SIZE * 0.18),
                 background: `radial-gradient(circle, ${lv.hex}b0 0%, ${lv.glow} 28%, transparent 62%)`,
-                opacity: lit ? 1 : 0.45,
+                opacity: isLit ? 1 : 0.45,
                 transition: 'opacity 0.25s',
                 pointerEvents: 'none',
                 filter: 'blur(4px)',
@@ -208,12 +214,12 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
                     width: '100%', height: '100%',
                     borderRadius: '50%',
                     objectFit: 'cover',
-                    filter: `drop-shadow(0 0 ${lit ? 13 : 4}px ${lv.glow})`,
+                    filter: `drop-shadow(0 0 ${isLit ? 13 : 4}px ${lv.glow})`,
                     transition: 'filter 0.25s',
                   }}
                 />
               )}
-              {/* Aktívny krúžok */}
+              {/* Active ring */}
               {isActive && (
                 <div style={{
                   position: 'absolute', inset: -3,
@@ -223,15 +229,25 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
                   pointerEvents: 'none',
                 }} />
               )}
+              {/* Pending ring — dashed */}
+              {isPending && !isActive && (
+                <div style={{
+                  position: 'absolute', inset: -3,
+                  borderRadius: '50%',
+                  border: `2px dashed ${lv.hex}`,
+                  opacity: 0.75,
+                  pointerEvents: 'none',
+                }} />
+              )}
             </div>
 
-            {/* Labely */}
+            {/* Labels */}
             <div style={{ marginTop: 7, textAlign: 'center' }}>
               <div style={{
                 fontSize: 9, letterSpacing: '0.2em', fontWeight: 600,
                 textTransform: 'uppercase',
-                color: lit ? lv.hex : 'rgba(200,190,178,0.55)',
-                textShadow: lit ? `0 0 8px ${lv.glow}` : 'none',
+                color: isLit ? lv.hex : 'rgba(200,190,178,0.55)',
+                textShadow: isLit ? `0 0 8px ${lv.glow}` : 'none',
                 transition: 'color 0.25s',
               }}>
                 {lv.name}
@@ -240,7 +256,7 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
                 marginTop: 2, fontSize: 9,
                 fontFamily: "'Playfair Display', Georgia, serif",
                 fontStyle: 'italic',
-                color: lit ? 'rgba(220,210,200,0.88)' : 'rgba(200,190,178,0.3)',
+                color: isLit ? 'rgba(220,210,200,0.88)' : 'rgba(200,190,178,0.3)',
                 transition: 'color 0.25s',
               }}>
                 {lv.motto}
@@ -250,7 +266,7 @@ export default function SpiralLensV5({ icons = {}, activeKeys = [], onLevelClick
         );
       })}
 
-      {/* Spodný hint */}
+      {/* Bottom hint */}
       <div style={{
         position: 'absolute', bottom: 28, left: 0, right: 0,
         textAlign: 'center', pointerEvents: 'none', zIndex: 6,

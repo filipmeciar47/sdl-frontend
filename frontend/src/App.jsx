@@ -530,7 +530,6 @@ export default function App() {
       <div className="wrap">
         <div style={{ textAlign: "center", marginBottom: 0 }}><img src={TITLE_IMG} alt="Spiral Dynamics Lens" style={{ width: "min(380px, 70vw)", height: "auto", display: "block", margin: "0 auto" }} /></div>
         <p className="sub">Viacúrovňový pohľad na realitu</p>
-        <div style={{ textAlign: "center", marginTop: 8 }}><button onClick={() => setTutorialOpen(true)} style={{ background: "none", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 99, padding: "4px 16px", color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans,sans-serif", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer" }}>Tutorial</button></div>
 
         {!topicSet ? (
           <div style={{ maxWidth: 600, margin: "0 auto" }}>
@@ -545,7 +544,8 @@ export default function App() {
             <div className="topic-bar">{"„"}{topicSet}{"”"}</div>
 
             {/* View mode toggle */}
-            <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: 16, position: "relative" }}>
+              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: 0, background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "4px 14px", color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans,sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer" }}>Tutorial</button>
               {["mandala", "icons"].map(mode => (
                 <button key={mode} onClick={() => setViewMode(mode)} style={{
                   padding: "5px 18px", borderRadius: 99,
