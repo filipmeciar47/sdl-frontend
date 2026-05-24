@@ -83,10 +83,10 @@ export default function SpiralLensV5({
     >
       {/* Zone labels flanking the separator line */}
       <div style={{ position: 'absolute', top: MID_Y - 16, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.32em', color: 'rgba(255,180,100,0.28)', pointerEvents: 'none', zIndex: 5 }}>
-        EXPRESS · JA
+        EXPRESS SELF · JA
       </div>
       <div style={{ position: 'absolute', top: MID_Y + 5, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.32em', color: 'rgba(96,165,250,0.28)', pointerEvents: 'none', zIndex: 5 }}>
-        DENY · MY
+        DENY SELF · MY
       </div>
 
       <svg width={width} height={HEIGHT} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3 }}>
