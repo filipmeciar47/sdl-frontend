@@ -12,9 +12,10 @@ const LEVELS = [
   { id: 'turquoise', name: 'TYRKYSOVÁ', motto: 'Celostné vedomie',    polarity: 'deny',    hex: '#2DD4BF', glow: 'rgba(45,212,191,0.6)'   },
 ];
 
-const HEIGHT  = 460;
-const ROW_TOP = 110;
-const ROW_BOT = 310;
+const HEIGHT  = 360;
+const ROW_TOP = 88;
+const ROW_BOT = 238;
+const MID_Y   = (ROW_TOP + ROW_BOT) / 2;  // 163 — separator line
 const ICO_MAIN = 64;
 const ICO_AXIS = 44;
 
@@ -80,11 +81,11 @@ export default function SpiralLensV5({
       ref={containerRef}
       style={{ position: 'relative', width: '100%', height: HEIGHT, overflow: 'hidden', fontFamily: "'DM Sans', Georgia, sans-serif" }}
     >
-      {/* Zone labels */}
-      <div style={{ position: 'absolute', top: 6, left: 0, right: 0, textAlign: 'center', fontSize: 9, letterSpacing: '0.38em', color: 'rgba(255,180,100,0.3)', pointerEvents: 'none', zIndex: 5 }}>
+      {/* Zone labels flanking the separator line */}
+      <div style={{ position: 'absolute', top: MID_Y - 16, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.32em', color: 'rgba(255,180,100,0.28)', pointerEvents: 'none', zIndex: 5 }}>
         EXPRESS · JA
       </div>
-      <div style={{ position: 'absolute', bottom: 6, left: 0, right: 0, textAlign: 'center', fontSize: 9, letterSpacing: '0.38em', color: 'rgba(96,165,250,0.3)', pointerEvents: 'none', zIndex: 5 }}>
+      <div style={{ position: 'absolute', top: MID_Y + 5, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.32em', color: 'rgba(96,165,250,0.28)', pointerEvents: 'none', zIndex: 5 }}>
         DENY · MY
       </div>
 
@@ -99,7 +100,18 @@ export default function SpiralLensV5({
           <filter id="slv5-core" x="-40%" y="-40%" width="180%" height="180%" colorInterpolationFilters="sRGB">
             <feGaussianBlur stdDeviation="1.5" />
           </filter>
+          <linearGradient id="slv5-sep" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stopColor="white" stopOpacity="0" />
+            <stop offset="20%"  stopColor="white" stopOpacity="0.12" />
+            <stop offset="50%"  stopColor="white" stopOpacity="0.18" />
+            <stop offset="80%"  stopColor="white" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </linearGradient>
         </defs>
+
+        {/* Subtle separator line between the two icon rows */}
+        <line x1="0" y1={MID_Y} x2={width} y2={MID_Y}
+          stroke="url(#slv5-sep)" strokeWidth="1" />
 
         {/* Glowing zigzag — connected levels only (solid, no dashes) */}
         {N >= 2 && (
@@ -250,7 +262,7 @@ export default function SpiralLensV5({
       <div style={{
         position: 'absolute', bottom: 22, left: 0, right: 0,
         textAlign: 'center', pointerEvents: 'none', zIndex: 6,
-        fontSize: 10, letterSpacing: '0.28em',
+        fontSize: 9, letterSpacing: '0.28em',
         color: N === 0 ? 'rgba(200,190,178,0.22)' : 'transparent',
         transition: 'color 0.3s',
       }}>
