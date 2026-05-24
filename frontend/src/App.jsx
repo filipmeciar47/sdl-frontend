@@ -507,19 +507,39 @@ export default function App() {
                 </svg>
                 Tutorial
               </button>
-              <div style={{ display: "inline-flex", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden", background: "rgba(255,255,255,0.03)" }}>
-                {["icons", "mandala"].map(m => (
-                  <button key={m} onClick={() => setViewMode(m)} style={{
-                    padding: "3px 11px",
-                    background: viewMode === m ? "rgba(255,255,255,0.09)" : "transparent",
-                    border: "none",
-                    borderRight: m === "icons" ? "1px solid rgba(255,255,255,0.1)" : "none",
-                    color: viewMode === m ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.22)",
-                    fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase",
-                    cursor: "pointer", fontFamily: "DM Sans,sans-serif",
-                    transition: "background 0.18s, color 0.18s",
-                  }}>{m === "icons" ? "Ikony" : "Mandala"}</button>
-                ))}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                  {/* Ikony piktogram — zigzag bodiek */}
+                  <svg width="16" height="10" viewBox="0 0 22 12" fill="none" stroke="currentColor" strokeWidth="1.2"
+                    style={{ color: "#fff", opacity: viewMode === "icons" ? 0.65 : 0.2, transition: "opacity 0.25s" }}>
+                    <circle cx="1.5" cy="2" r="1.5" fill="currentColor" stroke="none"/>
+                    <circle cx="7.5" cy="9" r="1.5" fill="currentColor" stroke="none"/>
+                    <circle cx="13.5" cy="2" r="1.5" fill="currentColor" stroke="none"/>
+                    <circle cx="19.5" cy="9" r="1.5" fill="currentColor" stroke="none"/>
+                    <path d="M1.5 2L7.5 9L13.5 2L19.5 9" strokeWidth="0.9" opacity="0.5"/>
+                  </svg>
+                  {/* Switch */}
+                  <div onClick={() => setViewMode(viewMode === "mandala" ? "icons" : "mandala")}
+                    style={{ position: "relative", width: 30, height: 16, borderRadius: 8, cursor: "pointer",
+                      background: viewMode === "mandala" ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.1)",
+                      border: "1px solid rgba(255,255,255,0.12)", transition: "background 0.28s" }}>
+                    <div style={{ position: "absolute", top: 2, left: viewMode === "mandala" ? 14 : 2,
+                      width: 10, height: 10, borderRadius: "50%",
+                      background: viewMode === "mandala" ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.4)",
+                      transition: "left 0.28s, background 0.28s" }} />
+                  </div>
+                  {/* Mandala piktogram — sústredné kruhy */}
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1"
+                    style={{ color: "#fff", opacity: viewMode === "mandala" ? 0.65 : 0.2, transition: "opacity 0.25s" }}>
+                    <circle cx="8" cy="8" r="7"/>
+                    <circle cx="8" cy="8" r="4.5"/>
+                    <circle cx="8" cy="8" r="2"/>
+                  </svg>
+                </div>
+                <span style={{ fontSize: 7, letterSpacing: "0.22em", textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.2)", fontFamily: "DM Sans,sans-serif", pointerEvents: "none" }}>
+                  {viewMode === "icons" ? "ikony" : "mandala"}
+                </span>
               </div>
             </div>
 
