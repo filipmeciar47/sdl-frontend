@@ -507,11 +507,20 @@ export default function App() {
                 </svg>
                 Tutorial
               </button>
-              <span style={{ opacity: viewMode === "icons" ? 1 : 0.4, fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#fff" }}>Ikony</span>
-              <div className={"toggle" + (viewMode === "mandala" ? " on" : "")} onClick={() => setViewMode(viewMode === "mandala" ? "icons" : "mandala")}>
-                <div className="toggle-dot" />
+              <div style={{ display: "inline-flex", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden", background: "rgba(255,255,255,0.03)" }}>
+                {["icons", "mandala"].map(m => (
+                  <button key={m} onClick={() => setViewMode(m)} style={{
+                    padding: "3px 11px",
+                    background: viewMode === m ? "rgba(255,255,255,0.09)" : "transparent",
+                    border: "none",
+                    borderRight: m === "icons" ? "1px solid rgba(255,255,255,0.1)" : "none",
+                    color: viewMode === m ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.22)",
+                    fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase",
+                    cursor: "pointer", fontFamily: "DM Sans,sans-serif",
+                    transition: "background 0.18s, color 0.18s",
+                  }}>{m === "icons" ? "Ikony" : "Mandala"}</button>
+                ))}
               </div>
-              <span style={{ opacity: viewMode === "mandala" ? 1 : 0.4, fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#fff" }}>Mandala</span>
             </div>
 
             {viewMode === "icons" ? (
