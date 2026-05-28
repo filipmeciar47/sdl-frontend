@@ -520,11 +520,38 @@ export default function App() {
                 </svg>
                 Tutorial
               </button>
-              <span style={{ opacity: viewMode === "icons" ? 1 : 0.4, fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#fff" }}>Ikony</span>
-              <div className={"toggle" + (viewMode === "mandala" ? " on" : "")} onClick={() => setViewMode(viewMode === "mandala" ? "icons" : "mandala")}>
-                <div className="toggle-dot" />
-              </div>
-              <span style={{ opacity: viewMode === "mandala" ? 1 : 0.4, fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#fff" }}>Mandala</span>
+              <button
+                onClick={() => setViewMode("icons")}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  background: viewMode === "icons" ? "rgba(255,255,255,0.1)" : "transparent",
+                  border: viewMode === "icons" ? "1px solid rgba(255,255,255,0.18)" : "1px solid transparent",
+                  borderRadius: 8, padding: "6px 14px", cursor: "pointer",
+                  color: viewMode === "icons" ? "#fff" : "rgba(255,255,255,0.38)",
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.18em",
+                  textTransform: "uppercase", transition: "all 0.22s",
+                }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="9" r="3"/><circle cx="15" cy="15" r="3"/><circle cx="9" cy="15" r="3"/><circle cx="15" cy="9" r="3"/>
+                </svg>
+                Ikony
+              </button>
+              <button
+                onClick={() => setViewMode("mandala")}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  background: viewMode === "mandala" ? "rgba(255,255,255,0.1)" : "transparent",
+                  border: viewMode === "mandala" ? "1px solid rgba(255,255,255,0.18)" : "1px solid transparent",
+                  borderRadius: 8, padding: "6px 14px", cursor: "pointer",
+                  color: viewMode === "mandala" ? "#fff" : "rgba(255,255,255,0.38)",
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.18em",
+                  textTransform: "uppercase", transition: "all 0.22s",
+                }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="7"/>
+                </svg>
+                Mandala
+              </button>
             </div>
 
             {viewMode === "icons" ? (
