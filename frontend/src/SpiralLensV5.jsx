@@ -1,5 +1,5 @@
 // SpiralLensV5.jsx
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 const LEVELS = [
   { id: 'beige',     name: 'BÉŽOVÁ',    motto: 'Prežitie',            polarity: 'express', hex: '#C4A882', glow: 'rgba(196,168,130,0.55)' },
@@ -34,6 +34,9 @@ export default function SpiralLensV5({
   const [hover, setHover] = useState(null);
   const containerRef = useRef(null);
   const [width, setWidth] = useState(860);
+  const [carouselIdx, setCarouselIdx] = useState(0);
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -45,6 +48,26 @@ export default function SpiralLensV5({
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+
+  const isMobile = width < 520;
+
+  const goPrev = useCallback(() => setCarouselIdx(i => (i - 1 + LEVELS.length) % LEVELS.length), []);
+  const goNext = useCallback(() => setCarouselIdx(i => (i + 1) % LEVELS.length), []);
+
+  const handleTouchStart = useCallback((e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 36) {
+      if (dx < 0) goNext(); else goPrev();
+    }
+    touchStartX.current = null;
+  }, [goPrev, goNext]);
 
   const active  = useMemo(() => new Set(activeKeys),  [activeKeys]);
   const pending = useMemo(() => new Set(pendingKeys),  [pendingKeys]);
@@ -59,6 +82,132 @@ export default function SpiralLensV5({
     if (maxIdx === -1) return selected;
     return new Set(LEVELS.slice(0, maxIdx + 1).map(lv => lv.id));
   }, [selected, integrated]);
+
+  // ── MOBILE CAROUSEL ────────────────────────────────────────────────
+  if (isMobile) {
+    const lv      = LEVELS[carouselIdx];
+    const prevLv  = LEVELS[(carouselIdx - 1 + LEVELS.length) % LEVELS.length];
+    const nextLv  = LEVELS[(carouselIdx + 1) % LEVELS.length];
+    const isSel   = selected.has(lv.id);
+    const isAct   = active.has(lv.id);
+    const isPend  = pending.has(lv.id);
+
+    const iconStyle = (lvl, size, opacity) => ({
+      width: size, height: size, borderRadius: '50%', objectFit: 'cover',
+      opacity,
+      filter: selected.has(lvl.id)
+        ? `drop-shadow(0 0 10px ${lvl.glow})`
+        : 'none',
+      transition: 'opacity 0.25s',
+      display: 'block',
+    });
+
+    return (
+      <div
+        ref={containerRef}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        style={{ width: '100%', userSelect: 'none', fontFamily: "'DM Sans', Georgia, sans-serif", paddingBottom: 8 }}
+      >
+        {/* Icons row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 14 }}>
+          {/* Left arrow */}
+          <button onClick={goPrev} style={{
+            background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
+            fontSize: 32, lineHeight: 1, cursor: 'pointer', padding: '0 6px',
+            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>‹</button>
+
+          {/* Prev icon (small) */}
+          <div onClick={() => goPrev()} style={{ width: 52, height: 52, flexShrink: 0, cursor: 'pointer', position: 'relative' }}>
+            {icons[prevLv.id] && <img src={icons[prevLv.id]} alt={prevLv.name} style={iconStyle(prevLv, 52, 0.35)} />}
+          </div>
+
+          {/* Current icon (large) */}
+          <div
+            onClick={() => onLevelClick?.(lv.id)}
+            style={{ width: 96, height: 96, flexShrink: 0, cursor: 'pointer', position: 'relative', margin: '0 10px' }}
+          >
+            {/* glow */}
+            <div style={{
+              position: 'absolute', inset: -16,
+              background: `radial-gradient(circle, ${lv.hex}88 0%, transparent 70%)`,
+              opacity: isSel ? 0.9 : 0.35,
+              filter: 'blur(8px)',
+              transition: 'opacity 0.25s',
+              pointerEvents: 'none',
+              borderRadius: '50%',
+            }} />
+            {icons[lv.id] && <img src={icons[lv.id]} alt={lv.name} style={{
+              ...iconStyle(lv, 96, 1),
+              filter: isSel ? `drop-shadow(0 0 14px ${lv.glow})` : 'drop-shadow(0 0 4px rgba(0,0,0,0.5))',
+            }} />}
+            {/* selection ring */}
+            {isAct && <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `2.5px solid ${lv.hex}`, boxShadow: `0 0 14px ${lv.glow}`, pointerEvents: 'none' }} />}
+            {!isAct && isPend && <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `2px solid ${lv.hex}bb`, pointerEvents: 'none' }} />}
+          </div>
+
+          {/* Next icon (small) */}
+          <div onClick={() => goNext()} style={{ width: 52, height: 52, flexShrink: 0, cursor: 'pointer', position: 'relative' }}>
+            {icons[nextLv.id] && <img src={icons[nextLv.id]} alt={nextLv.name} style={iconStyle(nextLv, 52, 0.35)} />}
+          </div>
+
+          {/* Right arrow */}
+          <button onClick={goNext} style={{
+            background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
+            fontSize: 32, lineHeight: 1, cursor: 'pointer', padding: '0 6px',
+            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>›</button>
+        </div>
+
+        {/* Level info */}
+        <div style={{ textAlign: 'center', marginBottom: 14 }}>
+          <div style={{
+            fontSize: 11, letterSpacing: '0.22em', fontWeight: 600, textTransform: 'uppercase',
+            color: isSel ? lv.hex : 'rgba(200,190,178,0.7)',
+            textShadow: isSel ? `0 0 10px ${lv.glow}` : 'none',
+            transition: 'color 0.22s',
+            marginBottom: 3,
+          }}>{lv.name}</div>
+          <div style={{
+            fontSize: 12, fontFamily: "'Playfair Display', Georgia, serif", fontStyle: 'italic',
+            color: isSel ? 'rgba(220,210,200,0.9)' : 'rgba(200,190,178,0.45)',
+            transition: 'color 0.22s',
+          }}>{lv.motto}</div>
+        </div>
+
+        {/* Dots */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
+          {LEVELS.map((l, i) => {
+            const isSelected = selected.has(l.id);
+            const isCurrent  = i === carouselIdx;
+            return (
+              <div
+                key={l.id}
+                onClick={() => setCarouselIdx(i)}
+                style={{
+                  width: isCurrent ? 18 : 7,
+                  height: 7,
+                  borderRadius: 4,
+                  background: isCurrent
+                    ? lv.hex
+                    : isSelected
+                      ? l.hex
+                      : 'rgba(255,255,255,0.18)',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s cubic-bezier(.2,.7,.2,1)',
+                  flexShrink: 0,
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+  // ── END MOBILE CAROUSEL ─────────────────────────────────────────────
 
   const slot = width / LEVELS.length;
 

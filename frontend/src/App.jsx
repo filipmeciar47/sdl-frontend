@@ -469,6 +469,19 @@ export default function App() {
         .toggle.on .toggle-dot{left:23px;background:#FACC15}
         .topic-bar{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:#ccc;text-align:center;margin-bottom:24px;font-style:italic}
         .hint{font-family:'DM Sans',sans-serif;font-size:11px;color:#777;text-align:center;margin-top:6px}
+        @media(max-width:520px){
+          .wrap{padding:20px 14px 80px}
+          .sub{font-size:10px;letter-spacing:1.8px;margin-bottom:20px}
+          .topic-bar{font-size:15px;margin-bottom:16px}
+          .toggle-wrap{font-size:10px;gap:8px;margin:16px 0 4px}
+          .hint{font-size:10px}
+          .btn{font-size:12px;padding:10px 28px}
+          .tutorial-btn{display:none}
+          .view-toggle-bar{gap:8px}
+          .ms{padding:16px 14px}
+          .cp{border-radius:8px}
+          .cm{max-height:220px}
+        }
       `}</style>
       <div className="bg" />
       <div className="wrap">
@@ -481,7 +494,7 @@ export default function App() {
               <div style={{ width: "100%", paddingBottom: "100%", opacity: 0.85, position: "relative" }}>
                 <img src={MANDALA} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", borderRadius: "50%", display: "block" }} />
               </div>
-              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 0, left: -68, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+              <button className="tutorial-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 0, left: -68, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -498,8 +511,8 @@ export default function App() {
             <div className="topic-bar">{"„"}{topicSet}{"”"}</div>
 
             {/* View mode toggle */}
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 16, position: "relative" }}>
-              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: -100, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+            <div className="view-toggle-bar" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 16, position: "relative" }}>
+              <button className="tutorial-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: -100, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
