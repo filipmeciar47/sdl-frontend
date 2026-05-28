@@ -528,7 +528,6 @@ export default function App() {
               />
             ) : (
             <SpiralMandala
-              mandalaSrc="/assets/mandala.png"
               mode={integrated ? 'integrative' : 'single'}
               onSelectionChange={(levels) => {
                 if (!topicSet) return;
