@@ -93,7 +93,7 @@ export default function App() {
   const [mainInput, setMainInput] = useState("");
   const [mainLoading, setMainLoading] = useState(false);
   const [integratedContext, setIntegratedContext] = useState("");
-  const [viewMode, setViewMode] = useState("icons");
+  const [viewMode, setViewMode] = useState("mandala");
   const [pendingLevels, setPendingLevels] = useState(new Set());
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const mainEndRef = useRef(null);
@@ -528,7 +528,6 @@ export default function App() {
               />
             ) : (
             <SpiralMandala
-              mandalaSrc="/assets/mandala.png"
               mode={integrated ? 'integrative' : 'single'}
               onSelectionChange={(levels) => {
                 if (!topicSet) return;
