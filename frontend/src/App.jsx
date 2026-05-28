@@ -96,6 +96,8 @@ export default function App() {
   const [viewMode, setViewMode] = useState("mandala");
   const [pendingLevels, setPendingLevels] = useState(new Set());
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [mandalaHoverLevel, setMandalaHoverLevel] = useState(null);
+  const [mandalaMousePos, setMandalaMousePos] = useState({ x: 0, y: 0 });
   const mainEndRef = useRef(null);
   const chatInputRefs = useRef({});
 
@@ -510,9 +512,9 @@ export default function App() {
           <>
             <div className="topic-bar">{"„"}{topicSet}{"”"}</div>
 
-            {/* View mode toggle */}
-            <div className="view-toggle-bar" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 16, position: "relative" }}>
-              <button className="tutorial-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: -100, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+            {/* View mode switch */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, marginBottom: 18, position: "relative" }}>
+              <button className="tutorial-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: -108, top: 18, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -520,38 +522,46 @@ export default function App() {
                 </svg>
                 Tutorial
               </button>
-              <button
-                onClick={() => setViewMode("icons")}
-                style={{
-                  display: "flex", alignItems: "center", gap: 6,
-                  background: viewMode === "icons" ? "rgba(255,255,255,0.1)" : "transparent",
-                  border: viewMode === "icons" ? "1px solid rgba(255,255,255,0.18)" : "1px solid transparent",
-                  borderRadius: 8, padding: "6px 14px", cursor: "pointer",
-                  color: viewMode === "icons" ? "#fff" : "rgba(255,255,255,0.38)",
-                  fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.18em",
-                  textTransform: "uppercase", transition: "all 0.22s",
-                }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="9" cy="9" r="3"/><circle cx="15" cy="15" r="3"/><circle cx="9" cy="15" r="3"/><circle cx="15" cy="9" r="3"/>
+
+              {/* Label */}
+              <div style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.28)", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase" }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                 </svg>
-                Ikony
-              </button>
-              <button
-                onClick={() => setViewMode("mandala")}
-                style={{
-                  display: "flex", alignItems: "center", gap: 6,
-                  background: viewMode === "mandala" ? "rgba(255,255,255,0.1)" : "transparent",
-                  border: viewMode === "mandala" ? "1px solid rgba(255,255,255,0.18)" : "1px solid transparent",
-                  borderRadius: 8, padding: "6px 14px", cursor: "pointer",
-                  color: viewMode === "mandala" ? "#fff" : "rgba(255,255,255,0.38)",
-                  fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.18em",
+                Štýl zobrazenia
+              </div>
+
+              {/* Switch pill */}
+              <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 11, padding: 3, gap: 2 }}>
+                <button onClick={() => setViewMode("icons")} style={{
+                  display: "flex", alignItems: "center", gap: 7,
+                  background: viewMode === "icons" ? "rgba(255,255,255,0.13)" : "transparent",
+                  border: "none", borderRadius: 8, padding: "7px 18px", cursor: "pointer",
+                  color: viewMode === "icons" ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.32)",
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.16em",
                   textTransform: "uppercase", transition: "all 0.22s",
+                  boxShadow: viewMode === "icons" ? "0 1px 6px rgba(0,0,0,0.3)" : "none",
                 }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="7"/>
-                </svg>
-                Mandala
-              </button>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                  </svg>
+                  Ikony
+                </button>
+                <button onClick={() => setViewMode("mandala")} style={{
+                  display: "flex", alignItems: "center", gap: 7,
+                  background: viewMode === "mandala" ? "rgba(255,255,255,0.13)" : "transparent",
+                  border: "none", borderRadius: 8, padding: "7px 18px", cursor: "pointer",
+                  color: viewMode === "mandala" ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.32)",
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.16em",
+                  textTransform: "uppercase", transition: "all 0.22s",
+                  boxShadow: viewMode === "mandala" ? "0 1px 6px rgba(0,0,0,0.3)" : "none",
+                }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                  </svg>
+                  Mandala
+                </button>
+              </div>
             </div>
 
             {viewMode === "icons" ? (
@@ -567,14 +577,51 @@ export default function App() {
                 }}
               />
             ) : (
-            <SpiralMandala
-              mode={integrated ? 'integrative' : 'single'}
-              onSelectionChange={(levels) => {
-                if (!topicSet) return;
-                setPendingLevels(new Set(levels.map(l => l.key).filter(k => !colorChats[k])));
-              }}
-              onDeselect={() => setPendingLevels(new Set())}
-            />
+              <div style={{ position: "relative", width: "100%" }}
+                onMouseMove={e => setMandalaMousePos({ x: e.clientX, y: e.clientY })}
+                onMouseLeave={() => setMandalaHoverLevel(null)}
+              >
+                <SpiralMandala
+                  mode={integrated ? 'integrative' : 'single'}
+                  onSelectionChange={(levels) => {
+                    if (!topicSet) return;
+                    setPendingLevels(new Set(levels.map(l => l.key).filter(k => !colorChats[k])));
+                  }}
+                  onDeselect={() => setPendingLevels(new Set())}
+                  onHover={setMandalaHoverLevel}
+                />
+                {/* Hover tooltip */}
+                {mandalaHoverLevel && (() => {
+                  const lv = LEVEL_MAP[mandalaHoverLevel.key];
+                  if (!lv) return null;
+                  const isExpress = lv.axis === "express";
+                  const iconL = isExpress ? AXIS_ICONS[lv.key] : ICONS[lv.key];
+                  const iconR = isExpress ? ICONS[lv.key] : AXIS_ICONS[lv.key];
+                  const tooltipW = 220;
+                  const vp = window.innerWidth;
+                  const left = mandalaMousePos.x + 18 + tooltipW > vp
+                    ? mandalaMousePos.x - tooltipW - 14
+                    : mandalaMousePos.x + 18;
+                  return (
+                    <div style={{
+                      position: "fixed", top: mandalaMousePos.y - 52, left,
+                      width: tooltipW, pointerEvents: "none", zIndex: 999,
+                      background: "rgba(8,8,16,0.82)", backdropFilter: "blur(14px)",
+                      border: `1px solid ${lv.clr}44`, borderRadius: 12,
+                      padding: "10px 14px", boxShadow: `0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px ${lv.clr}22`,
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                        {iconL && <img src={iconL} style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", flexShrink: 0, filter: `drop-shadow(0 0 6px ${lv.clr}88)` }} />}
+                        <div style={{ flex: 1, textAlign: "center", fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: lv.clr }}>{lv.name}</div>
+                        {iconR && <img src={iconR} style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", flexShrink: 0, filter: `drop-shadow(0 0 6px ${lv.clr}88)` }} />}
+                      </div>
+                      <div style={{ textAlign: "center", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.32)" }}>
+                        {isExpress ? "Express Self · JA" : "Deny Self · MY"}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
             )}
 
             <div className="toggle-wrap">

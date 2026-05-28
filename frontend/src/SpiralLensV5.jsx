@@ -227,12 +227,12 @@ export default function SpiralLensV5({
       ref={containerRef}
       style={{ position: 'relative', width: '100%', height: HEIGHT, overflow: 'hidden', fontFamily: "'DM Sans', Georgia, sans-serif" }}
     >
-      {/* Zone labels */}
-      <div style={{ position: 'absolute', top: 6, left: 0, right: 0, textAlign: 'center', fontSize: 9, letterSpacing: '0.38em', color: 'rgba(255,180,100,0.3)', pointerEvents: 'none', zIndex: 5 }}>
-        EXPRESS · JA
+      {/* Zone labels — inside, between the icon rows */}
+      <div style={{ position: 'absolute', top: 76, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.38em', color: 'rgba(255,180,100,0.38)', pointerEvents: 'none', zIndex: 5, fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}>
+        Express Self · JA
       </div>
-      <div style={{ position: 'absolute', bottom: 6, left: 0, right: 0, textAlign: 'center', fontSize: 9, letterSpacing: '0.38em', color: 'rgba(96,165,250,0.3)', pointerEvents: 'none', zIndex: 5 }}>
-        DENY · MY
+      <div style={{ position: 'absolute', top: 350, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.38em', color: 'rgba(96,165,250,0.38)', pointerEvents: 'none', zIndex: 5, fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}>
+        Deny Self · MY
       </div>
 
       <svg width={width} height={HEIGHT} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3 }}>
