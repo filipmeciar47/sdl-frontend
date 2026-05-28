@@ -496,7 +496,7 @@ export default function App() {
               <div style={{ width: "100%", paddingBottom: "100%", opacity: 0.85, position: "relative" }}>
                 <img src={MANDALA} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", borderRadius: "50%", display: "block" }} />
               </div>
-              <button className="tutorial-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 0, left: -68, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+              <button className="tutorial-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 0, left: -32, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s", transform: "translateX(-100%)" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -514,7 +514,7 @@ export default function App() {
 
             {/* View mode switch */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, marginBottom: 18, position: "relative" }}>
-              <button className="tutorial-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: -108, top: 18, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+              <button className="tutorial-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", left: -12, top: 18, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s", transform: "translateX(-100%)" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -522,14 +522,6 @@ export default function App() {
                 </svg>
                 Tutorial
               </button>
-
-              {/* Label */}
-              <div style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.28)", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase" }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                </svg>
-                Štýl zobrazenia
-              </div>
 
               {/* Switch pill */}
               <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 11, padding: 3, gap: 2 }}>
@@ -561,6 +553,14 @@ export default function App() {
                   </svg>
                   Mandala
                 </button>
+              </div>
+
+              {/* Eye label — below the switch */}
+              <div style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.22)", fontFamily: "'DM Sans',sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", marginTop: 1 }}>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                Štýl zobrazenia
               </div>
             </div>
 

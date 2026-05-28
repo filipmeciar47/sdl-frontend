@@ -227,11 +227,11 @@ export default function SpiralLensV5({
       ref={containerRef}
       style={{ position: 'relative', width: '100%', height: HEIGHT, overflow: 'hidden', fontFamily: "'DM Sans', Georgia, sans-serif" }}
     >
-      {/* Zone labels — inside, between the icon rows */}
-      <div style={{ position: 'absolute', top: 76, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.38em', color: 'rgba(255,180,100,0.38)', pointerEvents: 'none', zIndex: 5, fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}>
+      {/* Zone labels — centered in the gap between the two icon rows */}
+      <div style={{ position: 'absolute', top: 168, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.38em', color: 'rgba(255,180,100,0.38)', pointerEvents: 'none', zIndex: 5, fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}>
         Express Self · JA
       </div>
-      <div style={{ position: 'absolute', top: 350, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.38em', color: 'rgba(96,165,250,0.38)', pointerEvents: 'none', zIndex: 5, fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}>
+      <div style={{ position: 'absolute', top: 248, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.38em', color: 'rgba(96,165,250,0.38)', pointerEvents: 'none', zIndex: 5, fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}>
         Deny Self · MY
       </div>
 
