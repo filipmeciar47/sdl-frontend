@@ -83,6 +83,19 @@ export default function SpiralLensV5({
     return new Set(LEVELS.slice(0, maxIdx + 1).map(lv => lv.id));
   }, [selected, integrated]);
 
+  // Desktop geometry — computed regardless of mobile (hooks must run unconditionally)
+  const slot = width / LEVELS.length;
+  const items = useMemo(() => LEVELS.map((lv, i) => {
+    const cx = (i + 0.5) * slot;
+    const iconsY = lv.polarity === 'express' ? ROW_TOP : ROW_BOT;
+    const axisY  = lv.polarity === 'express' ? ROW_BOT : ROW_TOP;
+    return { lv, cx, iconsY, axisY };
+  }), [slot]);
+  const connItems   = items.filter(it => connected.has(it.lv.id));
+  const connAnchors = connItems.map(it => ({ x: it.cx, y: it.iconsY }));
+  const N = connItems.length;
+  const outerToInner = Array.from({ length: N }, (_, i) => N - 1 - i);
+
   // ── MOBILE CAROUSEL ────────────────────────────────────────────────
   if (isMobile) {
     const lv      = LEVELS[carouselIdx];
@@ -209,32 +222,17 @@ export default function SpiralLensV5({
   }
   // ── END MOBILE CAROUSEL ─────────────────────────────────────────────
 
-  const slot = width / LEVELS.length;
-
-  const items = useMemo(() => LEVELS.map((lv, i) => {
-    const cx = (i + 0.5) * slot;
-    const iconsY = lv.polarity === 'express' ? ROW_TOP : ROW_BOT;
-    const axisY  = lv.polarity === 'express' ? ROW_BOT : ROW_TOP;
-    return { lv, cx, iconsY, axisY };
-  }), [slot]);
-
-  // Zigzag uses ICONS anchors for connected levels only
-  const connItems   = items.filter(it => connected.has(it.lv.id));
-  const connAnchors = connItems.map(it => ({ x: it.cx, y: it.iconsY }));
-  const N = connItems.length;
-  const outerToInner = Array.from({ length: N }, (_, i) => N - 1 - i);
-
   return (
     <div
       ref={containerRef}
       style={{ position: 'relative', width: '100%', height: HEIGHT, overflow: 'hidden', fontFamily: "'DM Sans', Georgia, sans-serif" }}
     >
-      {/* Zone labels */}
-      <div style={{ position: 'absolute', top: 6, left: 0, right: 0, textAlign: 'center', fontSize: 9, letterSpacing: '0.38em', color: 'rgba(255,180,100,0.3)', pointerEvents: 'none', zIndex: 5 }}>
-        EXPRESS · JA
+      {/* Zone labels — inside, between the icon rows */}
+      <div style={{ position: 'absolute', top: 76, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.38em', color: 'rgba(255,180,100,0.38)', pointerEvents: 'none', zIndex: 5, fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}>
+        Express Self · JA
       </div>
-      <div style={{ position: 'absolute', bottom: 6, left: 0, right: 0, textAlign: 'center', fontSize: 9, letterSpacing: '0.38em', color: 'rgba(96,165,250,0.3)', pointerEvents: 'none', zIndex: 5 }}>
-        DENY · MY
+      <div style={{ position: 'absolute', top: 350, left: 0, right: 0, textAlign: 'center', fontSize: 8, letterSpacing: '0.38em', color: 'rgba(96,165,250,0.38)', pointerEvents: 'none', zIndex: 5, fontFamily: "'DM Sans', sans-serif", textTransform: 'uppercase' }}>
+        Deny Self · MY
       </div>
 
       <svg width={width} height={HEIGHT} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3 }}>
@@ -352,15 +350,15 @@ export default function SpiralLensV5({
               {/* Label */}
               <div style={{ marginTop: 5, textAlign: 'center' }}>
                 <div style={{
-                  fontSize: 8, letterSpacing: '0.18em', fontWeight: 600, textTransform: 'uppercase',
-                  color: (isHover || isSel) ? lv.hex : 'rgba(200,190,178,0.55)',
+                  fontSize: 9, letterSpacing: '0.16em', fontWeight: 600, textTransform: 'uppercase',
+                  color: (isHover || isSel) ? lv.hex : 'rgba(200,190,178,0.7)',
                   textShadow: (isHover || isSel) ? `0 0 8px ${lv.glow}` : 'none',
                   transition: 'color 0.22s', whiteSpace: 'nowrap',
                 }}>{lv.name}</div>
                 <div style={{
-                  marginTop: 1, fontSize: 7.5,
+                  marginTop: 2, fontSize: 8,
                   fontFamily: "'Playfair Display', Georgia, serif", fontStyle: 'italic',
-                  color: (isHover || isSel) ? 'rgba(220,210,200,0.85)' : 'rgba(200,190,178,0.4)',
+                  color: (isHover || isSel) ? 'rgba(220,210,200,0.9)' : 'rgba(200,190,178,0.5)',
                   transition: 'color 0.22s', whiteSpace: 'nowrap',
                 }}>{lv.motto}</div>
               </div>
