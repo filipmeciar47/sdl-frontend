@@ -34,7 +34,7 @@ export default function SpiralLensV5({
   const [hover, setHover] = useState(null);
   const containerRef = useRef(null);
   const [width, setWidth] = useState(860);
-  const [carouselIdx, setCarouselIdx] = useState(0);
+  const [mobileOffset, setMobileOffset] = useState(0);
   const touchStartX = useRef(null);
   const touchStartY = useRef(null);
 
@@ -51,8 +51,9 @@ export default function SpiralLensV5({
 
   const isMobile = width < 520;
 
-  const goPrev = useCallback(() => setCarouselIdx(i => (i - 1 + LEVELS.length) % LEVELS.length), []);
-  const goNext = useCallback(() => setCarouselIdx(i => (i + 1) % LEVELS.length), []);
+  const MOBILE_VISIBLE = 4;
+  const goPrev = useCallback(() => setMobileOffset(i => Math.max(0, i - 1)), []);
+  const goNext = useCallback(() => setMobileOffset(i => Math.min(LEVELS.length - MOBILE_VISIBLE, i + 1)), []);
 
   const handleTouchStart = useCallback((e) => {
     touchStartX.current = e.touches[0].clientX;
@@ -96,24 +97,31 @@ export default function SpiralLensV5({
   const N = connItems.length;
   const outerToInner = Array.from({ length: N }, (_, i) => N - 1 - i);
 
-  // ── MOBILE CAROUSEL ────────────────────────────────────────────────
+  // ── MOBILE ZIG-ZAG ─────────────────────────────────────────────────
   if (isMobile) {
-    const lv      = LEVELS[carouselIdx];
-    const prevLv  = LEVELS[(carouselIdx - 1 + LEVELS.length) % LEVELS.length];
-    const nextLv  = LEVELS[(carouselIdx + 1) % LEVELS.length];
-    const isSel   = selected.has(lv.id);
-    const isAct   = active.has(lv.id);
-    const isPend  = pending.has(lv.id);
+    const M_HEIGHT   = 320;
+    const M_ROW_TOP  = 78;
+    const M_ROW_BOT  = 208;
+    const M_ICO_MAIN = 46;
+    const M_ICO_AXIS = 28;
+    const mSlot      = width / MOBILE_VISIBLE;
 
-    const iconStyle = (lvl, size, opacity) => ({
-      width: size, height: size, borderRadius: '50%', objectFit: 'cover',
-      opacity,
-      filter: selected.has(lvl.id)
-        ? `drop-shadow(0 0 10px ${lvl.glow})`
-        : 'none',
-      transition: 'opacity 0.25s',
-      display: 'block',
+    const mobileItems = LEVELS.map((lv, i) => {
+      const localIdx = i - mobileOffset;
+      const cx       = (localIdx + 0.5) * mSlot;
+      const iconsY   = lv.polarity === 'express' ? M_ROW_TOP : M_ROW_BOT;
+      const axisY    = lv.polarity === 'express' ? M_ROW_BOT : M_ROW_TOP;
+      return { lv, cx, iconsY, axisY, localIdx };
     });
+    const visibleItems = mobileItems.filter(it => it.localIdx >= 0 && it.localIdx < MOBILE_VISIBLE);
+
+    const connM        = visibleItems.filter(it => connected.has(it.lv.id));
+    const connMAnchors = connM.map(it => ({ x: it.cx, y: it.iconsY }));
+    const NM           = connM.length;
+
+    const canLeft  = mobileOffset > 0;
+    const canRight = mobileOffset + MOBILE_VISIBLE < LEVELS.length;
+    const numDots  = LEVELS.length - MOBILE_VISIBLE + 1;
 
     return (
       <div
@@ -122,105 +130,159 @@ export default function SpiralLensV5({
         onTouchEnd={handleTouchEnd}
         style={{ width: '100%', userSelect: 'none', fontFamily: "'DM Sans', Georgia, sans-serif", paddingBottom: 8 }}
       >
-        {/* Icons row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 14 }}>
+        <div style={{ position: 'relative', width: '100%', height: M_HEIGHT, overflow: 'hidden' }}>
+
+          {/* Zone labels */}
+          <div style={{ position: 'absolute', top: 136, left: 0, right: 0, textAlign: 'center', fontSize: 7, letterSpacing: '0.35em', color: 'rgba(255,180,100,0.3)', pointerEvents: 'none', zIndex: 5, textTransform: 'uppercase' }}>
+            Express Self · JA
+          </div>
+          <div style={{ position: 'absolute', top: 158, left: 0, right: 0, textAlign: 'center', fontSize: 7, letterSpacing: '0.35em', color: 'rgba(96,165,250,0.3)', pointerEvents: 'none', zIndex: 5, textTransform: 'uppercase' }}>
+            Deny Self · MY
+          </div>
+
+          {/* SVG: zig-zag + sparks */}
+          <svg width={width} height={M_HEIGHT} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3 }}>
+            <defs>
+              <filter id="mhalo" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation="14" />
+              </filter>
+            </defs>
+            {NM >= 2 && (
+              <g style={{ mixBlendMode: 'screen' }}>
+                <path d={polyPath(connMAnchors)} fill="none" stroke="rgba(255,255,255,0.12)"
+                  strokeWidth={18} strokeLinecap="round" strokeLinejoin="round"
+                  filter="url(#mhalo)" />
+                <path d={polyPath(connMAnchors)} fill="none" stroke="rgba(255,255,255,0.55)"
+                  strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" />
+              </g>
+            )}
+            {connMAnchors.map((a, i) => (
+              <circle key={i} cx={a.x} cy={a.y} r="2" fill="#fff" opacity="0.8" />
+            ))}
+          </svg>
+
           {/* Left arrow */}
-          <button onClick={goPrev} style={{
-            background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
-            fontSize: 32, lineHeight: 1, cursor: 'pointer', padding: '0 6px',
-            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>‹</button>
-
-          {/* Prev icon (small) */}
-          <div onClick={() => goPrev()} style={{ width: 52, height: 52, flexShrink: 0, cursor: 'pointer', position: 'relative' }}>
-            {icons[prevLv.id] && <img src={icons[prevLv.id]} alt={prevLv.name} style={iconStyle(prevLv, 52, 0.35)} />}
-          </div>
-
-          {/* Current icon (large) */}
-          <div
-            onClick={() => onLevelClick?.(lv.id)}
-            style={{ width: 96, height: 96, flexShrink: 0, cursor: 'pointer', position: 'relative', margin: '0 10px' }}
-          >
-            {/* glow */}
-            <div style={{
-              position: 'absolute', inset: -16,
-              background: `radial-gradient(circle, ${lv.hex}88 0%, transparent 70%)`,
-              opacity: isSel ? 0.9 : 0.35,
-              filter: 'blur(8px)',
-              transition: 'opacity 0.25s',
-              pointerEvents: 'none',
-              borderRadius: '50%',
-            }} />
-            {icons[lv.id] && <img src={icons[lv.id]} alt={lv.name} style={{
-              ...iconStyle(lv, 96, 1),
-              filter: isSel ? `drop-shadow(0 0 14px ${lv.glow})` : 'drop-shadow(0 0 4px rgba(0,0,0,0.5))',
-            }} />}
-            {/* selection ring */}
-            {isAct && <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `2.5px solid ${lv.hex}`, boxShadow: `0 0 14px ${lv.glow}`, pointerEvents: 'none' }} />}
-            {!isAct && isPend && <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `2px solid ${lv.hex}bb`, pointerEvents: 'none' }} />}
-          </div>
-
-          {/* Next icon (small) */}
-          <div onClick={() => goNext()} style={{ width: 52, height: 52, flexShrink: 0, cursor: 'pointer', position: 'relative' }}>
-            {icons[nextLv.id] && <img src={icons[nextLv.id]} alt={nextLv.name} style={iconStyle(nextLv, 52, 0.35)} />}
-          </div>
+          {canLeft && (
+            <button onClick={goPrev} style={{
+              position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
+              background: 'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, transparent 100%)',
+              border: 'none', color: 'rgba(255,255,255,0.65)',
+              fontSize: 26, lineHeight: 1, cursor: 'pointer',
+              width: 36, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 20, borderRadius: '0 6px 6px 0', flexShrink: 0,
+            }}>‹</button>
+          )}
 
           {/* Right arrow */}
-          <button onClick={goNext} style={{
-            background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
-            fontSize: 32, lineHeight: 1, cursor: 'pointer', padding: '0 6px',
-            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>›</button>
-        </div>
+          {canRight && (
+            <button onClick={goNext} style={{
+              position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)',
+              background: 'linear-gradient(270deg, rgba(0,0,0,0.55) 0%, transparent 100%)',
+              border: 'none', color: 'rgba(255,255,255,0.65)',
+              fontSize: 26, lineHeight: 1, cursor: 'pointer',
+              width: 36, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 20, borderRadius: '6px 0 0 6px', flexShrink: 0,
+            }}>›</button>
+          )}
 
-        {/* Level info */}
-        <div style={{ textAlign: 'center', marginBottom: 14 }}>
-          <div style={{
-            fontSize: 11, letterSpacing: '0.22em', fontWeight: 600, textTransform: 'uppercase',
-            color: isSel ? lv.hex : 'rgba(200,190,178,0.7)',
-            textShadow: isSel ? `0 0 10px ${lv.glow}` : 'none',
-            transition: 'color 0.22s',
-            marginBottom: 3,
-          }}>{lv.name}</div>
-          <div style={{
-            fontSize: 12, fontFamily: "'Playfair Display', Georgia, serif", fontStyle: 'italic',
-            color: isSel ? 'rgba(220,210,200,0.9)' : 'rgba(200,190,178,0.45)',
-            transition: 'color 0.22s',
-          }}>{lv.motto}</div>
-        </div>
+          {/* Icons */}
+          {visibleItems.map(({ lv, cx, iconsY, axisY }) => {
+            const isHvr   = hover === lv.id;
+            const isAct   = active.has(lv.id);
+            const isSel   = selected.has(lv.id);
+            const src1    = icons[lv.id];
+            const src2    = axisIcons[lv.id];
+            const glow    = isHvr ? 0.72 : isSel ? 0.88 : 0.28;
+            const imgOp   = isHvr ? 1 : isSel ? 1 : 0.82;
+            const blur    = isHvr ? 8 : isSel ? 10 : 3;
 
-        {/* Dots */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
-          {LEVELS.map((l, i) => {
-            const isSelected = selected.has(l.id);
-            const isCurrent  = i === carouselIdx;
             return (
-              <div
-                key={l.id}
-                onClick={() => setCarouselIdx(i)}
-                style={{
-                  width: isCurrent ? 18 : 7,
-                  height: 7,
-                  borderRadius: 4,
-                  background: isCurrent
-                    ? lv.hex
-                    : isSelected
-                      ? l.hex
-                      : 'rgba(255,255,255,0.18)',
-                  cursor: 'pointer',
-                  transition: 'all 0.25s cubic-bezier(.2,.7,.2,1)',
-                  flexShrink: 0,
-                }}
-              />
+              <React.Fragment key={lv.id}>
+                {/* Main icon */}
+                <div
+                  onMouseEnter={() => setHover(lv.id)}
+                  onMouseLeave={() => setHover(null)}
+                  onClick={() => onLevelClick?.(lv.id)}
+                  style={{
+                    position: 'absolute',
+                    left: cx - M_ICO_MAIN / 2 - 10,
+                    top: iconsY - M_ICO_MAIN / 2 - 2,
+                    width: M_ICO_MAIN + 20,
+                    cursor: 'pointer', zIndex: isHvr ? 50 : 10,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    transform: isHvr ? 'scale(1.1)' : 'scale(1)',
+                    transition: 'transform 0.2s cubic-bezier(.2,.7,.2,1)',
+                  }}
+                >
+                  <div style={{ position: 'relative', width: M_ICO_MAIN, height: M_ICO_MAIN }}>
+                    <div style={{
+                      position: 'absolute', inset: -(M_ICO_MAIN * 0.22),
+                      background: `radial-gradient(circle, ${lv.hex}99 0%, ${lv.glow} 30%, transparent 65%)`,
+                      opacity: glow, transition: 'opacity 0.2s', pointerEvents: 'none', filter: 'blur(4px)',
+                    }} />
+                    {src1 && (
+                      <img src={src1} alt={lv.name} style={{
+                        position: 'relative', width: '100%', height: '100%',
+                        borderRadius: '50%', objectFit: 'cover',
+                        filter: `drop-shadow(0 0 ${blur}px ${lv.glow})`,
+                        opacity: imgOp, transition: 'filter 0.2s, opacity 0.2s',
+                      }} />
+                    )}
+                    {isAct && <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `2px solid ${lv.hex}`, boxShadow: `0 0 10px ${lv.glow}`, pointerEvents: 'none' }} />}
+                    {!isAct && isSel && <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `1.5px solid ${lv.hex}bb`, pointerEvents: 'none' }} />}
+                  </div>
+                  <div style={{ marginTop: 3, fontSize: 7, letterSpacing: '0.13em', fontWeight: 600, textTransform: 'uppercase', textAlign: 'center', color: (isHvr || isSel) ? lv.hex : 'rgba(200,190,178,0.68)', whiteSpace: 'nowrap', transition: 'color 0.2s' }}>{lv.name}</div>
+                </div>
+
+                {/* Axis icon */}
+                {src2 && (
+                  <div
+                    onMouseEnter={() => setHover(lv.id)}
+                    onMouseLeave={() => setHover(null)}
+                    onClick={() => onLevelClick?.(lv.id)}
+                    style={{
+                      position: 'absolute',
+                      left: cx - M_ICO_AXIS / 2,
+                      top: axisY - M_ICO_AXIS / 2,
+                      width: M_ICO_AXIS, height: M_ICO_AXIS,
+                      cursor: 'pointer', zIndex: isHvr ? 50 : 10,
+                    }}
+                  >
+                    <img src={src2} alt={lv.name} style={{
+                      width: '100%', height: '100%',
+                      borderRadius: '50%', objectFit: 'cover',
+                      filter: `drop-shadow(0 0 ${isHvr ? 8 : isSel ? 6 : 2}px ${lv.glow})`,
+                      opacity: isHvr ? 0.95 : isSel ? 0.82 : 0.48,
+                      transition: 'filter 0.2s, opacity 0.2s',
+                    }} />
+                  </div>
+                )}
+              </React.Fragment>
             );
           })}
+        </div>
+
+        {/* Dot pagination */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, marginTop: 10 }}>
+          {Array.from({ length: numDots }, (_, i) => (
+            <div
+              key={i}
+              onClick={() => setMobileOffset(i)}
+              style={{
+                width: i === mobileOffset ? 16 : 6, height: 6, borderRadius: 3,
+                background: i === mobileOffset
+                  ? LEVELS[i + Math.floor(MOBILE_VISIBLE / 2)].hex
+                  : 'rgba(255,255,255,0.18)',
+                cursor: 'pointer',
+                transition: 'all 0.25s cubic-bezier(.2,.7,.2,1)',
+              }}
+            />
+          ))}
         </div>
       </div>
     );
   }
-  // ── END MOBILE CAROUSEL ─────────────────────────────────────────────
+  // ── END MOBILE ZIG-ZAG ──────────────────────────────────────────────
 
   return (
     <div
