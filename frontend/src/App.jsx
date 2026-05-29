@@ -491,20 +491,17 @@ export default function App() {
 
         {!topicSet ? (
           <div style={{ maxWidth: 600, margin: "0 auto" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 22, margin: "0 auto 28px" }}>
-              {/* Tutorial button — left of mandala */}
-              <button onClick={() => setTutorialOpen(true)} style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "10px 10px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {/* Centered mandala with tutorial btn at its top-left corner */}
+            <div style={{ position: "relative", width: "min(240px, 50vw)", margin: "0 auto 28px" }}>
+              <SpiralMandalaCore size="min(240px, 50vw)" mode="single" style={{ opacity: 0.9 }} />
+              <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 8, left: 8, zIndex: 100, display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.color="rgba(255,255,255,0.82)"; e.currentTarget.style.background="rgba(0,0,0,0.65)"; }}
+                onMouseLeave={e => { e.currentTarget.style.color="rgba(255,255,255,0.45)"; e.currentTarget.style.background="rgba(0,0,0,0.45)"; }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                 </svg>
                 Tutorial
               </button>
-              {/* Animated spiral mandala */}
-              <div style={{ flexShrink: 0, opacity: 0.9 }}>
-                <SpiralMandalaCore size="min(220px, 46vw)" mode="single" />
-              </div>
             </div>
             <textarea value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Zadajte tému, problém, otázku alebo situáciu..." />
             <button className="btn" onClick={startAnalysis} disabled={!topic.trim()}>Preskúmať</button>
