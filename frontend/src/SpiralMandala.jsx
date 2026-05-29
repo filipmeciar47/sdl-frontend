@@ -76,8 +76,8 @@ const LAYER_CONFIG = [
   { key: 'blue',      imgSize: 600,  innerSrc: 195, outerSrc: 292 },
   { key: 'orange',    imgSize: 500,  innerSrc: 195, outerSrc: 240 },
   { key: 'green',     imgSize: 600,  innerSrc: 202, outerSrc: 252, offsetY: 6 },
-  { key: 'yellow',    imgSize: 1254, innerSrc: 392, outerSrc: 477, offsetY: 10 },
-  { key: 'turquoise', imgSize: 600,  innerSrc: 196, outerSrc: 237 },
+  { key: 'yellow',    imgSize: 1568, innerSrc: 392, outerSrc: 477, offsetY: 10 },
+  { key: 'turquoise', imgSize: 750,  innerSrc: 196, outerSrc: 237 },
 ];
 
 const VIEW = 800;

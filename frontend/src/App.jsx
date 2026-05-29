@@ -598,6 +598,7 @@ export default function App() {
               >
                 <SpiralMandala
                   key="spiral-mandala-main"
+                  size="min(57.6vw, 448px)"
                   mode={integrated ? 'integrative' : 'single'}
                   onSelectionChange={(levels) => {
                     if (!topicSet) return;
