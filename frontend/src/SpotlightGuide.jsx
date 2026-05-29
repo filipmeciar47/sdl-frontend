@@ -129,6 +129,21 @@ export function useSpotlightGuide(phase) {
     setRect(null);
   }, [step, steps]);
 
+  // keep highlight locked to element while user scrolls
+  useEffect(() => {
+    if (step <= 0 || step > steps.length) return;
+    const id = steps[step - 1].id;
+    const update = () => {
+      const el = document.getElementById(id);
+      if (el) {
+        const r = el.getBoundingClientRect();
+        setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+      }
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, [step, steps]);
+
   const glow = !seen[phase] && step === 0;
   const showIntroTip = glow && phase !== "features";
 
