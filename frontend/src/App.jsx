@@ -583,11 +583,12 @@ export default function App() {
                 }}
               />
             ) : (
-              <div style={{ position: "relative", width: "100%" }}
+              <div key="mandala-view" style={{ position: "relative", width: "100%" }}
                 onMouseMove={e => setMandalaMousePos({ x: e.clientX, y: e.clientY })}
                 onMouseLeave={() => setMandalaHoverLevel(null)}
               >
                 <SpiralMandala
+                  key="spiral-mandala-main"
                   mode={integrated ? 'integrative' : 'single'}
                   onSelectionChange={(levels) => {
                     if (!topicSet) return;
