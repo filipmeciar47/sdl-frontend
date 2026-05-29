@@ -471,6 +471,11 @@ export default function App() {
         .toggle.on .toggle-dot{left:23px;background:#FACC15}
         .topic-bar{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:#ccc;text-align:center;margin-bottom:24px;font-style:italic}
         .hint{font-family:'DM Sans',sans-serif;font-size:11px;color:#777;text-align:center;margin-top:6px}
+        .tutorial-btn-mobile{display:none}
+        @media(max-width:860px){
+          .tutorial-btn{display:none!important}
+          .tutorial-btn-mobile{display:flex}
+        }
         @media(max-width:520px){
           .wrap{padding:20px 14px 80px}
           .sub{font-size:10px;letter-spacing:1.8px;margin-bottom:20px}
@@ -478,7 +483,6 @@ export default function App() {
           .toggle-wrap{font-size:10px;gap:8px;margin:16px 0 4px}
           .hint{font-size:10px}
           .btn{font-size:12px;padding:10px 28px}
-          .tutorial-btn{display:none}
           .view-toggle-bar{gap:8px}
           .ms{padding:16px 14px}
           .cp{border-radius:8px}
@@ -568,6 +572,17 @@ export default function App() {
                 </svg>
                 Štýl zobrazenia
               </div>
+
+              {/* Mobile tutorial button — inline, visible only on smaller screens */}
+              <button className="tutorial-btn-mobile" onClick={() => setTutorialOpen(true)}
+                style={{ alignItems: "center", gap: 5, marginTop: 2, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "5px 10px", color: "rgba(255,255,255,0.38)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.72)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.38)"; }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+                Tutorial
+              </button>
             </div>
 
             {viewMode === "icons" ? (
