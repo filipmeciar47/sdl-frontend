@@ -510,19 +510,9 @@ export default function App() {
           <>
             <div className="topic-bar">{"„"}{topicSet}{"”"}</div>
 
-            {/* View mode switch — flex row: [tutorial] [toggle+label] */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, marginBottom: 18 }}>
-              {/* Tutorial button — always left of toggle, in normal flow */}
-              <button onClick={() => setTutorialOpen(true)} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "5px 10px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                </svg>
-                Tutorial
-              </button>
-
-              {/* Toggle + eye label */}
+            {/* View mode switch — toggle centered, tutorial absolutely right */}
+            <div style={{ position: "relative", marginBottom: 18 }}>
+              {/* Centered toggle + label */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
                 {/* Compact lever toggle */}
                 <div style={{ position: "relative", display: "flex", alignItems: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 22, padding: 3, gap: 2 }}>
@@ -560,7 +550,7 @@ export default function App() {
                     </svg>
                   </button>
                 </div>
-                {/* Eye label */}
+                {/* Eye label — centered */}
                 <div style={{ display: "flex", alignItems: "center", gap: 4, color: "rgba(255,255,255,0.2)", fontFamily: "'DM Sans',sans-serif", fontSize: 8, letterSpacing: "0.25em", textTransform: "uppercase" }}>
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
@@ -568,6 +558,17 @@ export default function App() {
                   Štýl zobrazenia
                 </div>
               </div>
+
+              {/* Tutorial button — right side, approx at mandala edge, above mandala */}
+              <button onClick={() => setTutorialOpen(true)}
+                style={{ position: "absolute", right: "max(0px, calc((100% - min(72vw, 560px)) / 2))", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "5px 10px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}
+                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+                Tutorial
+              </button>
             </div>
 
             {viewMode === "icons" ? (
