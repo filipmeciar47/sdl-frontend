@@ -496,6 +496,7 @@ export default function SpiralMandala({
   onRotate,
   onRotateComplete,
   onDeselect,
+  onHover,
   size = 'min(72vw, 560px)',
   assetBase = '/assets/mandala',
   layers,
@@ -552,7 +553,7 @@ export default function SpiralMandala({
         onRotate={onRotate}
         onRotateComplete={onRotateComplete}
         onDeselect={() => { setActiveLevels([]); onDeselect?.(); }}
-        onHover={setHoveredLevel}
+        onHover={(lvl) => { setHoveredLevel(lvl); onHover?.(lvl); }}
       />
 
       {showInfoBar && (
