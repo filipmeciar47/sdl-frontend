@@ -491,7 +491,7 @@ export default function App() {
 
         {!topicSet ? (
           <div style={{ maxWidth: 600, margin: "0 auto" }}>
-            {/* Centered mandala with tutorial btn at its top-left corner */}
+            {/* Centered mandala with tutorial btn at its top-left corner, sprievodca at top-right */}
             <div style={{ position: "relative", width: "min(240px, 50vw)", margin: "0 auto 28px" }}>
               <SpiralMandalaCore size="min(240px, 50vw)" mode="single" style={{ opacity: 0.9 }} />
               <button onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 8, left: 8, zIndex: 100, display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
@@ -501,6 +501,14 @@ export default function App() {
                   <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                 </svg>
                 Tutorial
+              </button>
+              <button style={{ position: "absolute", top: 8, right: 8, zIndex: 100, display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.color="rgba(255,255,255,0.82)"; e.currentTarget.style.background="rgba(0,0,0,0.65)"; }}
+                onMouseLeave={e => { e.currentTarget.style.color="rgba(255,255,255,0.45)"; e.currentTarget.style.background="rgba(0,0,0,0.45)"; }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                </svg>
+                Sprievodca
               </button>
             </div>
             <textarea value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Zadajte tému, problém, otázku alebo situáciu..." />
@@ -558,6 +566,17 @@ export default function App() {
                   Štýl zobrazenia
                 </div>
               </div>
+
+              {/* Sprievodca button — left side, symmetrical to Tutorial */}
+              <button
+                style={{ position: "absolute", left: "max(0px, calc((100% - min(72vw, 560px)) / 2))", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "5px 10px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}
+                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                </svg>
+                Sprievodca
+              </button>
 
               {/* Tutorial button — right side, approx at mandala edge, above mandala */}
               <button onClick={() => setTutorialOpen(true)}
