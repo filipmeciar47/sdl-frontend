@@ -48,7 +48,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 async function callAPI(params, messages) {
   const body = JSON.stringify({ ...params, messages });
-  const retryDelays = [2000, 4000];
+  const retryDelays = [5000, 10000];
 
   for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
     const response = await fetch(`${BACKEND_URL}/api/chat`, {
@@ -58,10 +58,10 @@ async function callAPI(params, messages) {
     });
 
     if (response.status === 429) {
-      const delay = attempt < retryDelays.length ? retryDelays[attempt] : 8000;
+      const delay = attempt < retryDelays.length ? retryDelays[attempt] : 15000;
       await new Promise(r => setTimeout(r, delay));
       if (attempt === retryDelays.length) {
-        throw new Error("Príliš veľa požiadaviek. Skúste o chvíľu znova.");
+        throw new Error("Niečo sa pokazilo, skúste neskôr. (429)");
       }
       continue;
     }
@@ -535,8 +535,9 @@ export default function App() {
         .btn:disabled{opacity:.35;cursor:not-allowed}
         .sb{padding:8px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;backdrop-filter:blur(6px)}
         .sb:hover:not(:disabled){filter:brightness(1.2)}.sb:disabled{opacity:.35;cursor:not-allowed}
-        .sps{width:18px;height:18px;border:2px solid transparent;border-radius:50%;animation:s .9s linear infinite;flex-shrink:0}
-        @keyframes s{to{transform:rotate(360deg)}}
+        .ldb{position:relative;width:72px;height:2px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;flex-shrink:0}
+        .ldb::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,currentColor,transparent);animation:lb 1.5s ease-in-out infinite;border-radius:99px}
+        @keyframes lb{to{left:160%}}
         .lt{font-family:'DM Sans',sans-serif;font-size:12px;color:#555;letter-spacing:.5px}
         .mg{margin-bottom:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;line-height:1.8}
         .mu{color:rgba(255,255,255,.55);padding-left:12px;border-left:2px solid rgba(255,255,255,.15)}
@@ -840,7 +841,7 @@ export default function App() {
                               <button onClick={() => showGrowthDirection(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: "rgba(250,204,21,.04)", border: "1px solid rgba(250,204,21,.12)", borderRadius: 7, color: "rgba(250,204,21,.6)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Kam táto perspektíva smeruje</button>
                             </div>
                           )}
-                          {isLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="sps" style={{ borderTopColor: l.clr, borderRightColor: l.clr + "60" }} /><span className="lt">Premýšľam...</span></div>}
+                          {isLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: l.clr }} /><span className="lt">Premýšľam...</span></div>}
                         </div>
                         <div className="cr">
                           <input ref={el => { chatInputRefs.current[key] = el; }} className="ci" value={chat.input} onChange={e => setCCInput(key, e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendCC(key); }}} placeholder={"Opýtaj sa z pohľadu " + l.name.toLowerCase() + "..."} disabled={isLoading} style={{ borderColor: l.clr + "20" }} />
@@ -882,7 +883,7 @@ export default function App() {
                       ))}
                     </div>
                     <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 300, lineHeight: 1.8, color: "rgba(221,221,221,.85)", whiteSpace: "pre-line" }}>{conflictResult}</div>
-                    {conflictLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}><div className="sps" style={{ borderTopColor: "#F87171", borderRightColor: "rgba(248,113,113,.3)" }} /><span className="lt">Analyzujem...</span></div>}
+                    {conflictLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}><div className="ldb" style={{ color: "#F87171" }} /><span className="lt">Analyzujem...</span></div>}
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
                       <button onClick={elaborateConflicts} disabled={conflictLoading} style={{ padding: "5px 14px", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 7, color: "#F87171", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Rozvinúť napätia</button>
                       <button onClick={() => setConflictResult("")} style={{ padding: "5px 14px", background: "none", border: "1px solid rgba(255,255,255,.1)", borderRadius: 7, color: "rgba(255,255,255,.4)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer" }}>Zavrieť</button>
@@ -907,7 +908,7 @@ export default function App() {
               )}
               {mainChat.length > 0 && <div style={{ marginBottom: 14 }}>
                 {mainChat.map((m, i) => <div key={i} className={"mg " + (m.role === "user" ? "mu" : "ma")} style={m.role === "user" ? { borderLeftColor: "rgba(250,204,21,.25)" } : {}}>{m.content}</div>)}
-                {mainLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="sps" style={{ borderTopColor: "#FACC15", borderRightColor: "rgba(250,204,21,.3)" }} /><span className="lt">Integrujem perspektívy...</span></div>}
+                {mainLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: "#FACC15" }} /><span className="lt">Integrujem perspektívy...</span></div>}
                 <div ref={mainEndRef} />
               </div>}
               <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
