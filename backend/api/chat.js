@@ -1312,7 +1312,7 @@ module.exports = async function handler(req, res) {
       {
         type: "text",
         text: KNOWLEDGE_BASE,
-        cache_control: { type: "ephemeral" },
+        cache_control: { type: "ephemeral", ttl: 3600 },
       },
       {
         type: "text",
