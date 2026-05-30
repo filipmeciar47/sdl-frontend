@@ -103,6 +103,8 @@ export default function App() {
   const [mandalaMousePos, setMandalaMousePos] = useState({ x: 0, y: 0 });
   const mainEndRef = useRef(null);
   const chatInputRefs = useRef({});
+  const importFileRef = useRef(null);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   function scrollToChat(key) {
     const el = chatInputRefs.current[key];
@@ -392,6 +394,97 @@ export default function App() {
     setTimeout(() => win.print(), 400);
   }
 
+  function exportMarkdown() {
+    const chatKeys = LEVELS.filter(l => colorChats[l.key]).map(l => l.key);
+    let md = `# Spiral Dynamics Lens\n**Téma:** ${topicSet}\n\n`;
+    chatKeys.forEach(key => {
+      const l = LEVEL_MAP[key]; const chat = colorChats[key];
+      const axisLabel = l.axis === "express" ? "Express-self" : "Deny-self";
+      md += `### ${l.name} — ${l.sub}\n*${axisLabel}*\n\n`;
+      chat.messages.forEach(m => {
+        if (m.role === "error") return;
+        if (m.role === "user") md += `**Otázka:** ${m.content}\n\n`;
+        else md += `${m.content}\n\n`;
+      });
+    });
+    if (conflictResult) md += `## Napätia medzi perspektívami\n\n${conflictResult}\n\n`;
+    if (reflection) md += `## Vzorec explorácie\n\n${reflection}\n\n`;
+    if (mainChat.length > 0) {
+      md += `## Integratívny dialóg\n\n`;
+      mainChat.forEach(m => {
+        if (m.role === "user") md += `**Otázka:** ${m.content}\n\n`;
+        else md += `${m.content}\n\n`;
+      });
+    }
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sdl-${topicSet.replace(/[^a-z0-9]/gi, "-").toLowerCase().slice(0, 40)}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importAnalysis(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+
+        // Topic
+        const topicMatch = text.match(/^\*{0,2}Téma:\*{0,2}\s*(.+)$/m);
+        const importedTopic = topicMatch ? topicMatch[1].trim() : "";
+        if (!importedTopic) { alert("Súbor neobsahuje tému — skontroluj formát .md súboru."); return; }
+
+        // Level sections → last assistant message per level
+        const newColorChats = {};
+        const newExplored = {};
+        LEVELS.forEach(l => {
+          // Match "### LEVELNAME — anything" section
+          const sectionRx = new RegExp(
+            `###\\s+${l.name}\\s*[—\\-].*?\\n([\\s\\S]*?)(?=\\n###\\s+|\\n##\\s+|$)`, "i"
+          );
+          const sectionMatch = text.match(sectionRx);
+          if (!sectionMatch) return;
+          const rawSection = sectionMatch[1];
+          // Split on user questions; last chunk = last assistant message
+          const parts = rawSection.split(/\n\*\*Otázka:\*\*[^\n]*\n/);
+          // Strip the axis line (*Express-self* / *Deny-self*) and leading whitespace
+          const lastPart = (parts[parts.length - 1] || "").replace(/^\s*\*[^\n]+\*\s*\n/, "").trim();
+          if (!lastPart) return;
+          const sys = COLOR_PROMPTS[l.key] + "\nOdpovedáš primárne z perspektívy tejto úrovne. Facilitačné prvky zaraď prirodzene. Píš v slovenčine.";
+          newColorChats[l.key] = { messages: [{ role: "assistant", content: lastPart }], input: "", sys, elaborated: false };
+          newExplored[l.key] = true;
+        });
+
+        // Conflict result
+        const conflictRx = /##\s+Napätia medzi perspektívami\s*\n+([\s\S]*?)(?=\n##\s+|$)/;
+        const conflictMatch = text.match(conflictRx);
+        const importedConflict = conflictMatch ? conflictMatch[1].trim() : "";
+
+        // Apply state
+        setTopicSet(importedTopic);
+        setTopic(importedTopic);
+        setColorChats(newColorChats);
+        setExplored(newExplored);
+        setColorLoading({});
+        setSelected({});
+        setConflictResult(importedConflict);
+        setConflictHistory(importedConflict
+          ? [{ role: "user", content: `Téma: "${importedTopic}"\n\nAnalýza napätí:` }, { role: "assistant", content: importedConflict }]
+          : []);
+        setConflictInput("");
+        setMainChat([]);
+        setMainInput("");
+        setIntegratedContext("");
+      } catch (err) {
+        alert("Chyba pri načítaní súboru. Skontroluj, či ide o .md exportovaný z tejto aplikácie.");
+      }
+    };
+    reader.readAsText(file, "utf-8");
+  }
+
   async function sendMain() {
     if (!mainInput.trim() || mainLoading) return;
     const msg = mainInput.trim();
@@ -420,6 +513,13 @@ export default function App() {
     window.addEventListener('message', handleMsg);
     return () => window.removeEventListener('message', handleMsg);
   }, []);
+
+  useEffect(() => {
+    if (!exportMenuOpen) return;
+    const close = (e) => { if (!e.target.closest("[data-export-menu]")) setExportMenuOpen(false); };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [exportMenuOpen]);
 
   return (
     <div style={{ minHeight: "100vh", color: "#ddd", fontFamily: "Georgia, serif" }}>
@@ -507,7 +607,13 @@ export default function App() {
               </button>
               <GuideButton guide={guide} style={{ top: 8, right: 0, zIndex: 100 }} tipSide="right" />
             </div>
-            <textarea id="tut-textarea" value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Zadajte tému, problém, otázku alebo situáciu..." />
+            <div style={{ position: "relative" }}>
+              <textarea id="tut-textarea" value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Zadajte tému, problém, otázku alebo situáciu..." />
+              <button type="button" title="Pokračovať v uloženej analýze" onClick={() => importFileRef.current?.click()} style={{ position: "absolute", bottom: 10, right: 10, background: "none", border: "none", cursor: "pointer", opacity: 0.35, color: "rgba(255,255,255,0.8)", padding: 4, transition: "opacity 0.2s", lineHeight: 0 }} onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </button>
+              <input ref={importFileRef} type="file" accept=".md" style={{ display: "none" }} onChange={e => { importAnalysis(e.target.files?.[0]); e.target.value = ""; }} />
+            </div>
             <button id="tut-explore-btn" className="btn" onClick={startAnalysis} disabled={!topic.trim()}>Preskúmať</button>
           </div>
         ) : (
@@ -819,7 +925,15 @@ export default function App() {
             <div style={{ textAlign: "center", marginTop: 20, display: "flex", justifyContent: "center", gap: 12 }}>
               <button id="tut-feat-newtopic" className="btn" onClick={() => { setTopicSet(""); setTopic(""); }} style={{ fontSize: 11, padding: "8px 24px", margin: 0 }}>Nová téma</button>
               {openChatKeys.length > 0 && (
-                <button id="tut-feat-export" className="btn" onClick={exportConversation} style={{ fontSize: 11, padding: "8px 24px", margin: 0, background: "rgba(255,255,255,.06)", borderColor: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.6)" }}>Exportovať konverzáciu</button>
+                <div data-export-menu style={{ position: "relative" }}>
+                  <button id="tut-feat-export" className="btn" onClick={() => setExportMenuOpen(p => !p)} style={{ fontSize: 11, padding: "8px 24px", margin: 0, background: "rgba(255,255,255,.06)", borderColor: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.6)" }}>Exportovať ▾</button>
+                  {exportMenuOpen && (
+                    <div style={{ position: "absolute", bottom: "calc(100% + 4px)", left: 0, background: "rgba(10,10,18,.97)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 8, overflow: "hidden", zIndex: 200, minWidth: "100%", boxShadow: "0 4px 24px rgba(0,0,0,.5)" }}>
+                      <button onClick={() => { exportConversation(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", borderBottom: "1px solid rgba(255,255,255,.07)", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť PDF</button>
+                      <button onClick={() => { exportMarkdown(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť pre pokračovanie</button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </>
