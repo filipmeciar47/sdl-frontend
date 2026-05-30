@@ -47,18 +47,33 @@ const LEVEL_MAP = {}; LEVELS.forEach(l => { LEVEL_MAP[l.key] = l; });
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 async function callAPI(params, messages) {
-  const response = await fetch(`${BACKEND_URL}/api/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...params, messages }),
-  });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
-    throw new Error(err.error || "API chyba. Skúste znova.");
+  const body = JSON.stringify({ ...params, messages });
+  const retryDelays = [2000, 4000];
+
+  for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+    const response = await fetch(`${BACKEND_URL}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+    });
+
+    if (response.status === 429) {
+      const delay = attempt < retryDelays.length ? retryDelays[attempt] : 8000;
+      await new Promise(r => setTimeout(r, delay));
+      if (attempt === retryDelays.length) {
+        throw new Error("Príliš veľa požiadaviek. Skúste o chvíľu znova.");
+      }
+      continue;
+    }
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+      throw new Error(err.error || "API chyba. Skúste znova.");
+    }
+    const data = await response.json();
+    if (!data.content) throw new Error("Prázdna odpoveď. Skúste znova.");
+    return data.content;
   }
-  const data = await response.json();
-  if (!data.content) throw new Error("Prázdna odpoveď. Skúste znova.");
-  return data.content;
 }
 
 function Ico({ k, size = 28 }) {
