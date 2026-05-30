@@ -44,26 +44,13 @@ const LEVELS = [
 ];
 const LEVEL_MAP = {}; LEVELS.forEach(l => { LEVEL_MAP[l.key] = l; });
 
-const COLOR_PROMPTS = {
-  beige: "Si hlas BÉŽOVEJ úrovne Špirálovej dynamiky. Paradigma \"Prežijem.\" Vnímáš svet cez telo, zmysly, fyzické potreby. Hovor jednoducho, telesne, priamo.\nTICHÁ FACILITÁCIA: Jemne ukáž, kde logika prežitia volá po niečom inom.\nPRIESTOR PRE RAST: Béžová rastie k purpurovej — od osamotenia k bezpečiu v skupine.\nROZPOZNANIE HRANÍC: Ak užívateľ povie \"neviem\", \"niečo chýba\" — až vtedy jemne ukáž, čo je za hranicou.",
-  purple: "Si hlas PURPUROVEJ úrovne. Paradigma \"Sme v bezpečí.\" Rodina, kmeň, predkovia, tradície sú sväté. Lojalita ku skupine je najvyššia.\nTICHÁ FACILITÁCIA: Jemne ukáž, kde bezpečie skupiny brzdí osobnú silu, kde tradícia chráni ale zväzuje.\nPRIESTOR PRE RAST: Purpurová rastie k červenej — od kolektívu k vlastnému JA.\nROZPOZNANIE HRANÍC: Ak užívateľ naznačí frustráciu z obmedzení skupiny — vtedy ukáž, čo volá spoza hranice.",
-  red: "Si hlas ČERVENEJ úrovne. Paradigma \"Ja rozhodujem.\" Svet je džungľa, prežije silnejší. Hovoríš priamo, odvážne. Rešpekt sa získava činmi.\nTICHÁ FACILITÁCIA: Jemne ukáž, kde víťazstvo bez pravidiel vedie k chaosu.\nPRIESTOR PRE RAST: Červená rastie k modrej — od impulzívnej slobody k poriadku a zmyslu.\nROZPOZNANIE HRANÍC: Ak užívateľ naznačí únavu z boja, \"a čo potom?\" — vtedy ukáž, čo leží za čistou silou.",
-  blue: "Si hlas MODREJ úrovne. Paradigma \"Sme spasení.\" Svet je usporiadaný vyšším princípom. Disciplína, obeta a vernosť sú cnosti.\nTICHÁ FACILITÁCIA: Jemne ukáž, kde pravidlá, ktoré mali chrániť, začínajú brániť.\nPRIESTOR PRE RAST: Modrá rastie k oranžovej — od slepej poslušnosti ku kritickému mysleniu.\nROZPOZNANIE HRANÍC: Ak užívateľ spochybní pravidlo alebo vyjadrí frustráciu z rigidity — vtedy ukáž, čo poriadok nevie poskytnúť.",
-  orange: "Si hlas ORANŽOVEJ úrovne. Paradigma \"Ja sa zdokonaľujem.\" Svet je plný príležitostí. Myslíš strategicky, analyticky.\nTICHÁ FACILITÁCIA: Jemne ukáž, kde optimalizácia prináša prázdnotu, kde racionalita nevie uchopiť to najdôležitejšie.\nPRIESTOR PRE RAST: Oranžová rastie k zelenej — od individuálneho úspechu k hodnote vzťahov.\nROZPOZNANIE HRANÍC: Ak užívateľ naznačí vyhorenie, \"je toto naozaj všetko?\" — vtedy ukáž, čo výkon nedokáže poskytnúť.",
-  green: "Si hlas ZELENEJ úrovne. Paradigma \"My sa stávame.\" Svet je komunita s rovnakou hodnotou. Emócie, vzťahy, inklúzia, konsenzus.\nTICHÁ FACILITÁCIA: Jemne ukáž, kde nekonečný konsenzus paralyzuje konanie, kde rovnosť všetkých pohľadov bráni rozhodnutiu.\nPRIESTOR PRE RAST: Zelená rastie k žltej — od skupinového konsenzu k osobnej zodpovednosti.\nROZPOZNANIE HRANÍC: Ak užívateľ naznačí \"všetci majú pravdu ale nič sa nehýbe\" — vtedy ukáž, čo leží za čistou empatiou.",
-  yellow: "Si hlas ŽLTEJ úrovne. Paradigma \"Učím sa.\" Vidíš všetky úrovne ako funkčné a prepojené. Myslíš systémovo, flexibilne, integratívne.\nTICHÁ FACILITÁCIA: Jemne ukáž, kde systémové chápanie bez prežívanej jednoty ostáva intelektuálnym cvičením.\nPRIESTOR PRE RAST: Žltá rastie k tyrkysovej — od chápania systémov k prežívanej jednote s celkom.\nROZPOZNANIE HRANÍC: Ak užívateľ naznačí \"vidím všetko ale necítim nič\" — vtedy ukáž, čo je za hranicou.",
-  turquoise: "Si hlas TYRKYSOVEJ úrovne. Paradigma \"Sme jedno.\" Vnímáš svet ako živý prepojený organizmus. Planetárne vedomie, spirituálna integrácia.\nTICHÁ FACILITÁCIA: Jemne ukáž, kde vízia jednoty môže prehliadnuť konkrétne utrpenie jednotlivca.\nPRIESTOR PRE RAST: Aj najširšia perspektíva musí byť ukotvená v praxi, v tele, v konaní.\nROZPOZNANIE HRANÍC: Ak užívateľ naznačí \"ako toto žiť každý deň?\" — vtedy ukáž cestu k jednoduchosti.",
-};
-
-const SYS_MAIN = "Si integratívny facilitátor na úrovni ŽLTEJ Špirálovej dynamiky. Prepájaš perspektívy do funkčného celku. Identifikuješ napätia medzi úrovňami a navrhuješ mosty. Ponúkaš praktické odporúčania. Rešpektuješ každú úroveň. Píš v slovenčine. 4-8 viet.";
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
-async function callAPI(system, messages) {
+async function callAPI(params, messages) {
   const response = await fetch(`${BACKEND_URL}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ system, messages }),
+    body: JSON.stringify({ ...params, messages }),
   });
   if (!response.ok) {
     const err = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
@@ -139,8 +126,7 @@ export default function App() {
       const levelsToProcess = LEVELS.filter(l => pendingKeys.includes(l.key));
       levelsToProcess.forEach(l => {
         setExplored(prev => ({ ...prev, [l.key]: true }));
-        const sys = COLOR_PROMPTS[l.key] + "\nOdpovedáš primárne z perspektívy tejto úrovne. Facilitačné prvky zaraď prirodzene. Píš v slovenčine.";
-        setColorChats(prev => ({ ...prev, [l.key]: { messages: [], input: "", sys, elaborated: false } }));
+        setColorChats(prev => ({ ...prev, [l.key]: { messages: [], input: "", elaborated: false } }));
         setColorLoading(prev => ({ ...prev, [l.key]: true }));
       });
       fetchIntegrated(levelsToProcess);
@@ -153,9 +139,7 @@ export default function App() {
   function fetchIntegrated(levels) {
     const levelNames = levels.map(l => l.name).join(", ");
     const levelKeys = levels.map(l => l.key);
-    const markers = levels.map(l => "[" + l.key.toUpperCase() + "]").join(", ");
-    const sys = "Si expert na Špirálovú dynamiku. Pre každú požadovanú úroveň poskyni stručnú perspektívu (1-2 vety). Každú úroveň označ presne takto: [KEY] text. Kde KEY je: " + markers + ". Píš v slovenčine. Buď konkrétny voči téme.\n\n" + levels.map(l => "[" + l.key.toUpperCase() + "] = " + l.name + " (" + l.sub + "): " + COLOR_PROMPTS[l.key].split("\\n")[0]).join("\n");
-    callAPI(sys, [{ role: "user", content: "Téma: \"" + topicSet + "\"\n\nAnalyzuj túto tému z pohľadu úrovní: " + levelNames }])
+    callAPI({ task: "integrated", levels: levelKeys }, [{ role: "user", content: "Téma: \"" + topicSet + "\"\n\nAnalyzuj túto tému z pohľadu úrovní: " + levelNames }])
       .then(reply => {
         levelKeys.forEach(key => {
           const marker = "[" + key.toUpperCase() + "]";
@@ -190,14 +174,13 @@ export default function App() {
   function openOrFocusChat(key) {
     setExplored(prev => ({ ...prev, [key]: true }));
     if (colorChats[key]) return;
-    const sys = COLOR_PROMPTS[key] + "\nOdpovedáš primárne z perspektívy tejto úrovne. Facilitačné prvky zaraď prirodzene. Píš v slovenčine.";
-    setColorChats(prev => ({ ...prev, [key]: { messages: [], input: "", sys, elaborated: false } }));
-    fetchInitial(key, sys);
+    setColorChats(prev => ({ ...prev, [key]: { messages: [], input: "", elaborated: false } }));
+    fetchInitial(key);
   }
 
-  function fetchInitial(key, sys) {
+  function fetchInitial(key) {
     setColorLoading(prev => ({ ...prev, [key]: true }));
-    callAPI(sys, [{ role: "user", content: "Téma: \"" + topicSet + "\"\n\nPoskyni stručnú úvodnú perspektívu na túto tému z pohľadu tejto úrovne. MAX 2-3 vety. Buď konkrétny a výstižný." }])
+    callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"\n\nPoskyni stručnú úvodnú perspektívu na túto tému z pohľadu tejto úrovne. MAX 2-3 vety. Buď konkrétny a výstižný." }])
       .then(reply => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "assistant", content: reply }] } } : prev))
       .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || "Nepodarilo sa načítať perspektívu." }] } } : prev))
       .finally(() => setColorLoading(prev => ({ ...prev, [key]: false })));
@@ -210,7 +193,7 @@ export default function App() {
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], elaborated: true } }));
     const msgs = [...chat.messages, { role: "user", content: "Rozviň túto perspektívu podrobnejšie. Vysvetli hlbšie, prečo táto úroveň vidí tému práve takto, aké sú jej silné stránky a kde naráža na svoje hranice. 6-10 viet." }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
-    callAPI(chat.sys, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs])
+    callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs])
       .then(reply => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } } : prev))
       .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Chyba: " + err.message }] } } : prev))
       .finally(() => setColorLoading(prev => ({ ...prev, [key]: false })));
@@ -220,7 +203,7 @@ export default function App() {
     const chat = colorChats[key];
     if (!chat) return;
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [] } }));
-    fetchInitial(key, chat.sys);
+    fetchInitial(key);
   }
 
   function closeCC(key) {
@@ -237,7 +220,7 @@ export default function App() {
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs, input: "" } }));
     setColorLoading(prev => ({ ...prev, [key]: true }));
     try {
-      const reply = await callAPI(chat.sys, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs]);
+      const reply = await callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs]);
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } }));
     } catch (err) {
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Chyba: " + err.message }] } }));
@@ -275,10 +258,9 @@ export default function App() {
       const lastMsg = chat.messages.filter(m => m.role === "assistant").pop();
       return l.name + " (" + l.sub + "): " + (lastMsg ? lastMsg.content : "");
     }).join("\n\n");
-    const sys = "Si expert na Špirálovú dynamiku. Užívateľ skúma tému z viacerých úrovní a chce pochopiť, kde medzi nimi vznikajú napätia a konflikty. Nehodnoť úrovne — ukáž, kde sa ich logiky stretávajú a kde si odporujú. Buď konkrétny voči téme. Píš v slovenčine. 5-8 viet.";
     try {
       const prompt = "Téma: \"" + topicSet + "\"\n\nPerspektívy na porovnanie:\n" + levelDescs + "\n\nKde vznikajú napätia a konflikty medzi týmito perspektívami pri tejto konkrétnej téme? Čo jedna vidí ako riešenie, druhá môže vnímať ako problém?";
-      const reply = await callAPI(sys, [{ role: "user", content: prompt }]);
+      const reply = await callAPI({ task: "conflicts" }, [{ role: "user", content: prompt }]);
       setConflictResult(reply);
       setConflictHistory([{ role: "user", content: prompt }, { role: "assistant", content: reply }]);
     } catch (err) { setConflictResult("Chyba: " + err.message); }
@@ -288,10 +270,9 @@ export default function App() {
   async function elaborateConflicts() {
     if (conflictLoading || !conflictResult) return;
     setConflictLoading(true);
-    const sys = "Si expert na Špirálovú dynamiku. Pokračuješ v analýze napätí medzi úrovňami. Píš v slovenčine. 6-10 viet.";
     const msgs = [...conflictHistory, { role: "user", content: "Rozviň tieto napätia hlbšie. Kde presne nastáva stret hodnôt? Aké praktické dôsledky má toto napätie v každodennom živote? Existuje spôsob, ako tieto perspektívy prepojiť bez toho, aby niektorá stratila svoju podstatu?" }];
     try {
-      const reply = await callAPI(sys, msgs);
+      const reply = await callAPI({ task: "conflictsElaborate" }, msgs);
       setConflictResult(prev => prev + "\n\n" + reply);
       setConflictHistory(msgs.concat([{ role: "assistant", content: reply }]));
     } catch (err) { setConflictResult(prev => prev + "\n\nChyba: " + err.message); }
@@ -302,10 +283,9 @@ export default function App() {
     if (conflictLoading || !conflictInput.trim() || !conflictResult) return;
     const q = conflictInput.trim();
     setConflictInput(""); setConflictLoading(true);
-    const sys = "Si expert na Špirálovú dynamiku. Pokračuješ v analýze napätí medzi úrovňami. Píš v slovenčine. 4-8 viet.";
     const msgs = [...conflictHistory, { role: "user", content: q }];
     try {
-      const reply = await callAPI(sys, msgs);
+      const reply = await callAPI({ task: "conflictsQuestion" }, msgs);
       setConflictResult(prev => prev + "\n\n" + q + "\n\n" + reply);
       setConflictHistory(msgs.concat([{ role: "assistant", content: reply }]));
     } catch (err) { setConflictResult(prev => prev + "\n\nChyba: " + err.message); }
@@ -326,7 +306,7 @@ export default function App() {
     const msgs = [...chat.messages, { role: "user", content: emergePrompt }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
     try {
-      const reply = await callAPI(chat.sys, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs]);
+      const reply = await callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs]);
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } }));
     } catch (err) {
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Chyba: " + err.message }] } }));
@@ -347,7 +327,7 @@ export default function App() {
     const msgs = [...chat.messages, { role: "user", content: growthPrompt }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
     try {
-      const reply = await callAPI(chat.sys, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs]);
+      const reply = await callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs]);
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } }));
     } catch (err) {
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Chyba: " + err.message }] } }));
@@ -453,8 +433,7 @@ export default function App() {
           // Strip the axis line (*Express-self* / *Deny-self*) and leading whitespace
           const lastPart = (parts[parts.length - 1] || "").replace(/^\s*\*[^\n]+\*\s*\n/, "").trim();
           if (!lastPart) return;
-          const sys = COLOR_PROMPTS[l.key] + "\nOdpovedáš primárne z perspektívy tejto úrovne. Facilitačné prvky zaraď prirodzene. Píš v slovenčine.";
-          newColorChats[l.key] = { messages: [{ role: "assistant", content: lastPart }], input: "", sys, elaborated: false };
+          newColorChats[l.key] = { messages: [{ role: "assistant", content: lastPart }], input: "", elaborated: false };
           newExplored[l.key] = true;
         });
 
@@ -494,7 +473,7 @@ export default function App() {
       let ctx = "Téma: \"" + topicSet + "\"";
       if (integratedContext) ctx += "\n\nIntegrované perspektívy:" + integratedContext;
       if (reflection) ctx += "\n\nVzorec explorácie: " + reflection;
-      const reply = await callAPI(SYS_MAIN, [{ role: "user", content: ctx }, { role: "assistant", content: "Rozumiem. Pokračujeme." }, ...msgs]);
+      const reply = await callAPI({ task: "main" }, [{ role: "user", content: ctx }, { role: "assistant", content: "Rozumiem. Pokračujeme." }, ...msgs]);
       setMainChat(m => [...m, { role: "assistant", content: reply }]);
     } catch (err) { setMainChat(m => [...m, { role: "assistant", content: "Chyba: " + err.message }]); }
     finally { setMainLoading(false); }
