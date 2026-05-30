@@ -797,6 +797,9 @@ export default function App() {
                 {openChatKeys.map(key => {
                   const l = LEVEL_MAP[key]; const chat = colorChats[key];
                   const isLoading = colorLoading[key]; const isSel = !!selected[key];
+                  const levelIdx = LEVELS.findIndex(lv => lv.key === key);
+                  const prevClr = levelIdx > 0 ? LEVELS[levelIdx - 1].clr : null;
+                  const nextClr = levelIdx < LEVELS.length - 1 ? LEVELS[levelIdx + 1].clr : null;
                   return (
                     <div key={key} style={{ display: "flex", marginBottom: 12 }}>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 24, flexShrink: 0, paddingLeft: 6 }}>
@@ -837,8 +840,8 @@ export default function App() {
                           {!chat.elaborated && !isLoading && chat.messages.length > 0 && chat.messages[0].role === "assistant" && (
                             <div id={key === openChatKeys[0] ? "tut-feat-actions" : undefined} style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
                               <button onClick={() => elaborateChat(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: l.clr + "0a", border: "1px solid " + l.clr + "25", borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Rozvinúť perspektívu</button>
-                              <button onClick={() => showEmergence(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 7, color: "rgba(255,255,255,.5)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Ako vznikla táto perspektíva</button>
-                              <button onClick={() => showGrowthDirection(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: "rgba(250,204,21,.04)", border: "1px solid rgba(250,204,21,.12)", borderRadius: 7, color: "rgba(250,204,21,.6)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Kam táto perspektíva smeruje</button>
+                              <button onClick={() => showEmergence(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: prevClr ? prevClr + "0a" : "rgba(255,255,255,.03)", border: "1px solid " + (prevClr ? prevClr + "35" : "rgba(255,255,255,.1)"), borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Ako vznikla táto perspektíva</button>
+                              <button onClick={() => showGrowthDirection(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: nextClr ? nextClr + "0a" : "rgba(255,255,255,.03)", border: "1px solid " + (nextClr ? nextClr + "35" : "rgba(255,255,255,.1)"), borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Kam táto perspektíva smeruje</button>
                             </div>
                           )}
                           {isLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: l.clr }} /><span className="lt">Premýšľam...</span></div>}
