@@ -939,8 +939,10 @@ export default function App() {
       </div>
       <GuideOverlay guide={guide} />
       {tutorialOpen && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setTutorialOpen(false)}>
-          <iframe src="https://sdl-tutorial.vercel.app" allowTransparency={true} onClick={e => e.stopPropagation()} style={{ width: "700px", height: "clamp(400px, 78vh, 560px)", border: "none", background: "transparent", borderRadius: 16, display: "block" }} />
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.15)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(12px, 4vw, 32px)" }} onClick={() => setTutorialOpen(false)}>
+          <div style={{ width: "min(820px, 100%)", height: "min(600px, 100%)", borderRadius: 16, overflow: "hidden", flexShrink: 0, boxShadow: "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)" }}>
+            <iframe src="https://sdl-tutorial.vercel.app" allowTransparency={true} style={{ width: "100%", height: "100%", border: "none", display: "block", background: "transparent" }} />
+          </div>
         </div>
       )}
     </div>
