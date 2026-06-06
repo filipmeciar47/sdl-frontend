@@ -2,14 +2,14 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 const LEVELS = [
-  { id: 'beige',     name: 'BÉŽOVÁ',    motto: 'Prežitie',            polarity: 'express', hex: '#C4A882', glow: 'rgba(196,168,130,0.55)' },
-  { id: 'purple',    name: 'PURPUROVÁ', motto: 'Bezpečie klanu',      polarity: 'deny',    hex: '#A78BFA', glow: 'rgba(167,139,250,0.55)' },
-  { id: 'red',       name: 'ČERVENÁ',   motto: 'Moc a vôľa',          polarity: 'express', hex: '#F87171', glow: 'rgba(248,113,113,0.55)' },
-  { id: 'blue',      name: 'MODRÁ',     motto: 'Poriadok a zmysel',   polarity: 'deny',    hex: '#60A5FA', glow: 'rgba(96,165,250,0.55)'  },
-  { id: 'orange',    name: 'ORANŽOVÁ',  motto: 'Úspech a výkon',      polarity: 'express', hex: '#FB923C', glow: 'rgba(251,146,60,0.55)'  },
-  { id: 'green',     name: 'ZELENÁ',    motto: 'Harmónia a rovnosť',  polarity: 'deny',    hex: '#4ADE80', glow: 'rgba(74,222,128,0.55)'  },
-  { id: 'yellow',    name: 'ŽLTÁ',      motto: 'Syst. integrácia',    polarity: 'express', hex: '#FACC15', glow: 'rgba(250,204,21,0.6)'   },
-  { id: 'turquoise', name: 'TYRKYSOVÁ', motto: 'Celostné vedomie',    polarity: 'deny',    hex: '#2DD4BF', glow: 'rgba(45,212,191,0.6)'   },
+  { id: 'beige',     name: 'BEIGE',     motto: 'Survival',            polarity: 'express', hex: '#C4A882', glow: 'rgba(196,168,130,0.55)' },
+  { id: 'purple',    name: 'PURPLE',    motto: 'Clan Safety',         polarity: 'deny',    hex: '#A78BFA', glow: 'rgba(167,139,250,0.55)' },
+  { id: 'red',       name: 'RED',       motto: 'Power & Will',        polarity: 'express', hex: '#F87171', glow: 'rgba(248,113,113,0.55)' },
+  { id: 'blue',      name: 'BLUE',      motto: 'Order & Meaning',     polarity: 'deny',    hex: '#60A5FA', glow: 'rgba(96,165,250,0.55)'  },
+  { id: 'orange',    name: 'ORANGE',    motto: 'Achievement & Success', polarity: 'express', hex: '#FB923C', glow: 'rgba(251,146,60,0.55)'  },
+  { id: 'green',     name: 'GREEN',     motto: 'Harmony & Equality',  polarity: 'deny',    hex: '#4ADE80', glow: 'rgba(74,222,128,0.55)'  },
+  { id: 'yellow',    name: 'YELLOW',    motto: 'Systemic Integration', polarity: 'express', hex: '#FACC15', glow: 'rgba(250,204,21,0.6)'   },
+  { id: 'turquoise', name: 'TURQUOISE', motto: 'Holistic Awareness',  polarity: 'deny',    hex: '#2DD4BF', glow: 'rgba(45,212,191,0.6)'   },
 ];
 
 const HEIGHT  = 460;

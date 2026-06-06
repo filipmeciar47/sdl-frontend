@@ -42,54 +42,54 @@ function injectGuideStyles() {
 export const GUIDE_STEPS = {
   intro: [
     { id: "tut-manual-btn", pos: "bottom",
-      bold: "Detailný tutoriál.",
-      text: "Otvorí kompletnú interaktívnu príručku so všetkými úrovňami špirálovej dynamiky a vysvetleniami konceptov. Užitočné, ak Spiral Dynamics ešte nepoznáte." },
+      bold: "Detailed tutorial.",
+      text: "Opens the full interactive guide with all Spiral Dynamics levels and concept explanations. Useful if you're new to Spiral Dynamics." },
     { id: "tut-textarea", pos: "top",
-      bold: "Sem zadajte tému.",
-      text: "Otázku, problém alebo situáciu, ktorú chcete preskúmať. Nie je to bežný chat — je to vstupný bod do viacúrovňovej analýzy." },
+      bold: "Enter your topic here.",
+      text: "A question, problem, or situation you want to explore. This is not a regular chat — it's an entry point into multi-level analysis." },
     { id: "tut-explore-btn", pos: "top",
-      bold: "Kliknutím spustíte analýzu.",
-      text: "Otvorí sa interaktívna mandala, na ktorej môžete zvoliť konkrétne úrovne pre váš pohľad." },
+      bold: "Click to start the analysis.",
+      text: "An interactive mandala opens where you can select specific levels for your perspective." },
   ],
   tools: [
     { id: "tut-view-toggle", pos: "bottom",
-      bold: "Prepínač zobrazenia.",
-      text: "Mandala ako sústredné prstence, alebo Ikony ako prehľadný zoznam. Obsah je rovnaký — vyberte si, čo vám vyhovuje." },
+      bold: "View toggle.",
+      text: "Mandala as concentric rings, or Icons as a clear list. The content is the same — choose what works for you." },
     { id: "tut-map-active", pos: "bottom",
-      bold: "Kliknite na ktorúkoľvek vrstvu.",
-      text: "Označíte úroveň pre analýzu. Vrstiev môžete označiť viac naraz." },
+      bold: "Click any layer.",
+      text: "Select a level for analysis. You can select multiple levels at once." },
     { id: "tut-mode-toggle", pos: "bottom",
-      bold: "Jednotlivá úroveň alebo integrovaný pohľad.",
-      text: "Integrovaný otvorí zvolenú vrstvu so všetkými vnútornými — úrovne sú kumulatívne a nedajú sa preskakovať." },
+      bold: "Single level or integrated view.",
+      text: "Integrated opens the selected layer with all inner levels — levels are cumulative and cannot be skipped." },
     { id: "tut-run-analysis", pos: "bottom",
-      bold: "Spustiť analýzu.",
-      text: "Keď máte vrstvy označené, týmto otvoríte všetky zvolené perspektívy naraz." },
+      bold: "Run analysis.",
+      text: "Once you have layers selected, this opens all chosen perspectives at once." },
   ],
   features: [
     { id: "tut-feat-checkbox", pos: "bottom",
-      bold: "Označte perspektívu.",
-      text: "Zaškrtnutím vyberiete odpoveď. Pri dvoch a viac sa odomknú integrácia a porovnanie napätí." },
+      bold: "Select a perspective.",
+      text: "Check to select a response. With two or more selected, integration and tension comparison unlock." },
     { id: "tut-feat-actions", pos: "top",
-      bold: "Prehĺbte perspektívu.",
-      text: "Rozvinúť, ukázať ako vznikla z predchádzajúcej úrovne, alebo kam smeruje v dôsledkoch." },
+      bold: "Deepen the perspective.",
+      text: "Expand it, show how it emerged from the previous level, or where it leads in its consequences." },
     { id: "tut-feat-axis", pos: "top",
-      bold: "Os úrovne.",
-      text: "Individualistická (express-self) alebo kolektívna (deny-self). Špirála sa medzi pólmi prirodzene strieda." },
+      bold: "Level axis.",
+      text: "Individualistic (express-self) or collective (deny-self). The spiral naturally alternates between poles." },
     { id: "tut-feat-integrate", pos: "top",
-      bold: "Integrovať do žltej.",
-      text: "Vybrané perspektívy sa prenesú do integratívneho dialógu ako kontext." },
+      bold: "Integrate into Yellow.",
+      text: "Selected perspectives are transferred into the integrative dialogue as context." },
     { id: "tut-feat-conflict", pos: "top",
-      bold: "Napätia medzi perspektívami.",
-      text: "Ukáže, kde sa logiky úrovní stretávajú a kde si odporujú — bez hodnotenia." },
+      bold: "Tensions between perspectives.",
+      text: "Shows where the logics of levels meet and where they contradict — without judgment." },
     { id: "tut-feat-integrative", pos: "top",
-      bold: "Integratívny dialóg (žltá).",
-      text: "Žltá nehodnotí — prepája perspektívy a hľadá mosty pre vašu situáciu." },
+      bold: "Integrative dialogue (Yellow).",
+      text: "Yellow doesn't judge — it connects perspectives and finds bridges for your situation." },
     { id: "tut-feat-export", pos: "top",
-      bold: "Exportovať konverzáciu.",
-      text: "Dokument so všetkými perspektívami — pripravený na tlač alebo PDF." },
+      bold: "Export conversation.",
+      text: "A document with all perspectives — ready to print or save as PDF." },
     { id: "tut-feat-newtopic", pos: "top",
-      bold: "Nová téma.",
-      text: "Vyčistí všetko a vráti vás na začiatok pre novú tému." },
+      bold: "New topic.",
+      text: "Clears everything and returns you to the beginning for a new topic." },
   ],
 };
 
@@ -205,7 +205,7 @@ export function GuideOverlay({ guide }) {
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={skip} style={{ padding: "6px 14px", background: "none", border: "none",
               color: "rgba(255,255,255,.4)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer" }}>
-              Preskočiť
+              Skip
             </button>
             <button onClick={next} style={{ padding: "6px 20px", background: "rgba(250,204,21,.15)",
               border: "1px solid rgba(250,204,21,.35)", borderRadius: 8, color: "#FACC15",
@@ -242,7 +242,7 @@ export function GuideButton({ guide, style, tipSide = "left" }) {
           <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
           <line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
-        Sprievodca
+        Guide
       </button>
 
       {guide.showIntroTip && (
@@ -256,7 +256,7 @@ export function GuideButton({ guide, style, tipSide = "left" }) {
           pointerEvents: "none",
         }}>
           <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, lineHeight: 1.6 }}>
-            <span style={{ fontWeight: 600, color: "rgba(250,204,21,.95)" }}>Sprievodca aplikáciou. </span>
+            <span style={{ fontWeight: 600, color: "rgba(250,204,21,.95)" }}>App Guide. </span>
             <span style={{ fontWeight: 300, color: "rgba(240,240,240,.85)" }}>
               Kliknutím vás krok po kroku prevediem funkciami.
             </span>

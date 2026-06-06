@@ -530,8 +530,8 @@ export default function SpiralMandala({
   const showLevel    = showLevelIdx !== null ? GEOM[showLevelIdx] : null;
 
   const hintText = mode === 'integrative'
-    ? 'Kliknutím na vrstvu otvoríte túto + všetky vnútorné úrovne'
-    : 'Kliknutím pridáte / odoberiete úroveň; každá zostane svietiť svojou farbou';
+    ? 'Click a layer to open it + all inner levels'
+    : 'Click to add / remove a level; each one stays highlighted in its color';
 
   return (
     <div
