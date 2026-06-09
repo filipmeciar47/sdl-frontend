@@ -570,15 +570,17 @@ export default function App() {
         .toggle.on .toggle-dot{left:23px;background:#FACC15}
         .topic-bar{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:#ccc;text-align:center;margin-bottom:24px;font-style:italic}
         .hint{font-family:'DM Sans',sans-serif;font-size:11px;color:#777;text-align:center;margin-top:6px}
-        .crsl-wrap{position:relative;overflow:visible;perspective:1100px;perspective-origin:50% 40%;min-height:430px;margin-bottom:4px}
+        .crsl-wrap{position:relative;overflow:visible;perspective:1100px;perspective-origin:50% 40%;min-height:370px;margin-bottom:4px}
         .crsl-card{position:absolute;top:0;left:0;right:0;transition:transform .48s cubic-bezier(.25,.46,.45,.94),opacity .48s,filter .48s;transform-origin:50% 50%;will-change:transform}
         .crsl-card.is-side{cursor:pointer}
         .crsl-card.is-side:hover{filter:brightness(1.08)!important}
-        .crsl-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 2px 0;min-height:38px}
+        .crsl-nav{display:flex;justify-content:space-between;align-items:flex-start;padding:0 2px;margin-top:-2px;min-height:28px}
         .crsl-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:99px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;flex-shrink:0}
         .crsl-btn:hover:not(:disabled){background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.25)}
         .crsl-btn:disabled{opacity:.2;cursor:not-allowed}
-        .crsl-dots{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:200px}
+        .crsl-dots{display:flex;flex-direction:column;align-items:center;gap:5px;max-width:220px}
+        .crsl-dots-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center}
+        .crsl-dot-lbl{font-family:'DM Sans',sans-serif;font-size:9px;font-weight:400;color:rgba(255,255,255,.28);letter-spacing:.8px;text-transform:uppercase;transition:color .3s}
         @media(max-width:520px){
           .wrap{padding:20px 14px 80px}
           .sub{font-size:10px;letter-spacing:1.8px;margin-bottom:20px}
@@ -815,8 +817,8 @@ export default function App() {
                     const nextClr = levelIdx < LEVELS.length - 1 ? LEVELS[levelIdx + 1].clr : null;
                     let transform, zIdx, opacity, flt;
                     if (offset === 0) { transform = "translateX(0) scale(1) rotateY(0deg)"; zIdx = 3; opacity = 1; flt = "none"; }
-                    else if (offset === -1) { transform = "translateX(-60%) scale(0.72) rotateY(24deg)"; zIdx = 2; opacity = 0.6; flt = "blur(1px)"; }
-                    else if (offset === 1) { transform = "translateX(60%) scale(0.72) rotateY(-24deg)"; zIdx = 2; opacity = 0.6; flt = "blur(1px)"; }
+                    else if (offset === -1) { transform = "translateX(-60%) scale(0.74) rotateY(22deg)"; zIdx = 2; opacity = 0.82; flt = "none"; }
+                    else if (offset === 1) { transform = "translateX(60%) scale(0.74) rotateY(-22deg)"; zIdx = 2; opacity = 0.82; flt = "none"; }
                     else if (offset < -1) { transform = "translateX(-88%) scale(0.48) rotateY(38deg)"; zIdx = 1; opacity = 0; flt = "blur(2px)"; }
                     else { transform = "translateX(88%) scale(0.48) rotateY(-38deg)"; zIdx = 1; opacity = 0; flt = "blur(2px)"; }
                     return (
@@ -874,9 +876,12 @@ export default function App() {
                   <div className="crsl-nav">
                     <button className="crsl-btn" onClick={() => setActiveCardIdx(i => Math.max(0, i - 1))} disabled={safeActiveIdx === 0}>← Predch.</button>
                     <div className="crsl-dots">
-                      {openChatKeys.map((k, i) => (
-                        <div key={k} onClick={() => setActiveCardIdx(i)} title={LEVEL_MAP[k]?.name} style={{ width: i === safeActiveIdx ? 22 : 8, height: 8, borderRadius: 99, background: i === safeActiveIdx ? LEVEL_MAP[k]?.clr + "cc" : "rgba(255,255,255,.18)", cursor: "pointer", transition: "all .3s", flexShrink: 0 }} />
-                      ))}
+                      <div className="crsl-dots-row">
+                        {openChatKeys.map((k, i) => (
+                          <div key={k} onClick={() => setActiveCardIdx(i)} title={LEVEL_MAP[k]?.name} style={{ width: i === safeActiveIdx ? 22 : 8, height: 8, borderRadius: 99, background: i === safeActiveIdx ? LEVEL_MAP[k]?.clr + "cc" : "rgba(255,255,255,.18)", cursor: "pointer", transition: "all .3s", flexShrink: 0 }} />
+                        ))}
+                      </div>
+                      <span className="crsl-dot-lbl" style={{ color: LEVEL_MAP[openChatKeys[safeActiveIdx]]?.clr + "99" }}>{LEVEL_MAP[openChatKeys[safeActiveIdx]]?.name}</span>
                     </div>
                     <button className="crsl-btn" onClick={() => setActiveCardIdx(i => Math.min(openChatKeys.length - 1, i + 1))} disabled={safeActiveIdx === openChatKeys.length - 1}>Nasl. →</button>
                   </div>
