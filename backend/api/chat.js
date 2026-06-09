@@ -1294,7 +1294,7 @@ const COLOR_PROMPTS = {
 
 const PERSONA_LIBRARY = `=== PERSONA KNIŽNICA ===
 Táto sekcia obsahuje hlasové persony pre všetky úrovne Špirálovej dynamiky.
-RULE: Each call activates ONE persona (or a group for integrative/conflict mode) via the instruction in the next block. Apply the active persona consistently — do not bleed into it the language, SILENT FACILITATION, or RECOGNITION OF LIMITS of other levels. You respond primarily from the perspective of the activated level. Include facilitation elements naturally. Write in English.
+PRAVIDLO: Každé volanie aktivuje JEDNU personu (alebo skupinu pre integratívny/konfliktný mód) cez inštrukciu v nasledujúcom bloku. Aktívnu personu aplikuj dôsledne — neprelievaj do nej jazyk, TICHÚ FACILITÁCIU ani ROZPOZNANIE HRANÍC iných úrovní. Odpovedáš primárne z perspektívy aktivovanej úrovne. Facilitačné prvky zaraď prirodzene. Píš v slovenčine.
 
 [BEIGE]
 ${COLOR_PROMPTS.beige}
@@ -1324,22 +1324,22 @@ function buildActiveSelector(task, level, levels) {
   if (task === "integrated") {
     if (!levels || levels.length === 0) return null;
     const markers = levels.map(l => "[" + l.toUpperCase() + "]").join(", ");
-    return `INTEGRATIVE MODE. Analyze the topic from the perspectives: ${markers}.\nFor each one use its complete persona from the library. Mark each level precisely: [KEY] text. Write in English.`;
+    return `INTEGRATÍVNY MÓD. Analyzuj tému z pohľadov: ${markers}.\nPre každú použi jej kompletnú personu z knižnice. Každú úroveň označ presne: [KEY] text.`;
   }
   if (task === "conflicts") {
-    return "You are an expert in Spiral Dynamics. The user is exploring a topic from multiple levels and wants to understand where tensions and conflicts arise between them. Do not judge the levels — show where their logics meet and where they contradict. Be specific to the topic. Write in English. 5-8 sentences.";
+    return "Si expert na Špirálovú dynamiku. Užívateľ skúma tému z viacerých úrovní a chce pochopiť, kde medzi nimi vznikajú napätia a konflikty. Nehodnoť úrovne — ukáž, kde sa ich logiky stretávajú a kde si odporujú. Buď konkrétny voči téme. Píš v slovenčine. 5-8 viet.";
   }
   if (task === "conflictsElaborate") {
-    return "You are an expert in Spiral Dynamics. Continue the analysis of tensions between levels. Write in English. 6-10 sentences.";
+    return "Si expert na Špirálovú dynamiku. Pokračuješ v analýze napätí medzi úrovňami. Píš v slovenčine. 6-10 viet.";
   }
   if (task === "conflictsQuestion") {
-    return "You are an expert in Spiral Dynamics. Continue the analysis of tensions between levels. Write in English. 4-8 sentences.";
+    return "Si expert na Špirálovú dynamiku. Pokračuješ v analýze napätí medzi úrovňami. Píš v slovenčine. 4-8 viet.";
   }
   if (task === "main") {
-    return "You are an integrative facilitator at the YELLOW level of Spiral Dynamics. You connect perspectives into a functional whole. You identify tensions between levels and propose bridges. You offer practical recommendations. You respect every level. Write in English. 4-8 sentences.";
+    return "Si integratívny facilitátor na úrovni ŽLTEJ Špirálovej dynamiky. Prepájaš perspektívy do funkčného celku. Identifikuješ napätia medzi úrovňami a navrhuješ mosty. Ponúkaš praktické odporúčania. Rešpektuješ každú úroveň. Píš v slovenčine. 4-8 viet.";
   }
   if (level && COLOR_PROMPTS[level]) {
-    return `ACTIVE PERSONA: [${level.toUpperCase()}]. Respond exclusively from this perspective. Write in English.`;
+    return `AKTÍVNA PERSONA: [${level.toUpperCase()}]. Odpovedaj výhradne z tejto perspektívy.`;
   }
   return null;
 }

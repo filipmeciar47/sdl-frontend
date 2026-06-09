@@ -33,14 +33,14 @@ const BG_IMG = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANC
 const TITLE_IMG = "/assets/logo-title.png";
 
 const LEVELS = [
-  { key: "beige", name: "BEIGE", sub: "Survival", clr: "#C4A882", bg: "#1e1a14", axis: "express", r0: 0, r1: 0.12 },
-  { key: "purple", name: "PURPLE", sub: "Clan Safety", clr: "#A78BFA", bg: "#1a1528", axis: "deny", r0: 0.12, r1: 0.19 },
-  { key: "red", name: "RED", sub: "Power & Will", clr: "#F87171", bg: "#2a1212", axis: "express", r0: 0.19, r1: 0.27 },
-  { key: "blue", name: "BLUE", sub: "Order & Meaning", clr: "#60A5FA", bg: "#121a2a", axis: "deny", r0: 0.27, r1: 0.40 },
-  { key: "orange", name: "ORANGE", sub: "Achievement & Success", clr: "#FB923C", bg: "#2a1c0e", axis: "express", r0: 0.40, r1: 0.58 },
-  { key: "green", name: "GREEN", sub: "Harmony & Equality", clr: "#4ADE80", bg: "#0e2218", axis: "deny", r0: 0.58, r1: 0.76 },
-  { key: "yellow", name: "YELLOW", sub: "Systemic Integration", clr: "#FACC15", bg: "#2a250e", axis: "express", r0: 0.76, r1: 0.90 },
-  { key: "turquoise", name: "TURQUOISE", sub: "Holistic Awareness", clr: "#2DD4BF", bg: "#0e2422", axis: "deny", r0: 0.90, r1: 1.0 },
+  { key: "beige", name: "BÉŽOVÁ", sub: "Prežitie", clr: "#C4A882", bg: "#1e1a14", axis: "express", r0: 0, r1: 0.12 },
+  { key: "purple", name: "PURPUROVÁ", sub: "Bezpečie klanu", clr: "#A78BFA", bg: "#1a1528", axis: "deny", r0: 0.12, r1: 0.19 },
+  { key: "red", name: "ČERVENÁ", sub: "Moc a vôľa", clr: "#F87171", bg: "#2a1212", axis: "express", r0: 0.19, r1: 0.27 },
+  { key: "blue", name: "MODRÁ", sub: "Poriadok a zmysel", clr: "#60A5FA", bg: "#121a2a", axis: "deny", r0: 0.27, r1: 0.40 },
+  { key: "orange", name: "ORANŽOVÁ", sub: "Úspech a výkon", clr: "#FB923C", bg: "#2a1c0e", axis: "express", r0: 0.40, r1: 0.58 },
+  { key: "green", name: "ZELENÁ", sub: "Harmónia a rovnosť", clr: "#4ADE80", bg: "#0e2218", axis: "deny", r0: 0.58, r1: 0.76 },
+  { key: "yellow", name: "ŽLTÁ", sub: "Systémová integrácia", clr: "#FACC15", bg: "#2a250e", axis: "express", r0: 0.76, r1: 0.90 },
+  { key: "turquoise", name: "TYRKYSOVÁ", sub: "Celostné vedomie", clr: "#2DD4BF", bg: "#0e2422", axis: "deny", r0: 0.90, r1: 1.0 },
 ];
 const LEVEL_MAP = {}; LEVELS.forEach(l => { LEVEL_MAP[l.key] = l; });
 
@@ -61,7 +61,7 @@ async function callAPI(params, messages) {
       const delay = attempt < retryDelays.length ? retryDelays[attempt] : 15000;
       await new Promise(r => setTimeout(r, delay));
       if (attempt === retryDelays.length) {
-        throw new Error("Something went wrong, please try again later. (429)");
+        throw new Error("Niečo sa pokazilo, skúste neskôr. (429)");
       }
       continue;
     }
@@ -71,7 +71,7 @@ async function callAPI(params, messages) {
       throw new Error(err.error || "API chyba. Skúste znova.");
     }
     const data = await response.json();
-    if (!data.content) throw new Error("Empty response. Please try again.");
+    if (!data.content) throw new Error("Prázdna odpoveď. Skúste znova.");
     return data.content;
   }
 }
@@ -126,10 +126,10 @@ export default function App() {
 
   function getReflection() {
     if (exploredKeys.length < 2) return null;
-    if (expressCount > 0 && denyCount === 0) return "Your exploration moves through individualistic perspectives (express-self). Collective perspectives \u2014 " + unexploredDeny.join(", ") + " \u2014 offer a different kind of orientation, valuable when the individual approach hits its limits.";
-    if (denyCount > 0 && expressCount === 0) return "Your exploration moves through collective perspectives (deny-self). Individualistic perspectives \u2014 " + unexploredExpress.join(", ") + " \u2014 offer a view of personal power and autonomy.";
-    if (expressCount >= 2 && denyCount <= 1 && unexploredDeny.length > 0) return "Most of your exploration leans toward individualistic perspectives. Unexplored collective views \u2014 " + unexploredDeny.join(", ") + " \u2014 may offer something the individual lens cannot see.";
-    if (denyCount >= 2 && expressCount <= 1 && unexploredExpress.length > 0) return "Most of your exploration leans toward collective perspectives. Unexplored individualistic views \u2014 " + unexploredExpress.join(", ") + " \u2014 may offer something the group lens cannot see.";
+    if (expressCount > 0 && denyCount === 0) return "Tvoja explorácia sa pohybuje v individualistických perspektívach (express-self). Kolektívne perspektívy \u2014 " + unexploredDeny.join(", ") + " \u2014 ponúkajú iný druh orientácie, cenný keď individuálny prístup naráža na limity.";
+    if (denyCount > 0 && expressCount === 0) return "Tvoja explorácia sa pohybuje v kolektívnych perspektívach (deny-self). Individualistické perspektívy \u2014 " + unexploredExpress.join(", ") + " \u2014 ponúkajú pohľad na osobnú silu a autonómiu.";
+    if (expressCount >= 2 && denyCount <= 1 && unexploredDeny.length > 0) return "Väčšina explorácie smeruje k individualistickým perspektívam. Nepreskúmané kolektívne pohľady \u2014 " + unexploredDeny.join(", ") + " \u2014 môžu ponúknuť niečo, čo individuálna optika nevidí.";
+    if (denyCount >= 2 && expressCount <= 1 && unexploredExpress.length > 0) return "Väčšina explorácie smeruje ku kolektívnym perspektívam. Nepreskúmané individualistické pohľady \u2014 " + unexploredExpress.join(", ") + " \u2014 môžu ponúknuť niečo, čo skupinová optika nevidí.";
     return null;
   }
   const reflection = getReflection();
@@ -154,7 +154,7 @@ export default function App() {
   function fetchIntegrated(levels) {
     const levelNames = levels.map(l => l.name).join(", ");
     const levelKeys = levels.map(l => l.key);
-    callAPI({ task: "integrated", levels: levelKeys }, [{ role: "user", content: "Topic: \"" + topicSet + "\"\n\nAnalyze this topic from the perspective of levels: " + levelNames }])
+    callAPI({ task: "integrated", levels: levelKeys }, [{ role: "user", content: "Téma: \"" + topicSet + "\"\n\nAnalyzuj túto tému z pohľadu úrovní: " + levelNames }])
       .then(reply => {
         levelKeys.forEach(key => {
           const marker = "[" + key.toUpperCase() + "]";
@@ -175,7 +175,7 @@ export default function App() {
       })
       .catch(err => {
         levelKeys.forEach(key => {
-          setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || "Failed to load perspectives." }] } } : prev);
+          setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || "Nepodarilo sa načítať perspektívy." }] } } : prev);
         });
       })
       .finally(() => {
@@ -195,9 +195,9 @@ export default function App() {
 
   function fetchInitial(key) {
     setColorLoading(prev => ({ ...prev, [key]: true }));
-    callAPI({ level: key }, [{ role: "user", content: "Topic: \"" + topicSet + "\"\n\nProvide a brief introductory perspective on this topic from this level. MAX 2-3 sentences. Be specific and concise." }])
+    callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"\n\nPoskyni stručnú úvodnú perspektívu na túto tému z pohľadu tejto úrovne. MAX 2-3 vety. Buď konkrétny a výstižný." }])
       .then(reply => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "assistant", content: reply }] } } : prev))
-      .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || "Failed to load perspective." }] } } : prev))
+      .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || "Nepodarilo sa načítať perspektívu." }] } } : prev))
       .finally(() => setColorLoading(prev => ({ ...prev, [key]: false })));
   }
 
@@ -206,9 +206,9 @@ export default function App() {
     if (!chat || colorLoading[key]) return;
     setColorLoading(prev => ({ ...prev, [key]: true }));
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], elaborated: true } }));
-    const msgs = [...chat.messages, { role: "user", content: "Expand this perspective in more depth. Explain more deeply why this level sees the topic this way, what its strengths are, and where it hits its limits. 6-10 sentences." }];
+    const msgs = [...chat.messages, { role: "user", content: "Rozviň túto perspektívu podrobnejšie. Vysvetli hlbšie, prečo táto úroveň vidí tému práve takto, aké sú jej silné stránky a kde naráža na svoje hranice. 6-10 viet." }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
-    callAPI({ level: key }, [{ role: "user", content: "Topic: \"" + topicSet + "\"" }, ...msgs])
+    callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs])
       .then(reply => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } } : prev))
       .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Error: " + err.message }] } } : prev))
       .finally(() => setColorLoading(prev => ({ ...prev, [key]: false })));
@@ -251,7 +251,7 @@ export default function App() {
     sKeys.forEach(key => {
       const l = LEVEL_MAP[key]; const chat = colorChats[key];
       ctx += "\n\n=== " + l.name + " (" + l.sub + ") ===\n";
-      chat.messages.forEach(m => { ctx += (m.role === "user" ? "User: " : l.name + ": ") + m.content + "\n"; });
+      chat.messages.forEach(m => { ctx += (m.role === "user" ? "Užívateľ: " : l.name + ": ") + m.content + "\n"; });
     });
     setIntegratedContext(prev => prev + ctx);
     setSelected({});
@@ -274,18 +274,18 @@ export default function App() {
       return l.name + " (" + l.sub + "): " + (lastMsg ? lastMsg.content : "");
     }).join("\n\n");
     try {
-      const prompt = "Topic: \"" + topicSet + "\"\n\nPerspectives to compare:\n" + levelDescs + "\n\nWhere do tensions and conflicts arise between these perspectives on this specific topic? What one sees as a solution, another may perceive as a problem?";
+      const prompt = "Téma: \"" + topicSet + "\"\n\nPerspektívy na porovnanie:\n" + levelDescs + "\n\nKde vznikajú napätia a konflikty medzi týmito perspektívami pri tejto konkrétnej téme? Čo jedna vidí ako riešenie, druhá môže vnímať ako problém?";
       const reply = await callAPI({ task: "conflicts" }, [{ role: "user", content: prompt }]);
       setConflictResult(reply);
       setConflictHistory([{ role: "user", content: prompt }, { role: "assistant", content: reply }]);
-    } catch (err) { setConflictResult("Error: " + err.message); }
+    } catch (err) { setConflictResult("Chyba: " + err.message); }
     finally { setConflictLoading(false); }
   }
 
   async function elaborateConflicts() {
     if (conflictLoading || !conflictResult) return;
     setConflictLoading(true);
-    const msgs = [...conflictHistory, { role: "user", content: "Deepen these tensions further. Where exactly does the clash of values occur? What are the practical consequences of this tension in everyday life? Is there a way to connect these perspectives without any losing its essence?" }];
+    const msgs = [...conflictHistory, { role: "user", content: "Rozviň tieto napätia hlbšie. Kde presne nastáva stret hodnôt? Aké praktické dôsledky má toto napätie v každodennom živote? Existuje spôsob, ako tieto perspektívy prepojiť bez toho, aby niektorá stratila svoju podstatu?" }];
     try {
       const reply = await callAPI({ task: "conflictsElaborate" }, msgs);
       setConflictResult(prev => prev + "\n\n" + reply);
@@ -316,8 +316,8 @@ export default function App() {
     const previous = levelIdx > 0 ? LEVELS[levelIdx - 1] : null;
     setColorLoading(prev => ({ ...prev, [key]: true }));
     const emergePrompt = previous
-      ? "Explain how the " + current.name + " level emerged from the previous " + previous.name + " level in the context of this topic. Describe: 1) What were the conditions in " + previous.name + " that stopped being sufficient? 2) What crisis or contradiction led to the emergence of " + current.name + "? 3) What specifically did " + current.name + " bring as a response to the limits of " + previous.name + "? Provide a historical example relevant to the topic. 6-10 sentences."
-      : "Explain why the " + current.name + " level is the foundation of the entire spiral. How does the most fundamental form of consciousness manifest in the context of this topic? 4-6 sentences.";
+      ? "Vysvetli, ako sa " + current.name + " úroveň vyvinula z predchádzajúcej " + previous.name + " úrovne v kontexte tejto témy. Popíš: 1) Aké boli podmienky v " + previous.name + ", ktoré prestali stačiť? 2) Aká kríza alebo rozpor viedol k vzniku " + current.name + "? 3) Čo konkrétne " + current.name + " priniesla ako odpoveď na limity " + previous.name + "? Uveď historický príklad relevantný k téme. 6-10 viet."
+      : "Vysvetli, prečo je " + current.name + " úroveň základom celej špirály. Ako sa prejavuje najzákladnejšia forma vedomia v kontexte tejto témy? 4-6 viet.";
     const msgs = [...chat.messages, { role: "user", content: emergePrompt }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
     try {
@@ -337,8 +337,8 @@ export default function App() {
     const next = levelIdx < LEVELS.length - 1 ? LEVELS[levelIdx + 1] : null;
     setColorLoading(prev => ({ ...prev, [key]: true }));
     const growthPrompt = next
-      ? "Analyze where the " + current.name + " perspective leads in the context of this topic when taken to its logical conclusions. Specifically show: 1) What questions does this perspective begin to ask that it cannot answer itself? 2) Where does it hit its own limit — not as a flaw, but as a natural horizon? 3) What appears beyond that horizon, which this perspective does not yet see, but already senses? Do not use Spiral Dynamics level names. Talk about what emerges, not about where someone should move. 6-10 sentences."
-      : "Analyze where the " + current.name + " perspective — the broadest in Spiral Dynamics — leads in the context of this topic. What remains unsaid even from this most holistic view? Where does even this perspective meet the mystery that transcends any map? 4-6 sentences.";
+      ? "Analyzuj, kam smeruje " + current.name + " perspektíva v kontexte tejto témy, keď ju dovedieš do jej logických dôsledkov. Konkrétne ukáž: 1) Aké otázky si táto perspektíva začína klásť, na ktoré sama nemá odpoveď? 2) Kde naráža na svoju vlastnú hranicu — nie ako chybu, ale ako prirodzený horizont? 3) Čo sa objavuje za týmto horizontom, čo táto perspektíva zatiaľ nevidí, ale už tuší? Nepoužívaj názvy úrovní Špirálovej dynamiky. Hovor o tom, čo sa objavuje, nie o tom, kam by sa mal človek posunúť. 6-10 viet."
+      : "Analyzuj, kam smeruje " + current.name + " perspektíva — najširšia v Špirálovej dynamike — v kontexte tejto témy. Čo zostáva nevypovedané aj z tohto najcelostnejšieho pohľadu? Kde sa aj táto perspektíva stretáva s tajomstvom, ktoré presahuje akúkoľvek mapu? 4-6 viet.";
     const msgs = [...chat.messages, { role: "user", content: growthPrompt }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
     try {
@@ -354,7 +354,7 @@ export default function App() {
   const safeActiveIdx = openChatKeys.length > 0 ? Math.min(activeCardIdx, openChatKeys.length - 1) : 0;
 
   function exportConversation() {
-    const timestamp = new Date().toLocaleString("en-US");
+    const timestamp = new Date().toLocaleString("sk-SK");
     const chatKeys = LEVELS.filter(l => colorChats[l.key]).map(l => l.key);
     const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
     let body = "";
@@ -365,16 +365,16 @@ export default function App() {
         body += '<div class="section"><h2 style="color:' + l.clr + '">' + esc(l.name) + ' — ' + esc(l.sub) + '</h2><p class="axis">' + axisLabel + '</p>';
         chat.messages.forEach(m => {
           if (m.role === "error") return;
-          if (m.role === "user") body += '<div class="q"><strong>Question:</strong> ' + esc(m.content) + '</div>';
+          if (m.role === "user") body += '<div class="q"><strong>Otázka:</strong> ' + esc(m.content) + '</div>';
           else body += '<div class="a">' + esc(m.content) + '</div>';
         });
         body += '</div>';
       });
     }
-    if (conflictResult) body += '<div class="section"><h2>Tensions Between Perspectives</h2><div class="a">' + esc(conflictResult) + '</div></div>';
-    if (reflection) body += '<div class="section"><h2>Exploration Pattern</h2><div class="a">' + esc(reflection) + '</div></div>';
+    if (conflictResult) body += '<div class="section"><h2>Napätia medzi perspektívami</h2><div class="a">' + esc(conflictResult) + '</div></div>';
+    if (reflection) body += '<div class="section"><h2>Vzorec explorácie</h2><div class="a">' + esc(reflection) + '</div></div>';
     if (mainChat.length > 0) {
-      body += '<div class="section"><h2>Integrative Dialogue</h2>';
+      body += '<div class="section"><h2>Integratívny dialóg</h2>';
       mainChat.forEach(m => {
         if (m.role === "user") body += '<div class="q"><strong>Question:</strong> ' + esc(m.content) + '</div>';
         else body += '<div class="a">' + esc(m.content) + '</div>';
@@ -382,7 +382,7 @@ export default function App() {
       body += '</div>';
     }
     const css = 'body{font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:32px;color:#1a1a1a;font-size:13px;line-height:1.7}h1{font-size:20px;margin-bottom:4px}.meta{color:#666;font-size:11px;margin-bottom:32px}.section{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #e5e5e5}h2{font-size:15px;margin-bottom:4px}.axis{font-size:10px;color:#888;margin:0 0 12px;text-transform:uppercase;letter-spacing:.1em}.q{background:#f5f5f5;border-left:3px solid #ccc;padding:8px 12px;margin:10px 0;font-style:italic;font-size:12px}.a{margin:10px 0;white-space:pre-wrap}.footer{text-align:center;font-size:10px;color:#aaa;margin-top:40px}@media print{body{padding:0}}';
-    const html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Spiral Dynamics — ' + esc(topicSet) + '</title><style>' + css + '</style></head><body><h1>Spiral Dynamics Lens</h1><div class="meta"><strong>Topic:</strong> ' + esc(topicSet) + ' &nbsp;·&nbsp; ' + timestamp + '</div>' + body + '<div class="footer">Generated by Spiral Dynamics Lens</div></body></html>';
+    const html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Spiral Dynamics — ' + esc(topicSet) + '</title><style>' + css + '</style></head><body><h1>Spiral Dynamics Lens</h1><div class="meta"><strong>Téma:</strong> ' + esc(topicSet) + ' &nbsp;·&nbsp; ' + timestamp + '</div>' + body + '<div class="footer">Generated by Spiral Dynamics Lens</div></body></html>';
     const win = window.open("", "_blank");
     if (!win) return;
     win.document.write(html);
@@ -392,21 +392,21 @@ export default function App() {
 
   function exportMarkdown() {
     const chatKeys = LEVELS.filter(l => colorChats[l.key]).map(l => l.key);
-    let md = `# Spiral Dynamics Lens\n**Topic:** ${topicSet}\n\n`;
+    let md = `# Spiral Dynamics Lens\n**Téma:** ${topicSet}\n\n`;
     chatKeys.forEach(key => {
       const l = LEVEL_MAP[key]; const chat = colorChats[key];
       const axisLabel = l.axis === "express" ? "Express-self" : "Deny-self";
       md += `### ${l.name} — ${l.sub}\n*${axisLabel}*\n\n`;
       chat.messages.forEach(m => {
         if (m.role === "error") return;
-        if (m.role === "user") md += `**Question:** ${m.content}\n\n`;
+        if (m.role === "user") md += `**Otázka:** ${m.content}\n\n`;
         else md += `${m.content}\n\n`;
       });
     });
-    if (conflictResult) md += `## Tensions Between Perspectives\n\n${conflictResult}\n\n`;
-    if (reflection) md += `## Exploration Pattern\n\n${reflection}\n\n`;
+    if (conflictResult) md += `## Napätia medzi perspektívami\n\n${conflictResult}\n\n`;
+    if (reflection) md += `## Vzorec explorácie\n\n${reflection}\n\n`;
     if (mainChat.length > 0) {
-      md += `## Integrative Dialogue\n\n`;
+      md += `## Integratívny dialóg\n\n`;
       mainChat.forEach(m => {
         if (m.role === "user") md += `**Question:** ${m.content}\n\n`;
         else md += `${m.content}\n\n`;
@@ -429,9 +429,9 @@ export default function App() {
         const text = e.target.result;
 
         // Topic
-        const topicMatch = text.match(/^\*{0,2}Topic:\*{0,2}\s*(.+)$/m);
+        const topicMatch = text.match(/^\*{0,2}Téma:\*{0,2}\s*(.+)$/m);
         const importedTopic = topicMatch ? topicMatch[1].trim() : "";
-        if (!importedTopic) { alert("File does not contain a topic — check the .md file format."); return; }
+        if (!importedTopic) { alert("Súbor neobsahuje tému — skontrolujte formát .md súboru."); return; }
 
         // Level sections → last assistant message per level
         const newColorChats = {};
@@ -445,7 +445,7 @@ export default function App() {
           if (!sectionMatch) return;
           const rawSection = sectionMatch[1];
           // Split on user questions; last chunk = last assistant message
-          const parts = rawSection.split(/\n\*\*Question:\*\*[^\n]*\n/);
+          const parts = rawSection.split(/\n\*\*Otázka:\*\*[^\n]*\n/);
           // Strip the axis line (*Express-self* / *Deny-self*) and leading whitespace
           const lastPart = (parts[parts.length - 1] || "").replace(/^\s*\*[^\n]+\*\s*\n/, "").trim();
           if (!lastPart) return;
@@ -454,7 +454,7 @@ export default function App() {
         });
 
         // Conflict result
-        const conflictRx = /##\s+Tensions Between Perspectives\s*\n+([\s\S]*?)(?=\n##\s+|$)/;
+        const conflictRx = /##\s+Napätia medzi perspektívami\s*\n+([\s\S]*?)(?=\n##\s+|$)/;
         const conflictMatch = text.match(conflictRx);
         const importedConflict = conflictMatch ? conflictMatch[1].trim() : "";
 
@@ -467,7 +467,7 @@ export default function App() {
         setSelected({});
         setConflictResult(importedConflict);
         setConflictHistory(importedConflict
-          ? [{ role: "user", content: `Topic: "${importedTopic}"\n\nTension analysis:` }, { role: "assistant", content: importedConflict }]
+          ? [{ role: "user", content: `Téma: "${importedTopic}"\n\nAnalýza napätí:` }, { role: "assistant", content: importedConflict }]
           : []);
         setConflictInput("");
         setMainChat([]);
@@ -486,12 +486,12 @@ export default function App() {
     const msgs = [...mainChat, { role: "user", content: msg }];
     setMainChat(msgs); setMainInput(""); setMainLoading(true);
     try {
-      let ctx = "Topic: \"" + topicSet + "\"";
-      if (integratedContext) ctx += "\n\nIntegrated perspectives:" + integratedContext;
-      if (reflection) ctx += "\n\nExploration pattern: " + reflection;
-      const reply = await callAPI({ task: "main" }, [{ role: "user", content: ctx }, { role: "assistant", content: "Understood. Let us continue." }, ...msgs]);
+      let ctx = "Téma: \"" + topicSet + "\"";
+      if (integratedContext) ctx += "\n\nIntegrované perspektívy:" + integratedContext;
+      if (reflection) ctx += "\n\nVzorec explorácie: " + reflection;
+      const reply = await callAPI({ task: "main" }, [{ role: "user", content: ctx }, { role: "assistant", content: "Rozumiem. Pokračujeme." }, ...msgs]);
       setMainChat(m => [...m, { role: "assistant", content: reply }]);
-    } catch (err) { setMainChat(m => [...m, { role: "assistant", content: "Error: " + err.message }]); }
+    } catch (err) { setMainChat(m => [...m, { role: "assistant", content: "Chyba: " + err.message }]); }
     finally { setMainLoading(false); }
   }
 
@@ -597,7 +597,7 @@ export default function App() {
       <div className="bg" />
       <div className="wrap">
         <div style={{ textAlign: "center", marginBottom: 0 }}><img src={TITLE_IMG} alt="Spiral Dynamics Lens" style={{ width: "min(380px, 70vw)", height: "auto", display: "block", margin: "0 auto" }} /></div>
-        <p className="sub">Multi-level View of Reality</p>
+        <p className="sub">Viacúrovňový pohľad na realitu</p>
 
         {!topicSet ? (
           <div style={{ maxWidth: 600, margin: "0 auto" }}>
@@ -616,7 +616,7 @@ export default function App() {
             </div>
             <div style={{ position: "relative" }}>
               <textarea id="tut-textarea" value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Enter a topic, problem, question, or situation..." />
-              <button type="button" title="Continue with saved analysis" onClick={() => importFileRef.current?.click()} style={{ position: "absolute", bottom: 10, right: 10, background: "none", border: "none", cursor: "pointer", opacity: 0.35, color: "rgba(255,255,255,0.8)", padding: 4, transition: "opacity 0.2s", lineHeight: 0 }} onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>
+              <button type="button" title="Pokračovať v uloženej analýze" onClick={() => importFileRef.current?.click()} style={{ position: "absolute", bottom: 10, right: 10, background: "none", border: "none", cursor: "pointer", opacity: 0.35, color: "rgba(255,255,255,0.8)", padding: 4, transition: "opacity 0.2s", lineHeight: 0 }} onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </button>
               <input ref={importFileRef} type="file" accept=".md" style={{ display: "none" }} onChange={e => { importAnalysis(e.target.files?.[0]); e.target.value = ""; }} />
@@ -672,7 +672,7 @@ export default function App() {
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                   </svg>
-                  View Style
+                  Štýl zobrazenia
                 </div>
               </div>
 
@@ -745,7 +745,7 @@ export default function App() {
                         {iconR && <img src={iconR} style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", flexShrink: 0, filter: `drop-shadow(0 0 6px ${lv.clr}88)` }} />}
                       </div>
                       <div style={{ textAlign: "center", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.32)" }}>
-                        {isExpress ? "Express Self · I" : "Deny Self · WE"}
+                        {isExpress ? "Express Self · JA" : "Deny Self · MY"}
                       </div>
                     </div>
                   );
@@ -759,9 +759,9 @@ export default function App() {
               <div className={"toggle" + (integrated ? " on" : "")} onClick={() => setIntegrated(!integrated)}>
                 <div className="toggle-dot" />
               </div>
-              <span style={{ opacity: integrated ? 1 : .4 }}>Integrated View</span>
+              <span style={{ opacity: integrated ? 1 : .4 }}>Integrovaný pohľad</span>
             </div>
-            <div className="hint">{integrated ? "Click to select a layer + inner ones, then run analysis" : "Click to select a level, then click Run Analysis"}</div>
+            <div className="hint">{integrated ? "Kliknutím zvolíte vrstvu + vnútorné, potom spustíte analýzu" : "Kliknutím zvolíte úroveň, potom kliknite Spustiť analýzu"}</div>
 
             {pendingLevels.size > 0 && (
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
@@ -774,7 +774,7 @@ export default function App() {
                   ) : null;
                 })}
                 <button id="tut-run-analysis" onClick={runAnalysis} style={{ marginLeft: 8, padding: "6px 18px", borderRadius: 99, border: "1px solid rgba(250,204,21,0.45)", background: "rgba(250,204,21,0.12)", color: "#FACC15", fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer" }}>
-                  Run Analysis
+                  Spustiť analýzu
                 </button>
               </div>
             )}
@@ -890,18 +890,18 @@ export default function App() {
                   <div style={{ marginTop: 12 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                       {Object.keys(selected).filter(k => selected[k]).map(k => (
-                        <div key={"ax-"+k} onClick={() => scrollToChat(k)} style={{ width: 36, height: 36, borderRadius: 8, background: LEVEL_MAP[k]?.clr + "18", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform .2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} title={"Jump to " + LEVEL_MAP[k]?.name}>
+                        <div key={"ax-"+k} onClick={() => scrollToChat(k)} style={{ width: 36, height: 36, borderRadius: 8, background: LEVEL_MAP[k]?.clr + "18", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform .2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} title={"Prejsť na " + LEVEL_MAP[k]?.name}>
                           <AxisIco k={k} size={30} />
                         </div>
                       ))}
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "flex-start" }}>
                       <button id="tut-feat-integrate" className="ib" onClick={integrateSelected}>
-                        {"Integrate " + selectedCount + (selectedCount === 1 ? " perspective" : " perspectives") + " into Yellow"}
+                        {"Integrovať " + selectedCount + (selectedCount === 1 ? " perspektívu" : " perspektívy") + " do Žltej"}
                       </button>
                       {selectedCount >= 2 && (
                         <button id="tut-feat-conflict" className="ib ib-conflict" onClick={analyzeConflicts} disabled={conflictLoading}>
-                          {conflictLoading ? "Analyzing tensions..." : "Tensions Between " + selectedCount + " Perspectives"}
+                          {conflictLoading ? "Analyzujem napätia..." : "Napätia medzi " + selectedCount + " perspektívami"}
                         </button>
                       )}
                     </div>
@@ -910,7 +910,7 @@ export default function App() {
                 {conflictResult && (
                   <div style={{ marginTop: 14, padding: "16px 18px", background: "rgba(10,10,18,.8)", border: "1px solid rgba(248,113,113,.15)", borderRadius: 12, borderLeft: "3px solid rgba(248,113,113,.3)", backdropFilter: "blur(10px)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600, color: "#F87171", letterSpacing: 1.5, textTransform: "uppercase" }}>Tensions Between Perspectives</span>
+                      <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600, color: "#F87171", letterSpacing: 1.5, textTransform: "uppercase" }}>Napätia medzi perspektívami</span>
                       {Object.keys(selected).filter(k => selected[k]).map(k => (
                         <div key={"cax-"+k} onClick={() => scrollToChat(k)} style={{ width: 30, height: 30, borderRadius: 7, background: LEVEL_MAP[k]?.clr + "18", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform .2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} title={"Jump to " + LEVEL_MAP[k]?.name}>
                           <AxisIco k={k} size={24} />
@@ -918,13 +918,13 @@ export default function App() {
                       ))}
                     </div>
                     <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 300, lineHeight: 1.8, color: "rgba(221,221,221,.85)", whiteSpace: "pre-line" }}>{conflictResult}</div>
-                    {conflictLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}><div className="ldb" style={{ color: "#F87171" }} /><span className="lt">Analyzing...</span></div>}
+                    {conflictLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}><div className="ldb" style={{ color: "#F87171" }} /><span className="lt">Analyzujem...</span></div>}
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
                       <button onClick={elaborateConflicts} disabled={conflictLoading} style={{ padding: "5px 14px", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 7, color: "#F87171", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Rozvinúť napätia</button>
                       <button onClick={() => setConflictResult("")} style={{ padding: "5px 14px", background: "none", border: "1px solid rgba(255,255,255,.1)", borderRadius: 7, color: "rgba(255,255,255,.4)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer" }}>Zavrieť</button>
                     </div>
                     <div style={{ display: "flex", gap: 8, marginTop: 10, alignItems: "flex-end" }}>
-                      <input className="ci" value={conflictInput} onChange={e => setConflictInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendConflictQuestion(); }}} placeholder="Ask about tensions..." disabled={conflictLoading} style={{ borderColor: "rgba(248,113,113,.15)", fontSize: 13 }} />
+                      <input className="ci" value={conflictInput} onChange={e => setConflictInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendConflictQuestion(); }}} placeholder="Opýtaj sa na napätia..." disabled={conflictLoading} style={{ borderColor: "rgba(248,113,113,.15)", fontSize: 13 }} />
                       <button className="sb" onClick={sendConflictQuestion} disabled={conflictLoading || !conflictInput.trim()} style={{ background: "rgba(248,113,113,.1)", color: "#F87171", border: "1px solid rgba(248,113,113,.2)" }}>Opýtať sa</button>
                     </div>
                   </div>
@@ -933,9 +933,9 @@ export default function App() {
             )}
 
             <div id="tut-feat-integrative" className="ms">
-              <div className="ml"><Ico k="yellow" size={20} /> Integrative Dialogue <span className="bg2">Yellow</span></div>
-              <div className="msl">Continue exploring the topic from an integrative, systemic perspective</div>
-              {integratedContext && <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, color: "rgba(250,204,21,.5)", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>Integrated perspectives are included in context</div>}
+              <div className="ml"><Ico k="yellow" size={20} /> Integratívny dialóg <span className="bg2">Žltá</span></div>
+              <div className="msl">Pokračuj v skúmaní témy z integratívnej, systémovej perspektívy</div>
+              {integratedContext && <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, color: "rgba(250,204,21,.5)", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>Integrované perspektívy sú zahrnuté v kontexte</div>}
               {reflection && (
                 <div style={{ padding: "12px 16px", marginBottom: 14, background: "rgba(250,204,21,.04)", border: "1px solid rgba(250,204,21,.1)", borderRadius: 10, fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 300, lineHeight: 1.7, color: "rgba(250,204,21,.55)", fontStyle: "italic" }}>
                   {reflection}
@@ -953,7 +953,7 @@ export default function App() {
             </div>
             <div className="ft">Each perspective is authentic {"·"} None is better or worse</div>
             <div style={{ textAlign: "center", marginTop: 20, display: "flex", justifyContent: "center", gap: 12 }}>
-              <button id="tut-feat-newtopic" className="btn" onClick={() => { setTopicSet(""); setTopic(""); }} style={{ fontSize: 11, padding: "8px 24px", margin: 0 }}>New Topic</button>
+              <button id="tut-feat-newtopic" className="btn" onClick={() => { setTopicSet(""); setTopic(""); }} style={{ fontSize: 11, padding: "8px 24px", margin: 0 }}>Nová téma</button>
               {openChatKeys.length > 0 && (
                 <div data-export-menu style={{ position: "relative" }}>
                   <button id="tut-feat-export" className="btn" onClick={() => setExportMenuOpen(p => !p)} style={{ fontSize: 11, padding: "8px 24px", margin: 0, background: "rgba(255,255,255,.06)", borderColor: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.6)" }}>Exportovať ▾</button>
