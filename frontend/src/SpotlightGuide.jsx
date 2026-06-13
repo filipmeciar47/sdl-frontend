@@ -206,7 +206,7 @@ export function GuideOverlay({ guide }) {
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={skip} style={{ padding: "6px 14px", background: "none", border: "none",
               color: "rgba(255,255,255,.4)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer" }}>
-              Skip
+              Preskočiť
             </button>
             <button onClick={next} style={{ padding: "6px 20px", background: "rgba(250,204,21,.15)",
               border: "1px solid rgba(250,204,21,.35)", borderRadius: 8, color: "#FACC15",
@@ -243,7 +243,7 @@ export function GuideButton({ guide, style, tipSide = "left", tipAbove = false }
           <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
           <line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
-        Guide
+        Sprievodca
       </button>
 
       {guide.showIntroTip && (
@@ -258,7 +258,7 @@ export function GuideButton({ guide, style, tipSide = "left", tipAbove = false }
           pointerEvents: "none",
         }}>
           <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, lineHeight: 1.6 }}>
-            <span style={{ fontWeight: 600, color: "rgba(250,204,21,.95)" }}>App Guide. </span>
+            <span style={{ fontWeight: 600, color: "rgba(250,204,21,.95)" }}>Sprievodca. </span>
             <span style={{ fontWeight: 300, color: "rgba(240,240,240,.85)" }}>
               Kliknutím vás krok po kroku prevediem funkciami.
             </span>

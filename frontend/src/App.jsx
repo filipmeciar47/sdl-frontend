@@ -361,7 +361,7 @@ export default function App() {
     if (chatKeys.length > 0) {
       chatKeys.forEach(key => {
         const l = LEVEL_MAP[key]; const chat = colorChats[key];
-        const axisLabel = l.axis === "express" ? "Express-self" : "Deny-self";
+        const axisLabel = l.axis === "express" ? "Expresívna (JA)" : "Kolektívna (MY)";
         body += '<div class="section"><h2 style="color:' + l.clr + '">' + esc(l.name) + ' — ' + esc(l.sub) + '</h2><p class="axis">' + axisLabel + '</p>';
         chat.messages.forEach(m => {
           if (m.role === "error") return;
@@ -376,7 +376,7 @@ export default function App() {
     if (mainChat.length > 0) {
       body += '<div class="section"><h2>Integratívny dialóg</h2>';
       mainChat.forEach(m => {
-        if (m.role === "user") body += '<div class="q"><strong>Question:</strong> ' + esc(m.content) + '</div>';
+        if (m.role === "user") body += '<div class="q"><strong>Otázka:</strong> ' + esc(m.content) + '</div>';
         else body += '<div class="a">' + esc(m.content) + '</div>';
       });
       body += '</div>';
@@ -395,7 +395,7 @@ export default function App() {
     let md = `# Spiral Dynamics Lens\n**Téma:** ${topicSet}\n\n`;
     chatKeys.forEach(key => {
       const l = LEVEL_MAP[key]; const chat = colorChats[key];
-      const axisLabel = l.axis === "express" ? "Express-self" : "Deny-self";
+      const axisLabel = l.axis === "express" ? "Expresívna (JA)" : "Kolektívna (MY)";
       md += `### ${l.name} — ${l.sub}\n*${axisLabel}*\n\n`;
       chat.messages.forEach(m => {
         if (m.role === "error") return;
@@ -408,7 +408,7 @@ export default function App() {
     if (mainChat.length > 0) {
       md += `## Integratívny dialóg\n\n`;
       mainChat.forEach(m => {
-        if (m.role === "user") md += `**Question:** ${m.content}\n\n`;
+        if (m.role === "user") md += `**Otázka:** ${m.content}\n\n`;
         else md += `${m.content}\n\n`;
       });
     }
