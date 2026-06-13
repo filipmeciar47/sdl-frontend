@@ -212,7 +212,7 @@ export function GuideOverlay({ guide }) {
               border: "1px solid rgba(250,204,21,.35)", borderRadius: 8, color: "#FACC15",
               fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 500, letterSpacing: 1,
               textTransform: "uppercase", cursor: "pointer" }}>
-              {hasNext ? "Next" : "Done"}
+              {hasNext ? "Ďalej" : "Hotovo"}
             </button>
           </div>
         </div>
@@ -260,7 +260,7 @@ export function GuideButton({ guide, style, tipSide = "left", tipAbove = false }
           <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, lineHeight: 1.6 }}>
             <span style={{ fontWeight: 600, color: "rgba(250,204,21,.95)" }}>App Guide. </span>
             <span style={{ fontWeight: 300, color: "rgba(240,240,240,.85)" }}>
-              Click to walk through the features step by step.
+              Kliknutím vás krok po kroku prevediem funkciami.
             </span>
           </div>
         </div>
