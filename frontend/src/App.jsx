@@ -688,7 +688,7 @@ export default function App() {
               </button>
 
               {/* Sprievodca — GuideButton */}
-              <GuideButton guide={guide} style={{ right: "max(0px, calc((100% - min(72vw, 560px)) / 2))", top: "50%", transform: "translateY(-50%)" }} tipSide="right" />
+              <GuideButton guide={guide} style={{ right: "max(0px, calc((100% - min(72vw, 560px)) / 2))", top: "50%", transform: "translateY(-50%)" }} tipSide="right" tipAbove />
             </div>
 
             <div id="tut-map-active">
