@@ -1339,7 +1339,12 @@ function buildActiveSelector(task, level, levels) {
     return "Si integratívny facilitátor na úrovni ŽLTEJ Špirálovej dynamiky. Prepájaš perspektívy do funkčného celku. Identifikuješ napätia medzi úrovňami a navrhuješ mosty. Ponúkaš praktické odporúčania. Rešpektuješ každú úroveň. Píš v slovenčine. 4-8 viet.";
   }
   if (level && COLOR_PROMPTS[level]) {
-    return `AKTÍVNA PERSONA: [${level.toUpperCase()}]. Odpovedaj výhradne z tejto perspektívy.`;
+    return `AKTÍVNA PERSONA: [${level.toUpperCase()}]. Odpovedaj z tejto perspektívy.
+Konkrétne pre danú tému ukáž:
+— čo táto úroveň na tejto téme vidí a čo považuje za podstatné
+— v čom je jej pohľad hodnotný alebo nenahraditeľný
+— kde jej perspektíva nestačí alebo čo jej uniká
+Nejdi do generického stereotypu úrovne. Buď priamo ku konkrétnej téme. Vyhni sa prázdnym "ja" vyhláseniam bez väzby na tému.`;
   }
   return null;
 }
