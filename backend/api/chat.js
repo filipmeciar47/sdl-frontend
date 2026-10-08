@@ -1356,19 +1356,83 @@ Nejdi do generického stereotypu úrovne. Buď priamo ku konkrétnej téme. Vyhn
 // Never hardcode the key here.
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// ─── CORS: allowlist domén namiesto '*' ──────────────────────────────────────
+// Predtým tu bolo `Access-Control-Allow-Origin: *` → endpoint mohol zavolať a odpoveď
+// aj prečítať akýkoľvek web. Teraz sa echo-uje výhradne origin z allowlistu.
+//
+// ALLOWED_ORIGINS je POVINNÁ env premenná (Vercel → Settings → Environment Variables),
+// napr. `https://moj-frontend.vercel.app`. Viac domén oddeľ čiarkou.
+//
+// Zámerne tu NIE JE regex na preview deploye: vzor ako `frontend-*.vercel.app` by
+// pustil hocijaký cudzí Vercel projekt s takým názvom. Preview domény, ktoré reálne
+// potrebuješ, pridaj do ALLOWED_ORIGINS.
+//
+// Pozor na hranice tejto ochrany: Origin je dôveryhodný len vtedy, keď ho pripisuje
+// prehliadač — curl si ho vymyslí. Chráni teda pred cudzím webom zneužívajúcim API
+// cez prehliadač návštevníka, nie pred skriptom. Na ten je rate-limit nižšie
+// a hlavne Spend limit v Anthropic konzole.
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+function corsOk(req, res) {
+  const origin = req.headers.origin || "";
+  if (!origin || !ALLOWED_ORIGINS.includes(origin)) return false; // presná zhoda
+  res.setHeader("Access-Control-Allow-Origin", origin); // konkrétna doména, nikdy '*'
+  res.setHeader("Vary", "Origin"); // správne cachovanie per-origin
+  return true;
+}
+
+// ─── Rate-limit: best effort, per warm inštanciu ──────────────────────────────
+// Tento backend dosiaľ nemal žiadny vlastný strop — jediným limitom bolo 429 od
+// Anthropicu. In-memory počítadlo sa resetuje pri cold starte a nezdieľa sa medzi
+// inštanciami, takže trvalý strop nastav vo Vercel Firewall → Rate limiting.
+//
+// Prečo 30 a nie menej: appka volá API raz za každú rozkliknutú úroveň
+// (`fetchInitial` vo frontende) plus integrovanú analýzu a konflikty, takže jeden
+// aktívny užívateľ spraví aj 10-15 volaní za minútu — a za firemnou NAT IP sedí
+// takých užívateľov viac. Nižší strop by generoval falošné 429. Ak ich aj tak
+// uvidíš, zvýš RATE_LIMIT_PER_MIN bez zásahu do kódu.
+const RATE_WINDOW_MS = 60_000;
+const RATE_LIMIT = parseInt(process.env.RATE_LIMIT_PER_MIN || "30", 10);
+const hits = new Map();
+
+function rateLimited(ip) {
+  const now = Date.now();
+  const arr = (hits.get(ip) || []).filter((t) => now - t < RATE_WINDOW_MS);
+  arr.push(now);
+  hits.set(ip, arr);
+  return arr.length > RATE_LIMIT;
+}
+
 module.exports = async function handler(req, res) {
+  if (!ALLOWED_ORIGINS.length) {
+    // Jasná 503 namiesto tichej 403 — nepomýli sa s bežnou CORS chybou.
+    console.error("ALLOWED_ORIGINS nie je nastavené — endpoint odmieta všetko.");
+    return res.status(503).json({ error: "Server misconfigured: ALLOWED_ORIGINS not set" });
+  }
+
+  const ok = corsOk(req, res);
+
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    if (!ok) return res.status(403).end();
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    return res.status(200).end();
+    res.setHeader("Access-Control-Max-Age", "86400");
+    return res.status(204).end();
   }
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  if (!ok) return res.status(403).json({ error: "Forbidden origin" });
+
+  const ip = String(req.headers["x-forwarded-for"] || "unknown").split(",")[0].trim();
+  if (rateLimited(ip)) {
+    return res.status(429).json({ error: "Too many requests. Try again in a minute." });
+  }
 
   const { level, task, levels, messages } = req.body || {};
   if (!messages || !Array.isArray(messages)) {
