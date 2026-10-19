@@ -474,7 +474,7 @@ export default function App() {
         setMainInput("");
         setIntegratedContext("");
       } catch (err) {
-        alert("Error loading file. Make sure it is a .md file exported from this application.");
+        alert("Chyba pri načítaní súboru. Skontrolujte, že ide o .md súbor exportovaný z tejto aplikácie.");
       }
     };
     reader.readAsText(file, "utf-8");
@@ -615,7 +615,7 @@ export default function App() {
               <GuideButton guide={guide} style={{ top: 8, right: 0, zIndex: 100 }} tipSide="right" />
             </div>
             <div style={{ position: "relative" }}>
-              <textarea id="tut-textarea" value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Enter a topic, problem, question, or situation..." />
+              <textarea id="tut-textarea" value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Zadajte tému, problém, otázku alebo situáciu..." />
               <button type="button" title="Pokračovať v uloženej analýze" onClick={() => importFileRef.current?.click()} style={{ position: "absolute", bottom: 10, right: 10, background: "none", border: "none", cursor: "pointer", opacity: 0.35, color: "rgba(255,255,255,0.8)", padding: 4, transition: "opacity 0.2s", lineHeight: 0 }} onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </button>
@@ -937,15 +937,15 @@ export default function App() {
               )}
               {mainChat.length > 0 && <div style={{ marginBottom: 14 }}>
                 {mainChat.map((m, i) => <div key={i} className={"mg " + (m.role === "user" ? "mu" : "ma")} style={m.role === "user" ? { borderLeftColor: "rgba(250,204,21,.25)" } : {}}>{m.content}</div>)}
-                {mainLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: "#FACC15" }} /><span className="lt">Integrating perspectives...</span></div>}
+                {mainLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: "#FACC15" }} /><span className="lt">Integrujem perspektívy...</span></div>}
                 <div ref={mainEndRef} />
               </div>}
               <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-                <input className="ci" value={mainInput} onChange={e => setMainInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMain(); }}} placeholder="Ask, explore the topic integratively..." disabled={mainLoading} style={{ borderColor: "rgba(250,204,21,.15)" }} />
-                <button className="sb" onClick={sendMain} disabled={mainLoading || !mainInput.trim()} style={{ background: "rgba(250,204,21,.1)", color: "#FACC15", border: "1px solid rgba(250,204,21,.2)" }}>Send</button>
+                <input className="ci" value={mainInput} onChange={e => setMainInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMain(); }}} placeholder="Spýtajte sa, preskúmajte tému integratívne..." disabled={mainLoading} style={{ borderColor: "rgba(250,204,21,.15)" }} />
+                <button className="sb" onClick={sendMain} disabled={mainLoading || !mainInput.trim()} style={{ background: "rgba(250,204,21,.1)", color: "#FACC15", border: "1px solid rgba(250,204,21,.2)" }}>Odoslať</button>
               </div>
             </div>
-            <div className="ft">Each perspective is authentic {"·"} None is better or worse</div>
+            <div className="ft">Každá perspektíva je autentická {"·"} Žiadna nie je lepšia ani horšia</div>
             <div style={{ textAlign: "center", marginTop: 20, display: "flex", justifyContent: "center", gap: 12 }}>
               <button id="tut-feat-newtopic" className="btn" onClick={() => { setTopicSet(""); setTopic(""); }} style={{ fontSize: 11, padding: "8px 24px", margin: 0 }}>Nová téma</button>
               {openChatKeys.length > 0 && (
@@ -953,8 +953,8 @@ export default function App() {
                   <button id="tut-feat-export" className="btn" onClick={() => setExportMenuOpen(p => !p)} style={{ fontSize: 11, padding: "8px 24px", margin: 0, background: "rgba(255,255,255,.06)", borderColor: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.6)" }}>Exportovať ▾</button>
                   {exportMenuOpen && (
                     <div style={{ position: "absolute", bottom: "calc(100% + 4px)", left: 0, background: "rgba(10,10,18,.97)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 8, overflow: "hidden", zIndex: 200, minWidth: "100%", boxShadow: "0 4px 24px rgba(0,0,0,.5)" }}>
-                      <button onClick={() => { exportConversation(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", borderBottom: "1px solid rgba(255,255,255,.07)", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Download PDF</button>
-                      <button onClick={() => { exportMarkdown(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Download for continuation</button>
+                      <button onClick={() => { exportConversation(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", borderBottom: "1px solid rgba(255,255,255,.07)", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť PDF</button>
+                      <button onClick={() => { exportMarkdown(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť na pokračovanie</button>
                     </div>
                   )}
                 </div>
