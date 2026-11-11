@@ -1,11 +1,34 @@
-const fs = require('fs');
+/* revert_en2.js — ARCHIVOVANÉ. Pôvodný migračný nástroj z 10/2026.
+ *
+ * Dobieral to, čo revert_en.js minul: zvyšné reťazce v App.jsx a kompletný
+ * sprievodca v SpotlightGuide.jsx. Dnes už nemá čo meniť — produkčné súbory
+ * sú preložené, takže náhrady minú a zápis sa odmietne. Úloha je teraz
+ * OVEROVACIA: náhľad vypíše, čo je ešte anglické.
+ *
+ * Pojistky sú opísané v safe-patch.js a v README.md vedľa. Krátko: --repo je
+ * povinný, predvolene sa nič nezapisuje, nahrádza sa každý výskyt a jediný
+ * MISS znamená, že sa nezapíše nič.
+ *
+ * Dáta nižšie sú vyrezané z pôvodného skriptu nezmenené. Dve náhrady sú
+ * regexové, lebo musia tolerovať CRLF aj LF — pôvodne aj tie menili len prvý
+ * výskyt, teraz menia všetky.
+ *
+ *   node tools/archive/revert_en2.js --repo=.            (náhľad)
+ *   node tools/archive/revert_en2.js --repo=. --write     (zápis)
+ */
 
-// Fix remaining misses from revert_en.js
+'use strict';
 
-// ─── App.jsx remaining 5 ─────────────────────────────────────────────────────
+const { patcher } = require('./safe-patch');
+
+const p = patcher({
+  name: 'revert_en2',
+  purpose: 'Dobratie zvyškov anglického prekladu (archivované, dnes overovacie).',
+});
+
+// ─── frontend/src/App.jsx — zvyšné reťazce ───────────────────────────────────
 {
-  let c = fs.readFileSync('frontend/src/App.jsx', 'utf8');
-  let ok = 0, fail = 0;
+  const app = p.file('frontend/src/App.jsx');
 
   const reps = [
     // 1. Failed to load perspectives — single close paren
@@ -20,44 +43,24 @@ const fs = require('fs');
     // 4 & 5 handled below with regex for CRLF tolerance
   ];
 
-  for (const [from, to] of reps) {
-    if (c.includes(from)) { c = c.replace(from, to); ok++; }
-    else { console.log('  MISS:', JSON.stringify(from).slice(0, 80)); fail++; }
-  }
+  app.many(reps);
 
-  // Handle "View Style" and "Run Analysis" with regex to tolerate CRLF
-  if (/\bView Style[\r\n]/.test(c)) {
-    c = c.replace(/\bView Style([\r\n])/, 'Štýl zobrazenia$1');
-    ok++;
-  } else { console.log('  MISS: View Style line'); fail++; }
+  // Tieto dva vzory musia zniesť CRLF aj LF, preto regex.
+  app.regex(/\bView Style([\r\n])/, 'Štýl zobrazenia$1', 'View Style');
+  app.regex(/\bRun Analysis([\r\n])/, 'Spustiť analýzu$1', 'Run Analysis');
 
-  if (/\bRun Analysis[\r\n]/.test(c)) {
-    c = c.replace(/\bRun Analysis([\r\n])/, 'Spustiť analýzu$1');
-    ok++;
-  } else { console.log('  MISS: Run Analysis line'); fail++; }
-
-  // Also check if Topic label was actually just part of a longer string (line 385)
-  // The line has: '<strong>Topic:</strong> ' inside the html const
-  const topicHtml = "'<head><meta charset=\"UTF-8\"><title>Spiral Dynamics";
-  // Let's just target the exact substring
-  const oldMeta = '<div class="meta"><strong>Topic:</strong> ';
-  const newMeta = '<div class="meta"><strong>Téma:</strong> ';
-  if (c.includes(oldMeta)) { c = c.replace(oldMeta, newMeta); ok++; }
-  else console.log('  MISS meta topic (already done or different)');
-
-  fs.writeFileSync('frontend/src/App.jsx', c, 'utf8');
-  console.log('App.jsx fix2 — ok:', ok, 'miss:', fail);
+  // Popisok témy v HTML exporte.
+  app.rep(
+    '<div class="meta"><strong>Topic:</strong> ',
+    '<div class="meta"><strong>Téma:</strong> ',
+    'meta Topic'
+  );
 }
 
-// ─── SpotlightGuide.jsx — CRLF version ──────────────────────────────────────
+// ─── frontend/src/SpotlightGuide.jsx — celý sprievodca ───────────────────────
 {
-  let c = fs.readFileSync('frontend/src/SpotlightGuide.jsx', 'utf8');
-  // Detect line ending
-  const crlf = c.includes('\r\n');
-  const nl = crlf ? '\r\n' : '\n';
-  console.log('SpotlightGuide line ending:', crlf ? 'CRLF' : 'LF');
-
-  let ok = 0, fail = 0;
+  const guide = p.file('frontend/src/SpotlightGuide.jsx');
+  const nl = guide.nl; // zistené zo súboru, nie hádané
 
   const steps = [
     ['      bold: "Detailed tutorial.",' + nl + '      text: "Opens the full interactive guide with all Spiral Dynamics levels and concept explanations. Useful if you\'re new to Spiral Dynamics." },',
@@ -92,13 +95,7 @@ const fs = require('fs');
      '      bold: "Nová téma.",' + nl + '      text: "Vymaže všetko a vráti vás na začiatok pre novú tému." },'],
   ];
 
-  for (const [from, to] of steps) {
-    if (c.includes(from)) { c = c.replace(from, to); ok++; }
-    else { console.log('  MISS:', JSON.stringify(from).slice(0, 80)); fail++; }
-  }
-
-  fs.writeFileSync('frontend/src/SpotlightGuide.jsx', c, 'utf8');
-  console.log('SpotlightGuide.jsx — ok:', ok, 'miss:', fail);
+  guide.many(steps);
 }
 
-console.log('\nDone.');
+p.finish();

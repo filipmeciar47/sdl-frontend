@@ -1,18 +1,32 @@
-const fs = require('fs');
+/* revert_en.js — ARCHIVOVANÉ. Pôvodný migračný nástroj z 10/2026.
+ *
+ * Vracal anglický preklad produkčnej appky späť do slovenčiny. Dnes už
+ * nemá čo meniť: produkčné súbory sú preložené, takže každá náhrada minie
+ * a skript zápis odmietne. Jeho úloha je teraz OVEROVACIA — náhľad vypíše,
+ * ktoré reťazce sú ešte anglické.
+ *
+ * Pojistky (prečo a aké) sú opísané v safe-patch.js a v README.md vedľa.
+ * Krátko: --repo je povinný, predvolene sa nič nezapisuje, nahrádza sa každý
+ * výskyt a jediný MISS znamená, že sa nezapíše nič.
+ *
+ * Dáta (páry anglický → slovenský reťazec) sú nižšie nezmenené. Tie isté
+ * páry sú ako čisté dáta v tools/i18n/sk-en-strings.json.
+ *
+ *   node tools/archive/revert_en.js --repo=.            (náhľad)
+ *   node tools/archive/revert_en.js --repo=. --write     (zápis)
+ */
 
-function patch(filePath, replacements) {
-  let c = fs.readFileSync(filePath, 'utf8');
-  let ok = 0, fail = 0;
-  for (const [from, to] of replacements) {
-    if (c.includes(from)) { c = c.replace(from, to); ok++; }
-    else { console.log('  MISS:', JSON.stringify(from).slice(0, 80)); fail++; }
-  }
-  fs.writeFileSync(filePath, c, 'utf8');
-  console.log(filePath.split(/[/\\]/).pop(), '— ok:', ok, 'miss:', fail);
-}
+'use strict';
+
+const { patcher } = require('./safe-patch');
+
+const p = patcher({
+  name: 'revert_en',
+  purpose: 'Revert anglického prekladu späť do slovenčiny (archivované, dnes overovacie).',
+});
 
 // ─── backend/api/chat.js ──────────────────────────────────────────────────────
-patch('backend/api/chat.js', [
+p.file('backend/api/chat.js').many([
   [
     'RULE: Each call activates ONE persona (or a group for integrative/conflict mode) via the instruction in the next block. Apply the active persona consistently — do not bleed into it the language, SILENT FACILITATION, or RECOGNITION OF LIMITS of other levels. You respond primarily from the perspective of the activated level. Include facilitation elements naturally. Write in English.',
     'PRAVIDLO: Každé volanie aktivuje JEDNU personu (alebo skupinu pre integratívny/konfliktný mód) cez inštrukciu v nasledujúcom bloku. Aktívnu personu aplikuj dôsledne — neprelievaj do nej jazyk, TICHÚ FACILITÁCIU ani ROZPOZNANIE HRANÍC iných úrovní. Odpovedáš primárne z perspektívy aktivovanej úrovne. Facilitačné prvky zaraď prirodzene. Píš v slovenčine.'
@@ -44,7 +58,7 @@ patch('backend/api/chat.js', [
 ]);
 
 // ─── frontend/src/SpiralLensV5.jsx ───────────────────────────────────────────
-patch('frontend/src/SpiralLensV5.jsx', [
+p.file('frontend/src/SpiralLensV5.jsx').many([
   ["{ id: 'beige',     name: 'BEIGE',     motto: 'Survival',",
    "{ id: 'beige',     name: 'BÉŽOVÁ',    motto: 'Prežitie',"],
   ["{ id: 'purple',    name: 'PURPLE',    motto: 'Clan Safety',",
@@ -64,7 +78,7 @@ patch('frontend/src/SpiralLensV5.jsx', [
 ]);
 
 // ─── frontend/src/SpiralMandala.jsx ──────────────────────────────────────────
-patch('frontend/src/SpiralMandala.jsx', [
+p.file('frontend/src/SpiralMandala.jsx').many([
   ["? 'Click a layer to open it + all inner levels'",
    "? 'Kliknutím na vrstvu otvoríte túto + všetky vnútorné úrovne'"],
   ["'Click to add / remove a level; each one stays highlighted in its color'",
@@ -72,7 +86,7 @@ patch('frontend/src/SpiralMandala.jsx', [
 ]);
 
 // ─── frontend/src/SpotlightGuide.jsx — len GUIDE_STEPS texty ─────────────────
-patch('frontend/src/SpotlightGuide.jsx', [
+p.file('frontend/src/SpotlightGuide.jsx').many([
   ['      bold: "Detailed tutorial.",\n      text: "Opens the full interactive guide with all Spiral Dynamics levels and concept explanations. Useful if you\'re new to Spiral Dynamics." },',
    '      bold: "Detailný tutoriál.",\n      text: "Otvorí kompletnú interaktívnu príručku so všetkými úrovňami špirálovej dynamiky a vysvetleniami konceptov. Užitočné, ak Spiral Dynamics ešte nepoznáte." },'],
   ['      bold: "Enter your topic here.",\n      text: "A question, problem, or situation you want to explore. This is not a regular chat — it\'s an entry point into multi-level analysis." },',
@@ -106,7 +120,7 @@ patch('frontend/src/SpotlightGuide.jsx', [
 ]);
 
 // ─── frontend/src/App.jsx ─────────────────────────────────────────────────────
-patch('frontend/src/App.jsx', [
+p.file('frontend/src/App.jsx').many([
   // LEVELS array — names and subs
   ['{ key: "beige", name: "BEIGE", sub: "Survival",',
    '{ key: "beige", name: "BÉŽOVÁ", sub: "Prežitie",'],
@@ -276,4 +290,4 @@ patch('frontend/src/App.jsx', [
    '>Nová téma<'],
 ]);
 
-console.log('\nDone.');
+p.finish();
