@@ -1,7 +1,13 @@
 ﻿import { useState, useRef, useEffect, useMemo } from "react";
 import SpiralLensV5 from "./SpiralLensV5";
+import SpiralLensV5EN from "./SpiralLensV5_en";
 import SpiralMandala, { SpiralMandalaCore } from "./SpiralMandala";
+import SpiralMandalaEN, { SpiralMandalaCore as SpiralMandalaCorEN } from "./SpiralMandala_en";
 import { useSpotlightGuide, GuideButton, GuideOverlay } from "./SpotlightGuide";
+import { useSpotlightGuide as useSpotlightGuideEN, GuideButton as GuideButtonEN, GuideOverlay as GuideOverlayEN } from "./SpotlightGuide_en";
+import MySDL from "./mysdl/MySDL";
+import MySDLEn from "./mysdl/MySDL.en";
+import { supabase, supabaseReady } from "./lib/supabaseClient";
 
 const ICONS = {
   beige: "data:image/png;base64,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",
@@ -32,7 +38,9 @@ const BG_IMG = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANC
 
 const TITLE_IMG = "/assets/logo-title.png";
 
-const LEVELS = [
+const _lang = new URLSearchParams(window.location.search).get("lang") || "sk";
+
+const LEVELS_SK = [
   { key: "beige", name: "BÉŽOVÁ", sub: "Prežitie", clr: "#C4A882", bg: "#1e1a14", axis: "express", r0: 0, r1: 0.12 },
   { key: "purple", name: "PURPUROVÁ", sub: "Bezpečie klanu", clr: "#A78BFA", bg: "#1a1528", axis: "deny", r0: 0.12, r1: 0.19 },
   { key: "red", name: "ČERVENÁ", sub: "Moc a vôľa", clr: "#F87171", bg: "#2a1212", axis: "express", r0: 0.19, r1: 0.27 },
@@ -42,36 +50,68 @@ const LEVELS = [
   { key: "yellow", name: "ŽLTÁ", sub: "Systémová integrácia", clr: "#FACC15", bg: "#2a250e", axis: "express", r0: 0.76, r1: 0.90 },
   { key: "turquoise", name: "TYRKYSOVÁ", sub: "Celostné vedomie", clr: "#2DD4BF", bg: "#0e2422", axis: "deny", r0: 0.90, r1: 1.0 },
 ];
+
+const LEVELS_EN = [
+  { key: "beige", name: "BEIGE", sub: "Survival", clr: "#C4A882", bg: "#1e1a14", axis: "express", r0: 0, r1: 0.12 },
+  { key: "purple", name: "PURPLE", sub: "Safety of the tribe", clr: "#A78BFA", bg: "#1a1528", axis: "deny", r0: 0.12, r1: 0.19 },
+  { key: "red", name: "RED", sub: "Power and will", clr: "#F87171", bg: "#2a1212", axis: "express", r0: 0.19, r1: 0.27 },
+  { key: "blue", name: "BLUE", sub: "Order and meaning", clr: "#60A5FA", bg: "#121a2a", axis: "deny", r0: 0.27, r1: 0.40 },
+  { key: "orange", name: "ORANGE", sub: "Success and drive", clr: "#FB923C", bg: "#2a1c0e", axis: "express", r0: 0.40, r1: 0.58 },
+  { key: "green", name: "GREEN", sub: "Harmony and equality", clr: "#4ADE80", bg: "#0e2218", axis: "deny", r0: 0.58, r1: 0.76 },
+  { key: "yellow", name: "YELLOW", sub: "Systemic integration", clr: "#FACC15", bg: "#2a250e", axis: "express", r0: 0.76, r1: 0.90 },
+  { key: "turquoise", name: "TURQUOISE", sub: "Holistic awareness", clr: "#2DD4BF", bg: "#0e2422", axis: "deny", r0: 0.90, r1: 1.0 },
+];
+
+const LEVELS = _lang === "en" ? LEVELS_EN : LEVELS_SK;
 const LEVEL_MAP = {}; LEVELS.forEach(l => { LEVEL_MAP[l.key] = l; });
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
+// Hláška zo servera má prednosť pred vymyslenou — backend posiela `error` (EN) aj `error_sk`.
+function srvMsg(err, fallbackSk, fallbackEn) {
+  const m = _lang === "en" ? (err && (err.error || err.error_sk)) : (err && (err.error_sk || err.error));
+  return m || (_lang === "en" ? fallbackEn : fallbackSk);
+}
+
 async function callAPI(params, messages) {
-  const body = JSON.stringify({ ...params, messages });
+  const body = JSON.stringify({ ...params, messages, lang: _lang });
   const retryDelays = [5000, 10000];
+
+  // Prihlásený posiela token → per-user denný limit; anonym ide bez tokenu (per-IP limit).
+  let authHeaders = {};
+  try {
+    if (supabase) {
+      const { data } = await supabase.auth.getSession();
+      const t = data && data.session && data.session.access_token;
+      if (t) authHeaders = { Authorization: `Bearer ${t}` };
+    }
+  } catch (e) { /* anonym */ }
 
   for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
     const response = await fetch(`${BACKEND_URL}/api/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders },
       body,
     });
 
     if (response.status === 429) {
-      const delay = attempt < retryDelays.length ? retryDelays[attempt] : 15000;
-      await new Promise(r => setTimeout(r, delay));
-      if (attempt === retryDelays.length) {
-        throw new Error("Niečo sa pokazilo, skúste neskôr. (429)");
+      const err = await response.json().catch(() => ({}));
+      // LIMIT = strop požiadaviek → okamžité opakovanie nepomôže, hláška hneď.
+      // QUOTA = AI služba je vyťažená (prechodné) → skús znova s odstupom;
+      // pri poslednom pokuse už nečakaj zbytočne, hneď vyhoď chybu.
+      if (err.code === "LIMIT" || attempt === retryDelays.length) {
+        throw new Error(srvMsg(err, "Niečo sa pokazilo, skúste neskôr. (429)", "Something went wrong, please try later. (429)"));
       }
+      await new Promise(r => setTimeout(r, retryDelays[attempt]));
       continue;
     }
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
-      throw new Error(err.error || "API chyba. Skúste znova.");
+      throw new Error(srvMsg(err, "API chyba. Skúste znova.", "API error. Please try again."));
     }
     const data = await response.json();
-    if (!data.content) throw new Error("Prázdna odpoveď. Skúste znova.");
+    if (!data.content) throw new Error(_lang === "en" ? "Empty response. Please try again." : "Prázdna odpoveď. Skúste znova.");
     return data.content;
   }
 }
@@ -96,11 +136,115 @@ export default function App() {
   const [mainInput, setMainInput] = useState("");
   const [mainLoading, setMainLoading] = useState(false);
   const [integratedContext, setIntegratedContext] = useState("");
-  const [viewMode, setViewMode] = useState("mandala");
+  const [viewMode, setViewMode] = useState(() => window.innerWidth >= 768 ? "icons" : "mandala");
   const [pendingLevels, setPendingLevels] = useState(new Set());
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [mysdlModalOpen, setMysdlModalOpen] = useState(false);
+  const [mysdlOpen, setMysdlOpen] = useState(false);
+  const [mysdlAccess, setMysdlAccess] = useState("full");
+  // --- Späť v prehliadači zatvára otvorenú obrazovku/overlay namiesto opustenia appky ---
+  const skipPopRef = useRef(false);
+  const pushView = () => { try { window.history.pushState({ sdlView: 1 }, ""); } catch (e) {} };
+  const consumeView = () => { if (typeof window !== "undefined" && window.history.state && window.history.state.sdlView) { skipPopRef.current = true; window.history.back(); } };
+  const openTutorial = () => { setTutorialOpen(true); pushView(); };
+  const openMySDL = (access) => { const fromModal = mysdlModalOpen; setMysdlAccess(access); setMysdlModalOpen(false); setMysdlOpen(true); if (!fromModal) pushView(); };
+  useEffect(() => {
+    const onPop = () => {
+      if (skipPopRef.current) { skipPopRef.current = false; return; }
+      if (mysdlOpen) { setMysdlOpen(false); return; }
+      if (mysdlModalOpen) { setMysdlModalOpen(false); return; }
+      if (tutorialOpen) { setTutorialOpen(false); return; }
+      if (topicSet) { setTopicSet(""); return; }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [mysdlOpen, mysdlModalOpen, tutorialOpen, topicSet]);
+  const [session, setSession] = useState(null);
+  const [authMode, setAuthMode] = useState("in"); // "in" = prihlásenie, "up" = registrácia
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPass, setAuthPass] = useState("");
+  const [authMsg, setAuthMsg] = useState(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  useEffect(() => {
+    if (!supabaseReady) return;
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+  const openAuthModal = () => { setAuthMsg(null); setAuthPass(""); setAuthMode("in"); setMysdlModalOpen(true); pushView(); };
+  // MySDL AI akcia bez prihlásenia (event z mysdlAI) → zavri MySDL náhľad a otvor registráciu.
+  useEffect(() => {
+    const onAuthRequired = () => {
+      setMysdlOpen(false);
+      setAuthPass(""); setAuthMode("up"); setMysdlModalOpen(true);
+      setAuthMsg(_lang === "en" ? "Sign in or register to use MySDL features." : "Na používanie MySDL funkcií sa prihlás alebo zaregistruj.");
+    };
+    window.addEventListener("sdl:auth-required", onAuthRequired);
+    return () => window.removeEventListener("sdl:auth-required", onAuthRequired);
+  }, []);
+  function authErr(e) {
+    const m = (e && e.message ? e.message : "").toLowerCase();
+    const en = _lang === "en";
+    // MUSÍ byť prvá vetva: sieťová chyba neobsahuje žiadne z kľúčových slov nižšie,
+    // takže by prepadla na všeobecný `return e.message` a užívateľ by videl
+    // "Failed to fetch" — teda hlášku, ktorá mu nepovie, že chyba nie je u neho.
+    // Stáva sa to, keď je Supabase projekt pozastavený alebo nedostupný.
+    if (m.includes("failed to fetch") || m.includes("network") || m.includes("load failed") ||
+        (e && e.name === "AuthRetryableFetchError"))
+      return en
+        ? "The sign-in service is temporarily unavailable — this isn't your fault. Please try again later."
+        : "Prihlasovacia služba je teraz nedostupná — nie je to chyba u teba. Skús to prosím neskôr.";
+    if (m.includes("leaked") || m.includes("pwned") || m.includes("breach") || m.includes("compromis"))
+      return en ? "This password appeared in a data breach — choose a stronger, unique one." : "Toto heslo sa našlo v úniku dát — zvoľ silnejšie, jedinečné heslo.";
+    if (m.includes("invalid login")) return en ? "Wrong email or password." : "Nesprávny email alebo heslo.";
+    if (m.includes("already registered") || m.includes("already exists")) return en ? "This email is already registered — please sign in." : "Tento email už je registrovaný — prihlás sa.";
+    if (m.includes("at least") && m.includes("charac")) return en ? "Password must be at least 6 characters." : "Heslo musí mať aspoň 6 znakov.";
+    if (m.includes("not confirmed") || (m.includes("confirm") && m.includes("email"))) return en ? "Confirm your email first (check your inbox)." : "Najprv potvrď email (skontroluj schránku).";
+    if (m.includes("not enabled")) return en ? "Google sign-in isn't enabled yet." : "Google prihlásenie zatiaľ nie je zapnuté.";
+    return (e && e.message) || (en ? "Authentication failed." : "Prihlásenie zlyhalo.");
+  }
+  async function authEmailSubmit() {
+    if (!supabaseReady || authLoading) return;
+    if (!authEmail.trim() || !authPass) { setAuthMsg(_lang === "en" ? "Enter email and password." : "Zadaj email aj heslo."); return; }
+    setAuthLoading(true); setAuthMsg(null);
+    try {
+      if (authMode === "up") {
+        const { data, error } = await supabase.auth.signUp({ email: authEmail.trim(), password: authPass });
+        if (error) throw error;
+        if (data.session) { setMysdlModalOpen(false); consumeView(); } // prihlásený → zavri modal, na úvode sa ukáže tlačidlo MySDL
+        else setAuthMsg(_lang === "en" ? "Almost there — confirm your registration via the email we sent." : "Skoro hotovo — potvrď registráciu cez email, ktorý sme poslali.");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email: authEmail.trim(), password: authPass });
+        if (error) throw error;
+        setMysdlModalOpen(false); consumeView();
+      }
+    } catch (e) {
+      setAuthMsg(authErr(e));
+    } finally { setAuthLoading(false); }
+  }
+  async function authGoogle() {
+    if (!supabaseReady) return;
+    setAuthMsg(null);
+    const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin } });
+    if (error) setAuthMsg(authErr(error));
+  }
+  async function authReset() {
+    if (!supabaseReady) return;
+    if (!authEmail.trim()) { setAuthMsg(_lang === "en" ? "Enter your email first, then tap 'Forgot password'." : "Najprv zadaj email, potom klikni 'Zabudnuté heslo'."); return; }
+    const { error } = await supabase.auth.resetPasswordForEmail(authEmail.trim(), { redirectTo: window.location.origin });
+    setAuthMsg(error ? authErr(error) : (_lang === "en" ? "Password reset link sent to your email." : "Odkaz na obnovu hesla sme poslali na tvoj email."));
+  }
+  async function authSignOut() {
+    if (!supabaseReady) return;
+    await supabase.auth.signOut();
+    if (mysdlOpen) { setMysdlOpen(false); consumeView(); }
+  }
   const guidePhase = !topicSet ? "intro" : Object.keys(colorChats).length === 0 ? "tools" : "features";
-  const guide = useSpotlightGuide(guidePhase);
+  const guideSK = useSpotlightGuide(guidePhase);
+  const guideEN = useSpotlightGuideEN(guidePhase);
+  const guide = _lang === "en" ? guideEN : guideSK;
+  const GuideBtnComp = _lang === "en" ? GuideButtonEN : GuideButton;
+  const GuideOvComp  = _lang === "en" ? GuideOverlayEN : GuideOverlay;
   const [mandalaHoverLevel, setMandalaHoverLevel] = useState(null);
   const [mandalaMousePos, setMandalaMousePos] = useState({ x: 0, y: 0 });
   const mainEndRef = useRef(null);
@@ -108,6 +252,12 @@ export default function App() {
   const importFileRef = useRef(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [activeCardIdx, setActiveCardIdx] = useState(0);
+  const [cardLayout, setCardLayout] = useState("carousel");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [draftView, setDraftView] = useState(viewMode);
+  const [draftLayout, setDraftLayout] = useState("carousel");
+  const [draftLang, setDraftLang] = useState(_lang);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth <= 520);
 
   function scrollToChat(key) {
     const idx = Object.keys(colorChats).indexOf(key);
@@ -117,6 +267,11 @@ export default function App() {
   }
 
   useEffect(() => { mainEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [mainChat]);
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth <= 520);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
 
   const exploredKeys = Object.keys(explored).filter(k => explored[k]);
   const expressCount = exploredKeys.filter(k => LEVEL_MAP[k]?.axis === "express").length;
@@ -124,12 +279,21 @@ export default function App() {
   const unexploredExpress = LEVELS.filter(l => l.axis === "express" && !explored[l.key]).map(l => l.name.toLowerCase());
   const unexploredDeny = LEVELS.filter(l => l.axis === "deny" && !explored[l.key]).map(l => l.name.toLowerCase());
 
+  function renderMd(text) {
+    if (!text) return null;
+    return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+      part.startsWith('**') && part.endsWith('**')
+        ? <strong key={i}>{part.slice(2, -2)}</strong>
+        : part
+    );
+  }
+
   function getReflection() {
     if (exploredKeys.length < 2) return null;
-    if (expressCount > 0 && denyCount === 0) return "Tvoja explorácia sa pohybuje v individualistických perspektívach (express-self). Kolektívne perspektívy \u2014 " + unexploredDeny.join(", ") + " \u2014 ponúkajú iný druh orientácie, cenný keď individuálny prístup naráža na limity.";
-    if (denyCount > 0 && expressCount === 0) return "Tvoja explorácia sa pohybuje v kolektívnych perspektívach (deny-self). Individualistické perspektívy \u2014 " + unexploredExpress.join(", ") + " \u2014 ponúkajú pohľad na osobnú silu a autonómiu.";
-    if (expressCount >= 2 && denyCount <= 1 && unexploredDeny.length > 0) return "Väčšina explorácie smeruje k individualistickým perspektívam. Nepreskúmané kolektívne pohľady \u2014 " + unexploredDeny.join(", ") + " \u2014 môžu ponúknuť niečo, čo individuálna optika nevidí.";
-    if (denyCount >= 2 && expressCount <= 1 && unexploredExpress.length > 0) return "Väčšina explorácie smeruje ku kolektívnym perspektívam. Nepreskúmané individualistické pohľady \u2014 " + unexploredExpress.join(", ") + " \u2014 môžu ponúknuť niečo, čo skupinová optika nevidí.";
+    if (expressCount > 0 && denyCount === 0) return _lang === "en" ? "Your exploration moves through individualistic (express-self) perspectives. Collective perspectives — " + unexploredDeny.join(", ") + " — offer a different kind of orientation, valuable when the individual approach meets its limits." : "Tvoja explorácia sa pohybuje v individualistických perspektívach (express-self). Kolektívne perspektívy — " + unexploredDeny.join(", ") + " — ponúkajú iný druh orientácie, cenný keď individuálny prístup naráža na limity.";
+    if (denyCount > 0 && expressCount === 0) return _lang === "en" ? "Your exploration moves through collective (other-oriented) perspectives. Individualistic perspectives — " + unexploredExpress.join(", ") + " — offer a view of personal strength and autonomy." : "Tvoja explorácia sa pohybuje v kolektívnych perspektívach (deny-self). Individualistické perspektívy — " + unexploredExpress.join(", ") + " — ponúkajú pohľad na osobnú silu a autonómiu.";
+    if (expressCount >= 2 && denyCount <= 1 && unexploredDeny.length > 0) return _lang === "en" ? "Most of your exploration leans toward individualistic perspectives. Unexplored collective viewpoints — " + unexploredDeny.join(", ") + " — may offer something the individual lens does not see." : "Väčšina explorácie smeruje k individualistickým perspektívam. Nepreskúmané kolektívne pohľady — " + unexploredDeny.join(", ") + " — môžu ponúknuť niečo, čo individuálna optika nevidí.";
+    if (denyCount >= 2 && expressCount <= 1 && unexploredExpress.length > 0) return _lang === "en" ? "Most of your exploration leans toward collective perspectives. Unexplored individualistic viewpoints — " + unexploredExpress.join(", ") + " — may offer something the group lens does not see." : "Väčšina explorácie smeruje ku kolektívnym perspektívam. Nepreskúmané individualistické pohľady — " + unexploredExpress.join(", ") + " — môžu ponúknuť niečo, čo skupinová optika nevidí.";
     return null;
   }
   const reflection = getReflection();
@@ -154,7 +318,7 @@ export default function App() {
   function fetchIntegrated(levels) {
     const levelNames = levels.map(l => l.name).join(", ");
     const levelKeys = levels.map(l => l.key);
-    callAPI({ task: "integrated", levels: levelKeys }, [{ role: "user", content: "Téma: \"" + topicSet + "\"\n\nAnalyzuj túto tému z pohľadu úrovní: " + levelNames }])
+    callAPI({ task: "integrated", levels: levelKeys }, [{ role: "user", content: (_lang === "en" ? "Topic: \"" : "Téma: \"") + topicSet + (_lang === "en" ? "\"\n\nAnalyze this topic from the perspectives of levels: " : "\"\n\nAnalyzuj túto tému z pohľadu úrovní: ") + levelNames }])
       .then(reply => {
         levelKeys.forEach(key => {
           const marker = "[" + key.toUpperCase() + "]";
@@ -175,7 +339,7 @@ export default function App() {
       })
       .catch(err => {
         levelKeys.forEach(key => {
-          setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || "Nepodarilo sa načítať perspektívy." }] } } : prev);
+          setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || (_lang === "en" ? "Failed to load perspectives." : "Nepodarilo sa načítať perspektívy.") }] } } : prev);
         });
       })
       .finally(() => {
@@ -195,9 +359,9 @@ export default function App() {
 
   function fetchInitial(key) {
     setColorLoading(prev => ({ ...prev, [key]: true }));
-    callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"\n\nPoskyni stručnú úvodnú perspektívu na túto tému z pohľadu tejto úrovne. MAX 2-3 vety. Buď konkrétny a výstižný." }])
+    callAPI({ level: key }, [{ role: "user", content: (_lang === "en" ? "Topic: \"" : "Téma: \"") + topicSet + (_lang === "en" ? "\"\n\nProvide a brief initial perspective on this topic from this level's viewpoint. MAX 2-3 sentences. Be specific and concise." : "\"\n\nPoskyni stručnú úvodnú perspektívu na túto tému z pohľadu tejto úrovne. MAX 2-3 vety. Buď konkrétny a výstižný.") }])
       .then(reply => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "assistant", content: reply }] } } : prev))
-      .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || "Nepodarilo sa načítať perspektívu." }] } } : prev))
+      .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [{ role: "error", content: err.message || (_lang === "en" ? "Failed to load perspective." : "Nepodarilo sa načítať perspektívu.") }] } } : prev))
       .finally(() => setColorLoading(prev => ({ ...prev, [key]: false })));
   }
 
@@ -206,11 +370,11 @@ export default function App() {
     if (!chat || colorLoading[key]) return;
     setColorLoading(prev => ({ ...prev, [key]: true }));
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], elaborated: true } }));
-    const msgs = [...chat.messages, { role: "user", content: "Rozviň túto perspektívu podrobnejšie. Vysvetli hlbšie, prečo táto úroveň vidí tému práve takto, aké sú jej silné stránky a kde naráža na svoje hranice. 6-10 viet." }];
+    const msgs = [...chat.messages, { role: "user", content: _lang === "en" ? "Expand this perspective in more detail. Explain more deeply why this level sees the topic this way, what its strengths are and where it meets its limits. 6-10 sentences." : "Rozviň túto perspektívu podrobnejšie. Vysvetli hlbšie, prečo táto úroveň vidí tému práve takto, aké sú jej silné stránky a kde naráža na svoje hranice. 6-10 viet." }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
-    callAPI({ level: key }, [{ role: "user", content: "Téma: \"" + topicSet + "\"" }, ...msgs])
+    callAPI({ level: key }, [{ role: "user", content: (_lang === "en" ? "Topic: \"" : "Téma: \"") + topicSet + "\"" }, ...msgs])
       .then(reply => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } } : prev))
-      .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Error: " + err.message }] } } : prev))
+      .catch(err => setColorChats(prev => prev[key] ? { ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: (_lang === "en" ? "Error: " : "Chyba: ") + err.message }] } } : prev))
       .finally(() => setColorLoading(prev => ({ ...prev, [key]: false })));
   }
 
@@ -235,10 +399,10 @@ export default function App() {
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs, input: "" } }));
     setColorLoading(prev => ({ ...prev, [key]: true }));
     try {
-      const reply = await callAPI({ level: key }, [{ role: "user", content: "Topic: \"" + topicSet + "\"" }, ...msgs]);
+      const reply = await callAPI({ level: key }, [{ role: "user", content: (_lang === "en" ? "Topic: \"" : "Téma: \"") + topicSet + "\"" }, ...msgs]);
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } }));
     } catch (err) {
-      setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Error: " + err.message }] } }));
+      setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: (_lang === "en" ? "Error: " : "Chyba: ") + err.message }] } }));
     } finally { setColorLoading(prev => ({ ...prev, [key]: false })); }
   }
 
@@ -274,23 +438,25 @@ export default function App() {
       return l.name + " (" + l.sub + "): " + (lastMsg ? lastMsg.content : "");
     }).join("\n\n");
     try {
-      const prompt = "Téma: \"" + topicSet + "\"\n\nPerspektívy na porovnanie:\n" + levelDescs + "\n\nKde vznikajú napätia a konflikty medzi týmito perspektívami pri tejto konkrétnej téme? Čo jedna vidí ako riešenie, druhá môže vnímať ako problém?";
+      const prompt = _lang === "en"
+        ? "Topic: \"" + topicSet + "\"\n\nPerspectives to compare:\n" + levelDescs + "\n\nWhere do tensions and conflicts arise between these perspectives on this specific topic? What one sees as a solution, the other may perceive as a problem?"
+        : "Téma: \"" + topicSet + "\"\n\nPerspektívy na porovnanie:\n" + levelDescs + "\n\nKde vznikajú napätia a konflikty medzi týmito perspektívami pri tejto konkrétnej téme? Čo jedna vidí ako riešenie, druhá môže vnímať ako problém?";
       const reply = await callAPI({ task: "conflicts" }, [{ role: "user", content: prompt }]);
       setConflictResult(reply);
       setConflictHistory([{ role: "user", content: prompt }, { role: "assistant", content: reply }]);
-    } catch (err) { setConflictResult("Chyba: " + err.message); }
+    } catch (err) { setConflictResult((_lang === "en" ? "Error: " : "Chyba: ") + err.message); }
     finally { setConflictLoading(false); }
   }
 
   async function elaborateConflicts() {
     if (conflictLoading || !conflictResult) return;
     setConflictLoading(true);
-    const msgs = [...conflictHistory, { role: "user", content: "Rozviň tieto napätia hlbšie. Kde presne nastáva stret hodnôt? Aké praktické dôsledky má toto napätie v každodennom živote? Existuje spôsob, ako tieto perspektívy prepojiť bez toho, aby niektorá stratila svoju podstatu?" }];
+    const msgs = [...conflictHistory, { role: "user", content: _lang === "en" ? "Expand these tensions further. Where exactly does the clash of values occur? What are the practical consequences of this tension in everyday life? Is there a way to connect these perspectives without any of them losing its essence?" : "Rozviň tieto napätia hlbšie. Kde presne nastáva stret hodnôt? Aké praktické dôsledky má toto napätie v každodennom živote? Existuje spôsob, ako tieto perspektívy prepojiť bez toho, aby niektorá stratila svoju podstatu?" }];
     try {
       const reply = await callAPI({ task: "conflictsElaborate" }, msgs);
       setConflictResult(prev => prev + "\n\n" + reply);
       setConflictHistory(msgs.concat([{ role: "assistant", content: reply }]));
-    } catch (err) { setConflictResult(prev => prev + "\n\nChyba: " + err.message); }
+    } catch (err) { setConflictResult(prev => prev + "\n\n" + (_lang === "en" ? "Error: " : "Chyba: ") + err.message); }
     finally { setConflictLoading(false); }
   }
 
@@ -303,7 +469,7 @@ export default function App() {
       const reply = await callAPI({ task: "conflictsQuestion" }, msgs);
       setConflictResult(prev => prev + "\n\n" + q + "\n\n" + reply);
       setConflictHistory(msgs.concat([{ role: "assistant", content: reply }]));
-    } catch (err) { setConflictResult(prev => prev + "\n\nChyba: " + err.message); }
+    } catch (err) { setConflictResult(prev => prev + "\n\n" + (_lang === "en" ? "Error: " : "Chyba: ") + err.message); }
     finally { setConflictLoading(false); }
   }
 
@@ -315,16 +481,20 @@ export default function App() {
     const current = LEVELS[levelIdx];
     const previous = levelIdx > 0 ? LEVELS[levelIdx - 1] : null;
     setColorLoading(prev => ({ ...prev, [key]: true }));
-    const emergePrompt = previous
-      ? "Vysvetli, ako sa " + current.name + " úroveň vyvinula z predchádzajúcej " + previous.name + " úrovne v kontexte tejto témy. Popíš: 1) Aké boli podmienky v " + previous.name + ", ktoré prestali stačiť? 2) Aká kríza alebo rozpor viedol k vzniku " + current.name + "? 3) Čo konkrétne " + current.name + " priniesla ako odpoveď na limity " + previous.name + "? Uveď historický príklad relevantný k téme. 6-10 viet."
-      : "Vysvetli, prečo je " + current.name + " úroveň základom celej špirály. Ako sa prejavuje najzákladnejšia forma vedomia v kontexte tejto témy? 4-6 viet.";
+    const emergePrompt = _lang === "en"
+      ? (previous
+        ? "Explain how the " + current.name + " level emerged from the previous " + previous.name + " level in the context of this topic. Describe: 1) What conditions in " + previous.name + " stopped being sufficient? 2) What crisis or contradiction led to the emergence of " + current.name + "? 3) What specifically did " + current.name + " bring as a response to the limits of " + previous.name + "? Give a historical example relevant to the topic. 6-10 sentences."
+        : "Explain why the " + current.name + " level is the foundation of the entire spiral. How does the most basic form of consciousness manifest in the context of this topic? 4-6 sentences.")
+      : (previous
+        ? "Vysvetli, ako sa " + current.name + " úroveň vyvinula z predchádzajúcej " + previous.name + " úrovne v kontexte tejto témy. Popíš: 1) Aké boli podmienky v " + previous.name + ", ktoré prestali stačiť? 2) Aká kríza alebo rozpor viedol k vzniku " + current.name + "? 3) Čo konkrétne " + current.name + " priniesla ako odpoveď na limity " + previous.name + "? Uveď historický príklad relevantný k téme. 6-10 viet."
+        : "Vysvetli, prečo je " + current.name + " úroveň základom celej špirály. Ako sa prejavuje najzákladnejšia forma vedomia v kontexte tejto témy? 4-6 viet.");
     const msgs = [...chat.messages, { role: "user", content: emergePrompt }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
     try {
-      const reply = await callAPI({ level: key }, [{ role: "user", content: "Topic: \"" + topicSet + "\"" }, ...msgs]);
+      const reply = await callAPI({ level: key }, [{ role: "user", content: (_lang === "en" ? "Topic: \"" : "Téma: \"") + topicSet + "\"" }, ...msgs]);
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } }));
     } catch (err) {
-      setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Error: " + err.message }] } }));
+      setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: (_lang === "en" ? "Error: " : "Chyba: ") + err.message }] } }));
     } finally { setColorLoading(prev => ({ ...prev, [key]: false })); }
   }
 
@@ -336,16 +506,20 @@ export default function App() {
     const current = LEVELS[levelIdx];
     const next = levelIdx < LEVELS.length - 1 ? LEVELS[levelIdx + 1] : null;
     setColorLoading(prev => ({ ...prev, [key]: true }));
-    const growthPrompt = next
-      ? "Analyzuj, kam smeruje " + current.name + " perspektíva v kontexte tejto témy, keď ju dovedieš do jej logických dôsledkov. Konkrétne ukáž: 1) Aké otázky si táto perspektíva začína klásť, na ktoré sama nemá odpoveď? 2) Kde naráža na svoju vlastnú hranicu — nie ako chybu, ale ako prirodzený horizont? 3) Čo sa objavuje za týmto horizontom, čo táto perspektíva zatiaľ nevidí, ale už tuší? Nepoužívaj názvy úrovní Špirálovej dynamiky. Hovor o tom, čo sa objavuje, nie o tom, kam by sa mal človek posunúť. 6-10 viet."
-      : "Analyzuj, kam smeruje " + current.name + " perspektíva — najširšia v Špirálovej dynamike — v kontexte tejto témy. Čo zostáva nevypovedané aj z tohto najcelostnejšieho pohľadu? Kde sa aj táto perspektíva stretáva s tajomstvom, ktoré presahuje akúkoľvek mapu? 4-6 viet.";
+    const growthPrompt = _lang === "en"
+      ? (next
+        ? "Analyze where the " + current.name + " perspective leads in the context of this topic when you follow it to its logical conclusions. Specifically show: 1) What questions does this perspective begin to ask that it cannot answer itself? 2) Where does it encounter its own limit — not as a flaw, but as a natural horizon? 3) What appears beyond this horizon that this perspective does not yet see, but already senses? Do not use Spiral Dynamics level names. Talk about what appears, not about where a person should move. 6-10 sentences."
+        : "Analyze where the " + current.name + " perspective — the widest in Spiral Dynamics — leads in the context of this topic. What remains unsaid even from this most holistic viewpoint? Where does even this perspective encounter a mystery that transcends any map? 4-6 sentences.")
+      : (next
+        ? "Analyzuj, kam smeruje " + current.name + " perspektíva v kontexte tejto témy, keď ju dovedieš do jej logických dôsledkov. Konkrétne ukáž: 1) Aké otázky si táto perspektíva začína klásť, na ktoré sama nemá odpoveď? 2) Kde naráža na svoju vlastnú hranicu — nie ako chybu, ale ako prirodzený horizont? 3) Čo sa objavuje za týmto horizontom, čo táto perspektíva zatiaľ nevidí, ale už tuší? Nepoužívaj názvy úrovní Špirálovej dynamiky. Hovor o tom, čo sa objavuje, nie o tom, kam by sa mal človek posunúť. 6-10 viet."
+        : "Analyzuj, kam smeruje " + current.name + " perspektíva — najširšia v Špirálovej dynamike — v kontexte tejto témy. Čo zostáva nevypovedané aj z tohto najcelostnejšieho pohľadu? Kde sa aj táto perspektíva stretáva s tajomstvom, ktoré presahuje akúkoľvek mapu? 4-6 viet.");
     const msgs = [...chat.messages, { role: "user", content: growthPrompt }];
     setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: msgs } }));
     try {
-      const reply = await callAPI({ level: key }, [{ role: "user", content: "Topic: \"" + topicSet + "\"" }, ...msgs]);
+      const reply = await callAPI({ level: key }, [{ role: "user", content: (_lang === "en" ? "Topic: \"" : "Téma: \"") + topicSet + "\"" }, ...msgs]);
       setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: reply }] } }));
     } catch (err) {
-      setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: "Error: " + err.message }] } }));
+      setColorChats(prev => ({ ...prev, [key]: { ...prev[key], messages: [...prev[key].messages, { role: "assistant", content: (_lang === "en" ? "Error: " : "Chyba: ") + err.message }] } }));
     } finally { setColorLoading(prev => ({ ...prev, [key]: false })); }
   }
 
@@ -354,35 +528,35 @@ export default function App() {
   const safeActiveIdx = openChatKeys.length > 0 ? Math.min(activeCardIdx, openChatKeys.length - 1) : 0;
 
   function exportConversation() {
-    const timestamp = new Date().toLocaleString("sk-SK");
+    const timestamp = new Date().toLocaleString(_lang === "en" ? "en-US" : "sk-SK");
     const chatKeys = LEVELS.filter(l => colorChats[l.key]).map(l => l.key);
     const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
     let body = "";
     if (chatKeys.length > 0) {
       chatKeys.forEach(key => {
         const l = LEVEL_MAP[key]; const chat = colorChats[key];
-        const axisLabel = l.axis === "express" ? "Expresívna (JA)" : "Kolektívna (MY)";
+        const axisLabel = _lang === "en" ? (l.axis === "express" ? "Express-self" : "Deny-self") : (l.axis === "express" ? "Expresívna (JA)" : "Kolektívna (MY)");
         body += '<div class="section"><h2 style="color:' + l.clr + '">' + esc(l.name) + ' — ' + esc(l.sub) + '</h2><p class="axis">' + axisLabel + '</p>';
         chat.messages.forEach(m => {
           if (m.role === "error") return;
-          if (m.role === "user") body += '<div class="q"><strong>Otázka:</strong> ' + esc(m.content) + '</div>';
+          if (m.role === "user") body += '<div class="q"><strong>' + (_lang === "en" ? "Question:" : "Otázka:") + '</strong> ' + esc(m.content) + '</div>';
           else body += '<div class="a">' + esc(m.content) + '</div>';
         });
         body += '</div>';
       });
     }
-    if (conflictResult) body += '<div class="section"><h2>Napätia medzi perspektívami</h2><div class="a">' + esc(conflictResult) + '</div></div>';
-    if (reflection) body += '<div class="section"><h2>Vzorec explorácie</h2><div class="a">' + esc(reflection) + '</div></div>';
+    if (conflictResult) body += '<div class="section"><h2>' + (_lang === "en" ? "Tensions between perspectives" : "Napätia medzi perspektívami") + '</h2><div class="a">' + esc(conflictResult) + '</div></div>';
+    if (reflection) body += '<div class="section"><h2>' + (_lang === "en" ? "Exploration pattern" : "Vzorec explorácie") + '</h2><div class="a">' + esc(reflection) + '</div></div>';
     if (mainChat.length > 0) {
-      body += '<div class="section"><h2>Integratívny dialóg</h2>';
+      body += '<div class="section"><h2>' + (_lang === "en" ? "Integrative dialogue" : "Integratívny dialóg") + '</h2>';
       mainChat.forEach(m => {
-        if (m.role === "user") body += '<div class="q"><strong>Otázka:</strong> ' + esc(m.content) + '</div>';
+        if (m.role === "user") body += '<div class="q"><strong>' + (_lang === "en" ? "Question:" : "Otázka:") + '</strong> ' + esc(m.content) + '</div>';
         else body += '<div class="a">' + esc(m.content) + '</div>';
       });
       body += '</div>';
     }
     const css = 'body{font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:32px;color:#1a1a1a;font-size:13px;line-height:1.7}h1{font-size:20px;margin-bottom:4px}.meta{color:#666;font-size:11px;margin-bottom:32px}.section{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #e5e5e5}h2{font-size:15px;margin-bottom:4px}.axis{font-size:10px;color:#888;margin:0 0 12px;text-transform:uppercase;letter-spacing:.1em}.q{background:#f5f5f5;border-left:3px solid #ccc;padding:8px 12px;margin:10px 0;font-style:italic;font-size:12px}.a{margin:10px 0;white-space:pre-wrap}.footer{text-align:center;font-size:10px;color:#aaa;margin-top:40px}@media print{body{padding:0}}';
-    const html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Spiral Dynamics — ' + esc(topicSet) + '</title><style>' + css + '</style></head><body><h1>Spiral Dynamics Lens</h1><div class="meta"><strong>Téma:</strong> ' + esc(topicSet) + ' &nbsp;·&nbsp; ' + timestamp + '</div>' + body + '<div class="footer">Generated by Spiral Dynamics Lens</div></body></html>';
+    const html = '<!DOCTYPE html><html lang="' + (_lang === "en" ? "en" : "sk") + '"><head><meta charset="UTF-8"><title>Spiral Dynamics — ' + esc(topicSet) + '</title><style>' + css + '</style></head><body><h1>Spiral Dynamics Lens</h1><div class="meta"><strong>' + (_lang === "en" ? "Topic:" : "Téma:") + '</strong> ' + esc(topicSet) + ' &nbsp;·&nbsp; ' + timestamp + '</div>' + body + '<div class="footer">' + (_lang === "en" ? "Generated by Spiral Dynamics Lens" : "Vygenerované aplikáciou Spiral Dynamics Lens") + '</div></body></html>';
     const win = window.open("", "_blank");
     if (!win) return;
     win.document.write(html);
@@ -392,23 +566,23 @@ export default function App() {
 
   function exportMarkdown() {
     const chatKeys = LEVELS.filter(l => colorChats[l.key]).map(l => l.key);
-    let md = `# Spiral Dynamics Lens\n**Téma:** ${topicSet}\n\n`;
+    let md = `# Spiral Dynamics Lens\n${_lang === "en" ? "**Topic:**" : "**Téma:**"} ${topicSet}\n\n`;
     chatKeys.forEach(key => {
       const l = LEVEL_MAP[key]; const chat = colorChats[key];
-      const axisLabel = l.axis === "express" ? "Expresívna (JA)" : "Kolektívna (MY)";
+      const axisLabel = _lang === "en" ? (l.axis === "express" ? "Express-self" : "Deny-self") : (l.axis === "express" ? "Expresívna (JA)" : "Kolektívna (MY)");
       md += `### ${l.name} — ${l.sub}\n*${axisLabel}*\n\n`;
       chat.messages.forEach(m => {
         if (m.role === "error") return;
-        if (m.role === "user") md += `**Otázka:** ${m.content}\n\n`;
+        if (m.role === "user") md += `**${_lang === "en" ? "Question" : "Otázka"}:** ${m.content}\n\n`;
         else md += `${m.content}\n\n`;
       });
     });
-    if (conflictResult) md += `## Napätia medzi perspektívami\n\n${conflictResult}\n\n`;
-    if (reflection) md += `## Vzorec explorácie\n\n${reflection}\n\n`;
+    if (conflictResult) md += `## ${_lang === "en" ? "Tensions between perspectives" : "Napätia medzi perspektívami"}\n\n${conflictResult}\n\n`;
+    if (reflection) md += `## ${_lang === "en" ? "Exploration pattern" : "Vzorec explorácie"}\n\n${reflection}\n\n`;
     if (mainChat.length > 0) {
-      md += `## Integratívny dialóg\n\n`;
+      md += `## ${_lang === "en" ? "Integrative dialogue" : "Integratívny dialóg"}\n\n`;
       mainChat.forEach(m => {
-        if (m.role === "user") md += `**Otázka:** ${m.content}\n\n`;
+        if (m.role === "user") md += `**${_lang === "en" ? "Question" : "Otázka"}:** ${m.content}\n\n`;
         else md += `${m.content}\n\n`;
       });
     }
@@ -429,9 +603,9 @@ export default function App() {
         const text = e.target.result;
 
         // Topic
-        const topicMatch = text.match(/^\*{0,2}Téma:\*{0,2}\s*(.+)$/m);
+        const topicMatch = text.match(/^\*{0,2}(?:Téma|Topic):\*{0,2}\s*(.+)$/m);
         const importedTopic = topicMatch ? topicMatch[1].trim() : "";
-        if (!importedTopic) { alert("Súbor neobsahuje tému — skontrolujte formát .md súboru."); return; }
+        if (!importedTopic) { alert(_lang === "en" ? "File does not contain a topic — check the .md file format." : "Súbor neobsahuje tému — skontrolujte formát .md súboru."); return; }
 
         // Level sections → last assistant message per level
         const newColorChats = {};
@@ -445,7 +619,7 @@ export default function App() {
           if (!sectionMatch) return;
           const rawSection = sectionMatch[1];
           // Split on user questions; last chunk = last assistant message
-          const parts = rawSection.split(/\n\*\*Otázka:\*\*[^\n]*\n/);
+          const parts = rawSection.split(/\n\*\*(?:Otázka|Question):\*\*[^\n]*\n/);
           // Strip the axis line (*Express-self* / *Deny-self*) and leading whitespace
           const lastPart = (parts[parts.length - 1] || "").replace(/^\s*\*[^\n]+\*\s*\n/, "").trim();
           if (!lastPart) return;
@@ -454,12 +628,12 @@ export default function App() {
         });
 
         // Conflict result
-        const conflictRx = /##\s+Napätia medzi perspektívami\s*\n+([\s\S]*?)(?=\n##\s+|$)/;
+        const conflictRx = /##\s+(?:Napätia medzi perspektívami|Tensions between perspectives)\s*\n+([\s\S]*?)(?=\n##\s+|$)/;
         const conflictMatch = text.match(conflictRx);
         const importedConflict = conflictMatch ? conflictMatch[1].trim() : "";
 
         // Apply state
-        setTopicSet(importedTopic);
+        setTopicSet(importedTopic); pushView();
         setTopic(importedTopic);
         setColorChats(newColorChats);
         setExplored(newExplored);
@@ -467,14 +641,14 @@ export default function App() {
         setSelected({});
         setConflictResult(importedConflict);
         setConflictHistory(importedConflict
-          ? [{ role: "user", content: `Téma: "${importedTopic}"\n\nAnalýza napätí:` }, { role: "assistant", content: importedConflict }]
+          ? [{ role: "user", content: (_lang === "en" ? `Topic: "${importedTopic}"\n\nTension analysis:` : `Téma: "${importedTopic}"\n\nAnalýza napätí:`) }, { role: "assistant", content: importedConflict }]
           : []);
         setConflictInput("");
         setMainChat([]);
         setMainInput("");
         setIntegratedContext("");
       } catch (err) {
-        alert("Chyba pri načítaní súboru. Skontroluj, či ide o .md exportovaný z tejto aplikácie.");
+        alert(_lang === "en" ? "Error loading file. Check that it is a .md file exported from this application." : "Chyba pri načítaní súboru. Skontroluj, či ide o .md exportovaný z tejto aplikácie.");
       }
     };
     reader.readAsText(file, "utf-8");
@@ -486,25 +660,25 @@ export default function App() {
     const msgs = [...mainChat, { role: "user", content: msg }];
     setMainChat(msgs); setMainInput(""); setMainLoading(true);
     try {
-      let ctx = "Téma: \"" + topicSet + "\"";
-      if (integratedContext) ctx += "\n\nIntegrované perspektívy:" + integratedContext;
-      if (reflection) ctx += "\n\nVzorec explorácie: " + reflection;
-      const reply = await callAPI({ task: "main" }, [{ role: "user", content: ctx }, { role: "assistant", content: "Rozumiem. Pokračujeme." }, ...msgs]);
+      let ctx = (_lang === "en" ? "Topic: \"" : "Téma: \"") + topicSet + "\"";
+      if (integratedContext) ctx += _lang === "en" ? "\n\nIntegrated perspectives:" + integratedContext : "\n\nIntegrované perspektívy:" + integratedContext;
+      if (reflection) ctx += (_lang === "en" ? "\n\nExploration pattern: " : "\n\nVzorec explorácie: ") + reflection;
+      const reply = await callAPI({ task: "main" }, [{ role: "user", content: ctx }, { role: "assistant", content: _lang === "en" ? "Understood. Let's continue." : "Rozumiem. Pokračujeme." }, ...msgs]);
       setMainChat(m => [...m, { role: "assistant", content: reply }]);
-    } catch (err) { setMainChat(m => [...m, { role: "assistant", content: "Chyba: " + err.message }]); }
+    } catch (err) { setMainChat(m => [...m, { role: "assistant", content: (_lang === "en" ? "Error: " : "Chyba: ") + err.message }]); }
     finally { setMainLoading(false); }
   }
 
   function startAnalysis() {
     if (!topic.trim()) return;
-    setTopicSet(topic.trim());
+    setTopicSet(topic.trim()); pushView();
     setColorChats({}); setColorLoading({}); setSelected({}); setExplored({});
     setMainChat([]); setMainInput(""); setIntegratedContext(""); setConflictResult(""); setConflictHistory([]); setConflictInput("");
   }
 
 
   useEffect(() => {
-    const handleMsg = (e) => { if (e.data && e.data.type === 'TUTORIAL_CLOSE') setTutorialOpen(false); };
+    const handleMsg = (e) => { if (e.data && e.data.type === 'TUTORIAL_CLOSE') { setTutorialOpen(false); consumeView(); } };
     window.addEventListener('message', handleMsg);
     return () => window.removeEventListener('message', handleMsg);
   }, []);
@@ -592,19 +766,23 @@ export default function App() {
           .ms{padding:16px 14px}
           .cp{border-radius:8px}
           .cm{max-height:220px}
+          .crsl-wrap{overflow:hidden;min-height:420px}
+          .crsl-nav{margin-top:14px}
+          .crsl-btn{font-size:9px;padding:5px 12px}
+          .crsl-tap-l,.crsl-tap-r{position:absolute;top:0;bottom:0;width:52px;z-index:10;cursor:pointer}
+          .crsl-tap-l{left:0}
+          .crsl-tap-r{right:0}
         }
       `}</style>
       <div className="bg" />
       <div className="wrap">
-        <div style={{ textAlign: "center", marginBottom: 0 }}><img src={TITLE_IMG} alt="Spiral Dynamics Lens" style={{ width: "min(228px, 42vw)", height: "auto", display: "block", margin: "0 auto" }} /></div>
-        <p className="sub">Viacúrovňový pohľad na realitu</p>
-
         {!topicSet ? (
           <div style={{ maxWidth: 600, margin: "0 auto" }}>
-            {/* Wider container so buttons sit further from mandala centre */}
-            <div style={{ position: "relative", width: "min(460px, 94vw)", margin: "0 auto 28px", display: "flex", justifyContent: "center" }}>
-              <SpiralMandalaCore size="min(240px, 50vw)" mode="single" style={{ opacity: 0.9 }} />
-              <button id="tut-manual-btn" onClick={() => setTutorialOpen(true)} style={{ position: "absolute", top: 8, left: 0, zIndex: 100, display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+            {/* Full-width container (matches textarea) so buttons sit further from logo centre */}
+            <div style={{ position: "relative", width: "min(600px, 94vw)", margin: "0 auto 28px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <img src={TITLE_IMG} alt="Spiral Dynamics Lens" style={{ width: "min(280px, 55vw)", height: "auto", display: "block", margin: "0 auto 10px" }} />
+              <p className="sub" style={{ margin: 0 }}>{_lang === "en" ? "Multi-level view of reality" : "Viacúrovňový pohľad na realitu"}</p>
+              <button id="tut-manual-btn" onClick={openTutorial} style={{ position: "absolute", top: 8, left: 0, zIndex: 100, display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 4, padding: "4px 8px", color: "rgba(255,255,255,0.45)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.color="rgba(255,255,255,0.82)"; e.currentTarget.style.background="rgba(0,0,0,0.65)"; }}
                 onMouseLeave={e => { e.currentTarget.style.color="rgba(255,255,255,0.45)"; e.currentTarget.style.background="rgba(0,0,0,0.45)"; }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -612,16 +790,45 @@ export default function App() {
                 </svg>
                 Tutorial
               </button>
-              <GuideButton guide={guide} style={{ top: 8, right: 0, zIndex: 100 }} tipSide="right" />
+              <GuideBtnComp guide={guide} style={{ top: 40, left: 0, zIndex: 100 }} tipSide="left" />
+              <button id="mysdl-open-btn" onClick={() => (session ? openMySDL("full") : openAuthModal())} aria-label="MySDL" title={_lang === "en" ? "Open MySDL" : "Vstúpiť do MySDL"} style={{ position: "absolute", top: 2, right: 0, zIndex: 100, background: "none", border: "none", padding: 3, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, transition: "all 0.2s", filter: "drop-shadow(0 0 12px rgba(45,212,191,0.3))" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.06)"; e.currentTarget.style.filter = "drop-shadow(0 0 22px rgba(45,212,191,0.6))"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "drop-shadow(0 0 12px rgba(45,212,191,0.3))"; }}>
+                <img src="/mysdl/mysdl-logo.png" alt="MySDL" style={{ height: 74, width: "auto", display: "block" }} />
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: _lang === "en" ? 12 : 10.5, fontWeight: 700, letterSpacing: _lang === "en" ? "0.12em" : "0.04em", textTransform: "uppercase", color: "#B8F5EC", whiteSpace: "nowrap" }}>{_lang === "en" ? "Enter MySDL" : "Vstúpiť do MySDL"}</span>
+              </button>
             </div>
             <div style={{ position: "relative" }}>
-              <textarea id="tut-textarea" value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder="Zadajte tému, problém, otázku alebo situáciu..." />
+              <textarea id="tut-textarea" value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); startAnalysis(); } }} placeholder={_lang === "en" ? "Enter a topic, problem, question or situation..." : "Zadajte tému, problém, otázku alebo situáciu..."} />
               <button type="button" title="Pokračovať v uloženej analýze" onClick={() => importFileRef.current?.click()} style={{ position: "absolute", bottom: 10, right: 10, background: "none", border: "none", cursor: "pointer", opacity: 0.35, color: "rgba(255,255,255,0.8)", padding: 4, transition: "opacity 0.2s", lineHeight: 0 }} onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </button>
               <input ref={importFileRef} type="file" accept=".md" style={{ display: "none" }} onChange={e => { importAnalysis(e.target.files?.[0]); e.target.value = ""; }} />
             </div>
-            <button id="tut-explore-btn" className="btn" onClick={startAnalysis} disabled={!topic.trim()}>Preskúmať</button>
+            <button id="tut-explore-btn" className="btn" onClick={startAnalysis} disabled={!topic.trim()}>{_lang === "en" ? "Explore" : "Preskúmať"}</button>
+            {session && (
+              <div style={{ marginTop: 18, textAlign: "center" }}>
+                <button className="btn" onClick={() => openMySDL("full")} style={{ margin: "0 auto 8px" }}>{_lang === "en" ? "Enter MySDL" : "Vstúpiť do MySDL"}</button>
+                <div style={{ fontFamily: "DM Sans,sans-serif", fontSize: 11, color: "rgba(255,255,255,0.42)" }}>
+                  {session.user?.email}{" · "}
+                  <button type="button" onClick={authSignOut} style={{ background: "none", border: "none", color: "rgba(167,139,250,0.85)", cursor: "pointer", fontSize: 11, padding: 0, fontFamily: "DM Sans,sans-serif" }}>{_lang === "en" ? "Sign out" : "Odhlásiť"}</button>
+                </div>
+              </div>
+            )}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 22 }}>
+              <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".8px", textTransform: "uppercase" }}>{_lang === "en" ? "Language" : "Jazyk"}</span>
+              <div style={{ display: "inline-flex", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", overflow: "hidden" }}>
+                {[["sk", "SK"], ["en", "EN"]].map(([val, label]) => {
+                  const active = _lang === val;
+                  return (
+                    <button key={val} onClick={() => { if (!active) { const u = new URL(window.location.href); u.searchParams.set("lang", val); window.location.href = u.toString(); } }}
+                      style={{ padding: "4px 14px", background: active ? "rgba(255,255,255,.1)" : "none", border: "none", borderRight: val === "sk" ? "1px solid rgba(255,255,255,.1)" : "none", color: active ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.25)", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", cursor: active ? "default" : "pointer", transition: "all .2s", fontWeight: active ? 600 : 400 }}>
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         ) : (
           <>
@@ -672,12 +879,12 @@ export default function App() {
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                   </svg>
-                  Štýl zobrazenia
+                  {_lang === "en" ? "Display style" : "Štýl zobrazenia"}
                 </div>
               </div>
 
               {/* Tutorial button — LEFT side */}
-              <button onClick={() => setTutorialOpen(true)}
+              <button onClick={openTutorial}
                 style={{ position: "absolute", left: "max(0px, calc((100% - min(72vw, 560px)) / 2))", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4, padding: "5px 10px", color: "rgba(255,255,255,0.35)", fontFamily: "DM Sans,sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.09)"; e.currentTarget.style.color="rgba(255,255,255,0.7)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.35)"; }}>
@@ -688,27 +895,53 @@ export default function App() {
               </button>
 
               {/* Sprievodca — GuideButton */}
-              <GuideButton guide={guide} style={{ right: "max(0px, calc((100% - min(72vw, 560px)) / 2))", top: "50%", transform: "translateY(-50%)" }} tipSide="right" tipAbove />
+              <GuideBtnComp guide={guide} style={{ right: "max(0px, calc((100% - min(72vw, 560px)) / 2))", top: "50%", transform: "translateY(-50%)" }} tipSide="right" tipAbove />
             </div>
 
             <div id="tut-map-active">
             {viewMode === "icons" ? (
-              <SpiralLensV5
-                icons={ICONS}
-                axisIcons={AXIS_ICONS}
-                activeKeys={Object.keys(colorChats)}
-                pendingKeys={Array.from(pendingLevels)}
-                integrated={integrated}
-                onLevelClick={key => {
-                  if (colorChats[key]) { scrollToChat(key); return; }
-                  setPendingLevels(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
-                }}
-              />
+              _lang === "en" ? (
+                <SpiralLensV5EN
+                  icons={ICONS}
+                  axisIcons={AXIS_ICONS}
+                  activeKeys={Object.keys(colorChats)}
+                  pendingKeys={Array.from(pendingLevels)}
+                  integrated={integrated}
+                  onLevelClick={key => {
+                    if (colorChats[key]) { scrollToChat(key); return; }
+                    setPendingLevels(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
+                  }}
+                />
+              ) : (
+                <SpiralLensV5
+                  icons={ICONS}
+                  axisIcons={AXIS_ICONS}
+                  activeKeys={Object.keys(colorChats)}
+                  pendingKeys={Array.from(pendingLevels)}
+                  integrated={integrated}
+                  onLevelClick={key => {
+                    if (colorChats[key]) { scrollToChat(key); return; }
+                    setPendingLevels(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
+                  }}
+                />
+              )
             ) : (
               <div key="mandala-view" style={{ position: "relative", width: "100%" }}
                 onMouseMove={e => setMandalaMousePos({ x: e.clientX, y: e.clientY })}
                 onMouseLeave={() => setMandalaHoverLevel(null)}
               >
+                {_lang === "en" ? (
+                  <SpiralMandalaEN
+                    key="spiral-mandala-main-en"
+                    mode={integrated ? 'integrative' : 'single'}
+                    onSelectionChange={(levels) => {
+                      if (!topicSet) return;
+                      setPendingLevels(new Set(levels.map(l => l.key).filter(k => !colorChats[k])));
+                    }}
+                    onDeselect={() => setPendingLevels(new Set())}
+                    onHover={setMandalaHoverLevel}
+                  />
+                ) : (
                 <SpiralMandala
                   key="spiral-mandala-main"
                   mode={integrated ? 'integrative' : 'single'}
@@ -719,6 +952,7 @@ export default function App() {
                   onDeselect={() => setPendingLevels(new Set())}
                   onHover={setMandalaHoverLevel}
                 />
+                )}
                 {/* Hover tooltip */}
                 {mandalaHoverLevel && (() => {
                   const lv = LEVEL_MAP[mandalaHoverLevel.key];
@@ -745,7 +979,7 @@ export default function App() {
                         {iconR && <img src={iconR} style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", flexShrink: 0, filter: `drop-shadow(0 0 6px ${lv.clr}88)` }} />}
                       </div>
                       <div style={{ textAlign: "center", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.32)" }}>
-                        {isExpress ? "Express Self · JA" : "Deny Self · MY"}
+                        {_lang === "en" ? (isExpress ? "Express Self" : "Other-Oriented") : (isExpress ? "Express Self · JA" : "Deny Self · MY")}
                       </div>
                     </div>
                   );
@@ -768,41 +1002,50 @@ export default function App() {
             )}
 
             <div id="tut-mode-toggle" className="toggle-wrap">
-              <span style={{ opacity: integrated ? .4 : 1 }}>Jednotlivá úroveň</span>
+              <span style={{ opacity: integrated ? .4 : 1 }}>{_lang === "en" ? "Single level" : "Jednotlivá úroveň"}</span>
               <div className={"toggle" + (integrated ? " on" : "")} onClick={() => setIntegrated(!integrated)}>
                 <div className="toggle-dot" />
               </div>
-              <span style={{ opacity: integrated ? 1 : .4 }}>Integrovaný pohľad</span>
+              <span style={{ opacity: integrated ? 1 : .4 }}>{_lang === "en" ? "Integrated view" : "Integrovaný pohľad"}</span>
             </div>
-            <div className="hint">{integrated ? "Kliknutím zvolíte vrstvu + vnútorné, potom spustíte analýzu" : "Kliknutím zvolíte úroveň, potom kliknite Spustiť analýzu"}</div>
+            <div className="hint">{_lang === "en" ? (integrated ? "Click to select a layer + inner ones, then run analysis" : "Click a level, then click Run analysis") : (integrated ? "Kliknutím zvolíte vrstvu + vnútorné, potom spustíte analýzu" : "Kliknutím zvolíte úroveň, potom kliknite Spustiť analýzu")}</div>
 
             {pendingLevels.size > 0 && (
               <div style={{ display: "flex", justifyContent: "center", marginTop: 10 }}>
                 <button id="tut-run-analysis" onClick={runAnalysis} style={{ padding: "6px 18px", borderRadius: 99, border: "1px solid rgba(250,204,21,0.45)", background: "rgba(250,204,21,0.12)", color: "#FACC15", fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer" }}>
-                  Spustiť analýzu
+                  {_lang === "en" ? "Run analysis" : "Spustiť analýzu"}
                 </button>
               </div>
             )}
 
             {openChatKeys.length > 0 && (
               <div style={{ marginTop: 28 }}>
-                <div className="crsl-wrap">
+                <div className={cardLayout === "carousel" ? "crsl-wrap" : undefined} style={cardLayout === "list" ? { display: "flex", flexDirection: "column", gap: 20 } : undefined}>
                   {openChatKeys.map((key, idx) => {
                     const offset = idx - safeActiveIdx;
-                    const isActive = offset === 0;
+                    const isActive = cardLayout === "list" ? true : offset === 0;
                     const l = LEVEL_MAP[key]; const chat = colorChats[key];
                     const isLoading = colorLoading[key]; const isSel = !!selected[key];
                     const levelIdx = LEVELS.findIndex(lv => lv.key === key);
                     const prevClr = levelIdx > 0 ? LEVELS[levelIdx - 1].clr : null;
                     const nextClr = levelIdx < LEVELS.length - 1 ? LEVELS[levelIdx + 1].clr : null;
                     let transform, zIdx, opacity, flt;
-                    if (offset === 0) { transform = "translateX(0) scale(1) rotateY(0deg)"; zIdx = 3; opacity = 1; flt = "none"; }
-                    else if (offset === -1) { transform = "translateX(-60%) scale(0.74) rotateY(22deg)"; zIdx = 2; opacity = 0.82; flt = "none"; }
-                    else if (offset === 1) { transform = "translateX(60%) scale(0.74) rotateY(-22deg)"; zIdx = 2; opacity = 0.82; flt = "none"; }
-                    else if (offset < -1) { transform = "translateX(-88%) scale(0.48) rotateY(38deg)"; zIdx = 1; opacity = 0; flt = "blur(2px)"; }
-                    else { transform = "translateX(88%) scale(0.48) rotateY(-38deg)"; zIdx = 1; opacity = 0; flt = "blur(2px)"; }
+                    if (cardLayout === "carousel") {
+                      if (isMobile) {
+                        if (offset === 0) { transform = "translateX(0) scale(1) rotateY(0deg)"; zIdx = 3; opacity = 1; flt = "none"; }
+                        else if (offset === -1) { transform = "translateX(-66%) scale(0.78) rotateY(15deg)"; zIdx = 2; opacity = 0.88; flt = "none"; }
+                        else if (offset === 1) { transform = "translateX(66%) scale(0.78) rotateY(-15deg)"; zIdx = 2; opacity = 0.88; flt = "none"; }
+                        else { transform = offset < 0 ? "translateX(-105%) scale(0.48) rotateY(38deg)" : "translateX(105%) scale(0.48) rotateY(-38deg)"; zIdx = 1; opacity = 0; flt = "blur(2px)"; }
+                      } else {
+                        if (offset === 0) { transform = "translateX(0) scale(1) rotateY(0deg)"; zIdx = 3; opacity = 1; flt = "none"; }
+                        else if (offset === -1) { transform = "translateX(-60%) scale(0.74) rotateY(22deg)"; zIdx = 2; opacity = 0.82; flt = "none"; }
+                        else if (offset === 1) { transform = "translateX(60%) scale(0.74) rotateY(-22deg)"; zIdx = 2; opacity = 0.82; flt = "none"; }
+                        else if (offset < -1) { transform = "translateX(-88%) scale(0.48) rotateY(38deg)"; zIdx = 1; opacity = 0; flt = "blur(2px)"; }
+                        else { transform = "translateX(88%) scale(0.48) rotateY(-38deg)"; zIdx = 1; opacity = 0; flt = "blur(2px)"; }
+                      }
+                    }
                     return (
-                      <div key={key} className={"crsl-card" + (!isActive ? " is-side" : "")} onClick={!isActive ? () => setActiveCardIdx(idx) : undefined} style={{ transform, zIndex: zIdx, opacity, filter: flt, pointerEvents: Math.abs(offset) > 1 ? "none" : "auto" }}>
+                      <div key={key} className={cardLayout === "carousel" ? ("crsl-card" + (!isActive ? " is-side" : "")) : undefined} onClick={cardLayout === "carousel" && !isActive ? () => setActiveCardIdx(idx) : undefined} style={cardLayout === "carousel" ? { transform, zIndex: zIdx, opacity, filter: flt, pointerEvents: Math.abs(offset) > 1 ? "none" : "auto" } : { position: "relative" }}>
                         <div style={{ display: "flex" }}>
                           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 24, flexShrink: 0, paddingLeft: 6 }}>
                             <div style={{ width: 8, height: 8, borderRadius: "50%", background: l.clr, opacity: .7, flexShrink: 0 }} />
@@ -810,7 +1053,7 @@ export default function App() {
                           </div>
                           <div className="cp" style={{ background: "linear-gradient(135deg, " + l.bg + "e0, rgba(10,10,18,.85))", border: "1px solid " + l.clr + (isSel ? "50" : "25"), borderLeft: "3px solid " + l.clr + "50", flexGrow: 1 }}>
                             <div className="ch">
-                              <input type="checkbox" className="chk" id={key === openChatKeys[0] ? "tut-feat-checkbox" : undefined} checked={isSel} onChange={() => toggleSelect(key)} title="Vybrať pre integráciu" style={{ accentColor: l.clr }} />
+                              <input type="checkbox" className="chk" id={key === openChatKeys[0] ? "tut-feat-checkbox" : undefined} checked={isSel} onChange={() => toggleSelect(key)} title={_lang === "en" ? "Select for integration" : "Vybrať pre integráciu"} style={{ accentColor: l.clr }} />
                               <Ico k={key} size={33} />
                               <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: l.clr }}>{l.name}</span>
                               <button className="cx" onClick={() => closeCC(key)}>{"✕"}</button>
@@ -825,36 +1068,40 @@ export default function App() {
                                 m.role === "error" ? (
                                   <div key={i} style={{ padding: "10px 14px", background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.15)", borderRadius: 8, marginBottom: 12 }}>
                                     <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#F87171", marginBottom: 8 }}>{m.content}</div>
-                                    <button onClick={() => retryChat(key)} style={{ padding: "5px 14px", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 6, color: "#F87171", fontFamily: "'DM Sans',sans-serif", fontSize: 12, cursor: "pointer" }}>Skúsiť znova</button>
+                                    <button onClick={() => retryChat(key)} style={{ padding: "5px 14px", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 6, color: "#F87171", fontFamily: "'DM Sans',sans-serif", fontSize: 12, cursor: "pointer" }}>{_lang === "en" ? "Try again" : "Skúsiť znova"}</button>
                                   </div>
                                 ) : m.role === "user" ? (
                                   <div key={i} className="mg mu">{m.content}</div>
                                 ) : (
-                                  <div key={i} className="mg ma">{m.content}</div>
+                                  <div key={i} className="mg ma">{renderMd(m.content)}</div>
                                 )
                               )}
                               {!chat.elaborated && !isLoading && chat.messages.length > 0 && chat.messages[0].role === "assistant" && (
                                 <div id={key === openChatKeys[0] ? "tut-feat-actions" : undefined} style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                                  <button onClick={() => elaborateChat(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: l.clr + "0a", border: "1px solid " + l.clr + "25", borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Rozvinúť perspektívu</button>
-                                  <button onClick={() => showEmergence(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: prevClr ? prevClr + "0a" : "rgba(255,255,255,.03)", border: "1px solid " + (prevClr ? prevClr + "35" : "rgba(255,255,255,.1)"), borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Ako vznikla táto perspektíva</button>
-                                  <button onClick={() => showGrowthDirection(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: nextClr ? nextClr + "0a" : "rgba(255,255,255,.03)", border: "1px solid " + (nextClr ? nextClr + "35" : "rgba(255,255,255,.1)"), borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Kam táto perspektíva smeruje</button>
+                                  <button onClick={() => elaborateChat(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: l.clr + "0a", border: "1px solid " + l.clr + "25", borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>{_lang === "en" ? "Expand perspective" : "Rozvinúť perspektívu"}</button>
+                                  <button onClick={() => showEmergence(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: prevClr ? prevClr + "0a" : "rgba(255,255,255,.03)", border: "1px solid " + (prevClr ? prevClr + "35" : "rgba(255,255,255,.1)"), borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>{_lang === "en" ? "How this perspective emerged" : "Ako vznikla táto perspektíva"}</button>
+                                  <button onClick={() => showGrowthDirection(key)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", background: nextClr ? nextClr + "0a" : "rgba(255,255,255,.03)", border: "1px solid " + (nextClr ? nextClr + "35" : "rgba(255,255,255,.1)"), borderRadius: 7, color: l.clr + "90", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>{_lang === "en" ? "Where this perspective leads" : "Kam táto perspektíva smeruje"}</button>
                                 </div>
                               )}
-                              {isLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: l.clr }} /><span className="lt">Premýšľam...</span></div>}
+                              {isLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: l.clr }} /><span className="lt">{_lang === "en" ? "Thinking..." : "Premýšľam..."}</span></div>}
                             </div>
                             <div className="cr">
-                              <input ref={el => { chatInputRefs.current[key] = el; }} className="ci" value={chat.input} onChange={e => setCCInput(key, e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendCC(key); }}} placeholder={"Opýtaj sa z pohľadu " + l.name.toLowerCase() + "..."} disabled={isLoading || !isActive} style={{ borderColor: l.clr + "20" }} />
-                              <button className="sb" onClick={() => sendCC(key)} disabled={isLoading || !chat.input.trim() || !isActive} style={{ background: l.clr + "18", color: l.clr, border: "1px solid " + l.clr + "30" }}>Odoslať</button>
+                              <input ref={el => { chatInputRefs.current[key] = el; }} className="ci" value={chat.input} onChange={e => setCCInput(key, e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendCC(key); }}} placeholder={_lang === "en" ? ("Ask from the " + l.name.toLowerCase() + " perspective...") : ("Opýtaj sa z pohľadu " + l.name.toLowerCase() + "...")} disabled={isLoading || !isActive} style={{ borderColor: l.clr + "20" }} />
+                              <button className="sb" onClick={() => sendCC(key)} disabled={isLoading || !chat.input.trim() || !isActive} style={{ background: l.clr + "18", color: l.clr, border: "1px solid " + l.clr + "30" }}>{_lang === "en" ? "Send" : "Odoslať"}</button>
                             </div>
                           </div>
                         </div>
                       </div>
                     );
                   })}
+                  {isMobile && cardLayout === "carousel" && openChatKeys.length > 1 && (<>
+                    <div className="crsl-tap-l" onClick={() => setActiveCardIdx(i => Math.max(0, i - 1))} />
+                    <div className="crsl-tap-r" onClick={() => setActiveCardIdx(i => Math.min(openChatKeys.length - 1, i + 1))} />
+                  </>)}
                 </div>
-                {openChatKeys.length > 1 && (
+                {cardLayout === "carousel" && openChatKeys.length > 1 && (
                   <div className="crsl-nav">
-                    <button className="crsl-btn" onClick={() => setActiveCardIdx(i => Math.max(0, i - 1))} disabled={safeActiveIdx === 0}>← Predch.</button>
+                    <button className="crsl-btn" onClick={() => setActiveCardIdx(i => Math.max(0, i - 1))} disabled={safeActiveIdx === 0}>{_lang === "en" ? "← Prev." : "← Predch."}</button>
                     <div className="crsl-dots">
                       <div className="crsl-dots-row">
                         {openChatKeys.map((k, i) => {
@@ -877,7 +1124,7 @@ export default function App() {
                       </div>
                       <span className="crsl-dot-lbl" style={{ color: LEVEL_MAP[openChatKeys[safeActiveIdx]]?.clr + "99" }}>{LEVEL_MAP[openChatKeys[safeActiveIdx]]?.name}</span>
                     </div>
-                    <button className="crsl-btn" onClick={() => setActiveCardIdx(i => Math.min(openChatKeys.length - 1, i + 1))} disabled={safeActiveIdx === openChatKeys.length - 1}>Nasl. →</button>
+                    <button className="crsl-btn" onClick={() => setActiveCardIdx(i => Math.min(openChatKeys.length - 1, i + 1))} disabled={safeActiveIdx === openChatKeys.length - 1}>{_lang === "en" ? "Next →" : "Nasl. →"}</button>
                   </div>
                 )}
                 {selectedCount > 0 && (
@@ -891,11 +1138,11 @@ export default function App() {
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "flex-start" }}>
                       <button id="tut-feat-integrate" className="ib" onClick={integrateSelected}>
-                        {"Integrovať " + selectedCount + (selectedCount === 1 ? " perspektívu" : " perspektívy") + " do Žltej"}
+                        {_lang === "en" ? ("Integrate " + selectedCount + (selectedCount === 1 ? " perspective" : " perspectives") + " into Yellow") : ("Integrovať " + selectedCount + (selectedCount === 1 ? " perspektívu" : selectedCount < 5 ? " perspektívy" : " perspektív") + " do Žltej")}
                       </button>
                       {selectedCount >= 2 && (
                         <button id="tut-feat-conflict" className="ib ib-conflict" onClick={analyzeConflicts} disabled={conflictLoading}>
-                          {conflictLoading ? "Analyzujem napätia..." : "Napätia medzi " + selectedCount + " perspektívami"}
+                          {conflictLoading ? (_lang === "en" ? "Analyzing tensions..." : "Analyzujem napätia...") : (_lang === "en" ? "Tensions between " + selectedCount + " perspectives" : "Napätia medzi " + selectedCount + " perspektívami")}
                         </button>
                       )}
                     </div>
@@ -904,22 +1151,22 @@ export default function App() {
                 {conflictResult && (
                   <div style={{ marginTop: 14, padding: "16px 18px", background: "rgba(10,10,18,.8)", border: "1px solid rgba(248,113,113,.15)", borderRadius: 12, borderLeft: "3px solid rgba(248,113,113,.3)", backdropFilter: "blur(10px)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600, color: "#F87171", letterSpacing: 1.5, textTransform: "uppercase" }}>Napätia medzi perspektívami</span>
+                      <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600, color: "#F87171", letterSpacing: 1.5, textTransform: "uppercase" }}>{_lang === "en" ? "Tensions between perspectives" : "Napätia medzi perspektívami"}</span>
                       {Object.keys(selected).filter(k => selected[k]).map(k => (
-                        <div key={"cax-"+k} onClick={() => scrollToChat(k)} style={{ width: 30, height: 30, borderRadius: 7, background: LEVEL_MAP[k]?.clr + "18", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform .2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} title={"Jump to " + LEVEL_MAP[k]?.name}>
+                        <div key={"cax-"+k} onClick={() => scrollToChat(k)} style={{ width: 30, height: 30, borderRadius: 7, background: LEVEL_MAP[k]?.clr + "18", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform .2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} title={"Prejsť na " + LEVEL_MAP[k]?.name}>
                           <AxisIco k={k} size={24} />
                         </div>
                       ))}
                     </div>
-                    <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 300, lineHeight: 1.8, color: "rgba(221,221,221,.85)", whiteSpace: "pre-line" }}>{conflictResult}</div>
-                    {conflictLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}><div className="ldb" style={{ color: "#F87171" }} /><span className="lt">Analyzujem...</span></div>}
+                    <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 300, lineHeight: 1.8, color: "rgba(221,221,221,.85)", whiteSpace: "pre-line" }}>{renderMd(conflictResult)}</div>
+                    {conflictLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}><div className="ldb" style={{ color: "#F87171" }} /><span className="lt">{_lang === "en" ? "Analyzing..." : "Analyzujem..."}</span></div>}
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-                      <button onClick={elaborateConflicts} disabled={conflictLoading} style={{ padding: "5px 14px", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 7, color: "#F87171", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>Rozvinúť napätia</button>
-                      <button onClick={() => setConflictResult("")} style={{ padding: "5px 14px", background: "none", border: "1px solid rgba(255,255,255,.1)", borderRadius: 7, color: "rgba(255,255,255,.4)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer" }}>Zavrieť</button>
+                      <button onClick={elaborateConflicts} disabled={conflictLoading} style={{ padding: "5px 14px", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 7, color: "#F87171", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", transition: "all .2s", letterSpacing: ".5px" }}>{_lang === "en" ? "Expand tensions" : "Rozvinúť napätia"}</button>
+                      <button onClick={() => setConflictResult("")} style={{ padding: "5px 14px", background: "none", border: "1px solid rgba(255,255,255,.1)", borderRadius: 7, color: "rgba(255,255,255,.4)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer" }}>{_lang === "en" ? "Close" : "Zavrieť"}</button>
                     </div>
                     <div style={{ display: "flex", gap: 8, marginTop: 10, alignItems: "flex-end" }}>
-                      <input className="ci" value={conflictInput} onChange={e => setConflictInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendConflictQuestion(); }}} placeholder="Opýtaj sa na napätia..." disabled={conflictLoading} style={{ borderColor: "rgba(248,113,113,.15)", fontSize: 13 }} />
-                      <button className="sb" onClick={sendConflictQuestion} disabled={conflictLoading || !conflictInput.trim()} style={{ background: "rgba(248,113,113,.1)", color: "#F87171", border: "1px solid rgba(248,113,113,.2)" }}>Opýtať sa</button>
+                      <input className="ci" value={conflictInput} onChange={e => setConflictInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendConflictQuestion(); }}} placeholder={_lang === "en" ? "Ask about tensions..." : "Opýtaj sa na napätia..."} disabled={conflictLoading} style={{ borderColor: "rgba(248,113,113,.15)", fontSize: 13 }} />
+                      <button className="sb" onClick={sendConflictQuestion} disabled={conflictLoading || !conflictInput.trim()} style={{ background: "rgba(248,113,113,.1)", color: "#F87171", border: "1px solid rgba(248,113,113,.2)" }}>{_lang === "en" ? "Ask" : "Opýtať sa"}</button>
                     </div>
                   </div>
                 )}
@@ -927,48 +1174,169 @@ export default function App() {
             )}
 
             <div id="tut-feat-integrative" className="ms">
-              <div className="ml"><Ico k="yellow" size={20} /> Integratívny dialóg <span className="bg2">Žltá</span></div>
-              <div className="msl">Pokračuj v skúmaní témy z integratívnej, systémovej perspektívy</div>
-              {integratedContext && <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, color: "rgba(250,204,21,.5)", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>Integrované perspektívy sú zahrnuté v kontexte</div>}
+              <div className="ml"><Ico k="yellow" size={20} /> {_lang === "en" ? "Integrative dialogue" : "Integratívny dialóg"} <span className="bg2">{_lang === "en" ? "Yellow" : "Žltá"}</span></div>
+              <div className="msl">{_lang === "en" ? "Continue exploring the topic from an integrative, systemic perspective" : "Pokračuj v skúmaní témy z integratívnej, systémovej perspektívy"}</div>
+              {integratedContext && <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, color: "rgba(250,204,21,.5)", marginTop: -8, marginBottom: 12, fontStyle: "italic" }}>{_lang === "en" ? "Integrated perspectives are included in context" : "Integrované perspektívy sú zahrnuté v kontexte"}</div>}
               {reflection && (
                 <div style={{ padding: "12px 16px", marginBottom: 14, background: "rgba(250,204,21,.04)", border: "1px solid rgba(250,204,21,.1)", borderRadius: 10, fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 300, lineHeight: 1.7, color: "rgba(250,204,21,.55)", fontStyle: "italic" }}>
                   {reflection}
                 </div>
               )}
               {mainChat.length > 0 && <div style={{ marginBottom: 14 }}>
-                {mainChat.map((m, i) => <div key={i} className={"mg " + (m.role === "user" ? "mu" : "ma")} style={m.role === "user" ? { borderLeftColor: "rgba(250,204,21,.25)" } : {}}>{m.content}</div>)}
-                {mainLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: "#FACC15" }} /><span className="lt">Integrujem perspektívy...</span></div>}
+                {mainChat.map((m, i) => <div key={i} className={"mg " + (m.role === "user" ? "mu" : "ma")} style={m.role === "user" ? { borderLeftColor: "rgba(250,204,21,.25)" } : {}}>{m.role === "user" ? m.content : renderMd(m.content)}</div>)}
+                {mainLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}><div className="ldb" style={{ color: "#FACC15" }} /><span className="lt">{_lang === "en" ? "Integrating perspectives..." : "Integrujem perspektívy..."}</span></div>}
                 <div ref={mainEndRef} />
               </div>}
               <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-                <input className="ci" value={mainInput} onChange={e => setMainInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMain(); }}} placeholder="Opýtaj sa, rozvíjaj tému integratívne..." disabled={mainLoading} style={{ borderColor: "rgba(250,204,21,.15)" }} />
-                <button className="sb" onClick={sendMain} disabled={mainLoading || !mainInput.trim()} style={{ background: "rgba(250,204,21,.1)", color: "#FACC15", border: "1px solid rgba(250,204,21,.2)" }}>Odoslať</button>
+                <input className="ci" value={mainInput} onChange={e => setMainInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMain(); }}} placeholder={_lang === "en" ? "Ask, explore the topic integratively..." : "Opýtaj sa, rozvíjaj tému integratívne..."} disabled={mainLoading} style={{ borderColor: "rgba(250,204,21,.15)" }} />
+                <button className="sb" onClick={sendMain} disabled={mainLoading || !mainInput.trim()} style={{ background: "rgba(250,204,21,.1)", color: "#FACC15", border: "1px solid rgba(250,204,21,.2)" }}>{_lang === "en" ? "Send" : "Odoslať"}</button>
               </div>
             </div>
-            <div className="ft">Každá perspektíva je autentická {"·"} Žiadna nie je lepšia ani horšia</div>
+            <div className="ft">{_lang === "en" ? "Every perspective is authentic · None is better or worse" : "Každá perspektíva je autentická · Žiadna nie je lepšia ani horšia"}</div>
             <div style={{ textAlign: "center", marginTop: 20, display: "flex", justifyContent: "center", gap: 12 }}>
-              <button id="tut-feat-newtopic" className="btn" onClick={() => { setTopicSet(""); setTopic(""); }} style={{ fontSize: 11, padding: "8px 24px", margin: 0 }}>Nová téma</button>
+              <button id="tut-feat-newtopic" className="btn" onClick={() => { setTopicSet(""); setTopic(""); consumeView(); }} style={{ fontSize: 11, padding: "8px 24px", margin: 0 }}>{_lang === "en" ? "New topic" : "Nová téma"}</button>
               {openChatKeys.length > 0 && (
                 <div data-export-menu style={{ position: "relative" }}>
-                  <button id="tut-feat-export" className="btn" onClick={() => setExportMenuOpen(p => !p)} style={{ fontSize: 11, padding: "8px 24px", margin: 0, background: "rgba(255,255,255,.06)", borderColor: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.6)" }}>Exportovať ▾</button>
+                  <button id="tut-feat-export" className="btn" onClick={() => setExportMenuOpen(p => !p)} style={{ fontSize: 11, padding: "8px 24px", margin: 0, background: "rgba(255,255,255,.06)", borderColor: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.6)" }}>{_lang === "en" ? "Export ▾" : "Exportovať ▾"}</button>
                   {exportMenuOpen && (
                     <div style={{ position: "absolute", bottom: "calc(100% + 4px)", left: 0, background: "rgba(10,10,18,.97)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 8, overflow: "hidden", zIndex: 200, minWidth: "100%", boxShadow: "0 4px 24px rgba(0,0,0,.5)" }}>
-                      <button onClick={() => { exportConversation(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", borderBottom: "1px solid rgba(255,255,255,.07)", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť PDF</button>
-                      <button onClick={() => { exportMarkdown(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť pre pokračovanie</button>
+                      <button onClick={() => { exportConversation(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", borderBottom: "1px solid rgba(255,255,255,.07)", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>{_lang === "en" ? "Download PDF" : "Stiahnuť PDF"}</button>
+                      <button onClick={() => { exportMarkdown(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>{_lang === "en" ? "Download for continuation" : "Stiahnuť pre pokračovanie"}</button>
                     </div>
                   )}
+                </div>
+              )}
+            </div>
+            <div style={{ marginTop: 18, borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 14 }}>
+              <button onClick={() => { setDraftView(viewMode); setDraftLayout(cardLayout); setDraftLang(_lang); setSettingsOpen(p => !p); }} style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,.28)", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", padding: "4px 8px", transition: "color .2s" }}
+                onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,.65)"}
+                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,.28)"}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+                {_lang === "en" ? "Settings" : "Nastavenia"} {settingsOpen ? "▲" : "▼"}
+              </button>
+              {settingsOpen && (
+                <div style={{ marginTop: 12, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".8px", textTransform: "uppercase" }}>{_lang === "en" ? "View:" : "Zobrazenie:"}</span>
+                    <div style={{ display: "inline-flex", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", overflow: "hidden" }}>
+                      {[["icons", _lang === "en" ? "Icons" : "Ikony"], ["mandala", _lang === "en" ? "Spiral" : "Špirála"]].map(([val, label]) => {
+                        const active = draftView === val;
+                        return (
+                          <button key={val} onClick={() => setDraftView(val)}
+                            style={{ padding: "4px 12px", background: active ? "rgba(255,255,255,.1)" : "none", border: "none", borderRight: val === "icons" ? "1px solid rgba(255,255,255,.1)" : "none", color: active ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.25)", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", cursor: active ? "default" : "pointer", transition: "all .2s", fontWeight: active ? 600 : 400 }}>
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".8px", textTransform: "uppercase" }}>{_lang === "en" ? "Card layout:" : "Rozloženie kariet:"}</span>
+                    <div style={{ display: "inline-flex", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", overflow: "hidden" }}>
+                      {[["carousel", _lang === "en" ? "Carousel" : "Karusel"], ["list", _lang === "en" ? "List" : "Zoznam"]].map(([val, label]) => {
+                        const active = draftLayout === val;
+                        return (
+                          <button key={val} onClick={() => setDraftLayout(val)}
+                            style={{ padding: "4px 12px", background: active ? "rgba(255,255,255,.1)" : "none", border: "none", borderRight: val === "carousel" ? "1px solid rgba(255,255,255,.1)" : "none", color: active ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.25)", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", cursor: active ? "default" : "pointer", transition: "all .2s", fontWeight: active ? 600 : 400 }}>
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".8px", textTransform: "uppercase" }}>{_lang === "en" ? "Language:" : "Jazyk:"}</span>
+                    <div style={{ display: "inline-flex", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", overflow: "hidden" }}>
+                      {[["sk", "SK"], ["en", "EN"]].map(([val, label]) => {
+                        const active = draftLang === val;
+                        return (
+                          <button key={val} onClick={() => setDraftLang(val)}
+                            style={{ padding: "4px 12px", background: active ? "rgba(255,255,255,.1)" : "none", border: "none", borderRight: val === "sk" ? "1px solid rgba(255,255,255,.1)" : "none", color: active ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.25)", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", cursor: active ? "default" : "pointer", transition: "all .2s", fontWeight: active ? 600 : 400 }}>
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <button onClick={() => { setViewMode(draftView); setCardLayout(draftLayout); if (draftLang !== _lang) { const u = new URL(window.location.href); u.searchParams.set("lang", draftLang); window.location.href = u.toString(); } else { setSettingsOpen(false); } }}
+                    style={{ marginTop: 4, padding: "5px 22px", background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.2)", borderRadius: 5, color: "rgba(255,255,255,.75)", fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all .2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,.18)"; e.currentTarget.style.color = "rgba(255,255,255,1)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.1)"; e.currentTarget.style.color = "rgba(255,255,255,.75)"; }}>
+                    {_lang === "en" ? "Apply" : "Použiť"}
+                  </button>
                 </div>
               )}
             </div>
           </>
         )}
       </div>
-      <GuideOverlay guide={guide} />
+      <GuideOvComp guide={guide} />
       {tutorialOpen && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.15)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(12px, 4vw, 32px)" }} onClick={() => setTutorialOpen(false)}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.15)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(12px, 4vw, 32px)" }} onClick={() => { setTutorialOpen(false); consumeView(); }}>
           <div style={{ width: "min(820px, 100%)", height: "min(600px, 100%)", borderRadius: 16, overflow: "hidden", flexShrink: 0, boxShadow: "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)" }}>
-            <iframe src="https://sdl-tutorial.vercel.app" allowTransparency={true} style={{ width: "100%", height: "100%", border: "none", display: "block", background: "transparent" }} />
+            <iframe src={`https://sdl-tutorial.vercel.app?lang=${_lang}`} allowTransparency={true} style={{ width: "100%", height: "100%", border: "none", display: "block", background: "transparent" }} />
           </div>
+        </div>
+      )}
+      {mysdlModalOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(12px, 4vw, 32px)" }} onClick={() => { setMysdlModalOpen(false); consumeView(); }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "min(420px, 100%)", background: "rgba(12,12,20,0.92)", border: "1px solid rgba(167,139,250,0.28)", borderRadius: 16, padding: "28px 24px", boxShadow: "0 32px 80px rgba(0,0,0,0.7)", backdropFilter: "blur(12px)", textAlign: "center" }}>
+            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, color: "#E9DDFF", marginBottom: 6 }}>MySDL</div>
+            <p style={{ fontFamily: "DM Sans,sans-serif", fontSize: 12.5, lineHeight: 1.6, color: "rgba(255,255,255,0.55)", margin: "0 0 22px" }}>{_lang === "en" ? "Your personal space for growth, self-diagnosis and progress tracking." : "Tvoj osobný priestor pre rast, sebadiagnostiku a sledovanie progresu."}</p>
+            {!supabaseReady && (
+              <p style={{ fontFamily: "DM Sans,sans-serif", fontSize: 12.5, lineHeight: 1.6, color: "rgba(233,221,255,0.85)", margin: "0 0 18px" }}>{_lang === "en" ? "Signing in to MySDL is coming soon. For now you can explore it in preview." : "Prihlasovanie do MySDL pripravujeme. Zatiaľ si ho môžeš prezrieť v náhľade."}</p>
+            )}
+            {supabaseReady && (<>
+            <input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} placeholder="Email" autoComplete="email"
+              style={{ width: "100%", boxSizing: "border-box", padding: "11px 14px", marginBottom: 10, background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 10, color: "#eee", fontFamily: "DM Sans,sans-serif", fontSize: 14, outline: "none" }} />
+            <input type="password" value={authPass} onChange={e => setAuthPass(e.target.value)} placeholder={_lang === "en" ? "Password" : "Heslo"} autoComplete={authMode === "up" ? "new-password" : "current-password"}
+              onKeyDown={e => { if (e.key === "Enter") authEmailSubmit(); }}
+              style={{ width: "100%", boxSizing: "border-box", padding: "11px 14px", marginBottom: 6, background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 10, color: "#eee", fontFamily: "DM Sans,sans-serif", fontSize: 14, outline: "none" }} />
+            <div style={{ textAlign: "right", marginBottom: 14 }}>
+              <button type="button" onClick={authReset} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontFamily: "DM Sans,sans-serif", fontSize: 11, cursor: "pointer", padding: 0 }}>{_lang === "en" ? "Forgot password?" : "Zabudnuté heslo?"}</button>
+            </div>
+            <button type="button" className="btn" disabled={authLoading || !supabaseReady} style={{ margin: "0 auto 12px", width: "100%" }} onClick={authEmailSubmit}>
+              {authLoading ? "…" : (authMode === "up" ? (_lang === "en" ? "Register" : "Registrovať sa") : (_lang === "en" ? "Sign in" : "Prihlásiť sa"))}
+            </button>
+            <button type="button" onClick={authGoogle} disabled={!supabaseReady} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, width: "100%", boxSizing: "border-box", margin: "0 auto 14px", padding: "10px", background: "#fff", border: "none", borderRadius: 10, color: "#3c4043", fontFamily: "DM Sans,sans-serif", fontSize: 13, fontWeight: 600, cursor: supabaseReady ? "pointer" : "default", opacity: supabaseReady ? 1 : 0.5 }}>
+              <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
+              {_lang === "en" ? "Continue with Google" : "Pokračovať cez Google"}
+            </button>
+            {authMsg && <p style={{ fontFamily: "DM Sans,sans-serif", fontSize: 11.5, color: "rgba(255,255,255,0.72)", margin: "0 0 12px", lineHeight: 1.5 }}>{authMsg}</p>}
+            <button type="button" onClick={() => { setAuthMode(authMode === "up" ? "in" : "up"); setAuthMsg(null); }} style={{ background: "none", border: "none", color: "rgba(167,139,250,0.85)", fontFamily: "DM Sans,sans-serif", fontSize: 12, cursor: "pointer", marginBottom: 16 }}>
+              {authMode === "up" ? (_lang === "en" ? "Have an account? Sign in" : "Máš účet? Prihlás sa") : (_lang === "en" ? "No account? Register" : "Nemáš účet? Zaregistruj sa")}
+            </button>
+            </>)}
+            <div style={supabaseReady ? { borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 14 } : undefined}>
+              <button type="button" onClick={() => openMySDL("once")} style={{ display: "block", width: "100%", boxSizing: "border-box", padding: "10px", background: "none", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 999, color: "rgba(255,255,255,0.6)", fontFamily: "DM Sans,sans-serif", fontSize: 12, letterSpacing: "1.5px", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,0.9)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.6)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)"; }}>
+                {_lang === "en" ? "Preview without account" : "Náhľad bez účtu"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {mysdlOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9998, overflow: "auto", background: "#08080d" }}>
+          <button onClick={() => { setMysdlOpen(false); consumeView(); }} style={{ position: "fixed", top: 14, left: 14, zIndex: 10001, display: "flex", alignItems: "center", gap: 6, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 999, padding: "7px 14px", color: "rgba(255,255,255,0.75)", fontFamily: "DM Sans,sans-serif", fontSize: 11, letterSpacing: "1px", textTransform: "uppercase", cursor: "pointer" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = "rgba(0,0,0,0.7)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.75)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            {_lang === "en" ? "Back" : "Späť"}
+          </button>
+          {session && (
+            <button onClick={authSignOut} style={{ position: "fixed", top: 14, right: 14, zIndex: 10001, display: "flex", alignItems: "center", gap: 7, maxWidth: "60vw", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 999, padding: "7px 14px", color: "rgba(255,255,255,0.75)", fontFamily: "DM Sans,sans-serif", fontSize: 11, cursor: "pointer" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = "rgba(0,0,0,0.7)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.75)"; e.currentTarget.style.background = "rgba(0,0,0,0.5)"; }}>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.email}</span>
+              <span style={{ opacity: 0.5 }}>·</span>
+              <span style={{ textTransform: "uppercase", letterSpacing: "1px" }}>{_lang === "en" ? "Sign out" : "Odhlásiť"}</span>
+            </button>
+          )}
+          {_lang === "en"
+            ? <MySDLEn access={mysdlAccess} userId={session?.user?.id ?? null} />
+            : <MySDL access={mysdlAccess} userId={session?.user?.id ?? null} />}
         </div>
       )}
     </div>

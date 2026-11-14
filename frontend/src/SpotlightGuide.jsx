@@ -144,8 +144,11 @@ export function useSpotlightGuide(phase) {
     return () => window.removeEventListener("scroll", update);
   }, [step, steps]);
 
-  const glow = !seen[phase] && step === 0;
-  const showIntroTip = glow && phase === "intro";
+  // Ako v sdl2 (7d9fb9d, 23. 6.): tlačidlo sprievodcu je vždy decentné — bez automatického
+  // žiarenia a bez automatického tipu (pôvodne: glow = !seen[phase] && step === 0,
+  // tip len na úvode). `tipAbove` ostáva podporované pre prípad, že sa tip vráti.
+  const glow = false;
+  const showIntroTip = false;
 
   // klik kamkoľvek mimo zhasne žiarenie
   useEffect(() => {
