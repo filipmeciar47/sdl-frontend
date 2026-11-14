@@ -474,7 +474,7 @@ export default function App() {
         setMainInput("");
         setIntegratedContext("");
       } catch (err) {
-        alert("Chyba pri načítaní súboru. Skontrolujte, že ide o .md súbor exportovaný z tejto aplikácie.");
+        alert("Chyba pri načítaní súboru. Skontroluj, či ide o .md exportovaný z tejto aplikácie.");
       }
     };
     reader.readAsText(file, "utf-8");
@@ -941,7 +941,7 @@ export default function App() {
                 <div ref={mainEndRef} />
               </div>}
               <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-                <input className="ci" value={mainInput} onChange={e => setMainInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMain(); }}} placeholder="Spýtajte sa, preskúmajte tému integratívne..." disabled={mainLoading} style={{ borderColor: "rgba(250,204,21,.15)" }} />
+                <input className="ci" value={mainInput} onChange={e => setMainInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMain(); }}} placeholder="Opýtaj sa, rozvíjaj tému integratívne..." disabled={mainLoading} style={{ borderColor: "rgba(250,204,21,.15)" }} />
                 <button className="sb" onClick={sendMain} disabled={mainLoading || !mainInput.trim()} style={{ background: "rgba(250,204,21,.1)", color: "#FACC15", border: "1px solid rgba(250,204,21,.2)" }}>Odoslať</button>
               </div>
             </div>
@@ -954,7 +954,7 @@ export default function App() {
                   {exportMenuOpen && (
                     <div style={{ position: "absolute", bottom: "calc(100% + 4px)", left: 0, background: "rgba(10,10,18,.97)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 8, overflow: "hidden", zIndex: 200, minWidth: "100%", boxShadow: "0 4px 24px rgba(0,0,0,.5)" }}>
                       <button onClick={() => { exportConversation(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", borderBottom: "1px solid rgba(255,255,255,.07)", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť PDF</button>
-                      <button onClick={() => { exportMarkdown(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť na pokračovanie</button>
+                      <button onClick={() => { exportMarkdown(); setExportMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "9px 18px", background: "none", border: "none", color: "rgba(255,255,255,.7)", fontFamily: "'DM Sans',sans-serif", fontSize: 11, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.06)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>Stiahnuť pre pokračovanie</button>
                     </div>
                   )}
                 </div>
