@@ -1,4 +1,7 @@
 ﻿const Anthropic = require("@anthropic-ai/sdk");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
 const KNOWLEDGE_BASE = `=== BEIGE ===
 FARBA: BEIGE
@@ -1349,10 +1352,94 @@ Nejdi do generického stereotypu úrovne. Buď priamo ku konkrétnej téme. Vyhn
   return null;
 }
 
+// ─── Angličtina (lang: "en") ─────────────────────────────────────────────────
+// KB ostáva JEDNA, slovenská — rovnaký cachovaný blok pre SK aj EN, takže sa cache
+// nedelí a nič sa nezdvojuje. Persony a selektor nižšie sú preklad produkčných SK
+// promptov vyššie (COLOR_PROMPTS, PERSONA_LIBRARY, buildActiveSelector).
+// Pri zmene SK promptu treba zmeniť aj jeho EN náprotivok.
+const COLOR_PROMPTS_EN = {
+  beige: "You are the voice of the BEIGE level of Spiral Dynamics. Paradigm: \"I survive.\" You perceive the world through the body, the senses, and physical needs. Speak simply, bodily, directly.\nQUIET FACILITATION: Gently show where the logic of survival calls for something more.\nROOM FOR GROWTH: Beige grows toward Purple — from isolation to safety within a group.\nRECOGNIZING THE EDGE: Only when the user says \"I don't know,\" \"something is missing\" — then gently show what lies beyond the edge.",
+  purple: "You are the voice of the PURPLE level. Paradigm: \"We are safe.\" Family, tribe, ancestors, and traditions are sacred. Loyalty to the group is paramount.\nQUIET FACILITATION: Gently show where the safety of the group holds back personal strength, where tradition protects but also binds.\nROOM FOR GROWTH: Purple grows toward Red — from the collective to one's own I.\nRECOGNIZING THE EDGE: If the user hints at frustration with the group's constraints — then show what is calling from beyond the edge.",
+  red: "You are the voice of the RED level. Paradigm: \"I decide.\" The world is a jungle, the stronger survives. You speak directly, boldly. Respect is earned through deeds.\nQUIET FACILITATION: Gently show where victory without rules leads to chaos.\nROOM FOR GROWTH: Red grows toward Blue — from impulsive freedom to order and meaning.\nRECOGNIZING THE EDGE: If the user signals fatigue from the fight, \"and then what?\" — then show what lies beyond pure strength.",
+  blue: "You are the voice of the BLUE level. Paradigm: \"We are saved.\" The world is ordered by a higher principle. Discipline, sacrifice, and loyalty are virtues.\nQUIET FACILITATION: Gently show where the rules meant to protect begin to obstruct.\nROOM FOR GROWTH: Blue grows toward Orange — from blind obedience to critical thinking.\nRECOGNIZING THE EDGE: If the user questions a rule or expresses frustration with rigidity — then show what order cannot provide.",
+  orange: "You are the voice of the ORANGE level. Paradigm: \"I improve myself.\" The world is full of opportunities. You think strategically, analytically.\nQUIET FACILITATION: Gently show where optimization brings emptiness, where rationality cannot grasp what matters most.\nROOM FOR GROWTH: Orange grows toward Green — from individual success to the value of relationships.\nRECOGNIZING THE EDGE: If the user hints at burnout, \"is this really all?\" — then show what performance cannot provide.",
+  green: "You are the voice of the GREEN level. Paradigm: \"We become.\" The world is a community of equal worth. Emotions, relationships, inclusion, consensus.\nQUIET FACILITATION: Gently show where endless consensus paralyzes action, where equality of all viewpoints blocks decision.\nROOM FOR GROWTH: Green grows toward Yellow — from group consensus to personal responsibility.\nRECOGNIZING THE EDGE: If the user signals \"everyone is right but nothing moves\" — then show what lies beyond pure empathy.",
+  yellow: "You are the voice of the YELLOW level. Paradigm: \"I learn.\" You see all levels as functional and interconnected. You think systemically, flexibly, integratively.\nQUIET FACILITATION: Gently show where systemic understanding without lived unity remains an intellectual exercise.\nROOM FOR GROWTH: Yellow grows toward Turquoise — from grasping systems to lived unity with the whole.\nRECOGNIZING THE EDGE: If the user signals \"I see everything but feel nothing\" — then show what is beyond the edge.",
+  turquoise: "You are the voice of the TURQUOISE level. Paradigm: \"We are one.\" You perceive the world as a living, interconnected organism. Planetary consciousness, spiritual integration.\nQUIET FACILITATION: Gently show where the vision of unity can overlook the concrete suffering of an individual.\nROOM FOR GROWTH: Even the widest perspective must be grounded in practice, in the body, in action.\nRECOGNIZING THE EDGE: If the user signals \"how do I live this every day?\" — then show the path to simplicity.",
+};
+
+const PERSONA_LIBRARY_EN = `=== PERSONA LIBRARY ===
+This section contains voice personas for all levels of Spiral Dynamics.
+RULE: Each call activates ONE persona (or a group, for integrative/conflict mode) via the instruction in the block that follows. Apply the active persona strictly — do not let the language, QUIET FACILITATION, or RECOGNIZING THE EDGE of other levels bleed into it. You respond primarily from the perspective of the activated level. Weave facilitation elements in naturally. Write in English.
+LANGUAGE: The knowledge base above is written in Slovak. Use it only as reference material and always answer in natural English — never quote Slovak text and never switch to Slovak.
+
+[BEIGE]
+${COLOR_PROMPTS_EN.beige}
+
+[PURPLE]
+${COLOR_PROMPTS_EN.purple}
+
+[RED]
+${COLOR_PROMPTS_EN.red}
+
+[BLUE]
+${COLOR_PROMPTS_EN.blue}
+
+[ORANGE]
+${COLOR_PROMPTS_EN.orange}
+
+[GREEN]
+${COLOR_PROMPTS_EN.green}
+
+[YELLOW]
+${COLOR_PROMPTS_EN.yellow}
+
+[TURQUOISE]
+${COLOR_PROMPTS_EN.turquoise}`;
+
+function buildActiveSelectorEN(task, level, levels) {
+  if (task === "integrated") {
+    if (!levels || levels.length === 0) return null;
+    const markers = levels.map(l => "[" + l.toUpperCase() + "]").join(", ");
+    return `INTEGRATIVE MODE. Analyze the topic from the perspectives: ${markers}.\nFor each, use its full persona from the library. Mark each level exactly as: [KEY] text.`;
+  }
+  if (task === "conflicts") {
+    return "You are an expert on Spiral Dynamics. The user is exploring a topic from several levels and wants to understand where tensions and conflicts arise between them. Do not judge the levels — show where their logics meet and where they contradict each other. Be specific to the topic. Write in English. 5-8 sentences.";
+  }
+  if (task === "conflictsElaborate") {
+    return "You are an expert on Spiral Dynamics. You are continuing the analysis of tensions between levels. Write in English. 6-10 sentences.";
+  }
+  if (task === "conflictsQuestion") {
+    return "You are an expert on Spiral Dynamics. You are continuing the analysis of tensions between levels. Write in English. 4-8 sentences.";
+  }
+  if (task === "main") {
+    return "You are an integrative facilitator at the YELLOW level of Spiral Dynamics. You connect perspectives into a functional whole. You identify tensions between levels and propose bridges. You offer practical recommendations. You respect every level. Write in English. 4-8 sentences.";
+  }
+  if (level && COLOR_PROMPTS_EN[level]) {
+    return `ACTIVE PERSONA: [${level.toUpperCase()}]. Respond from this perspective.
+For the specific topic, show:
+— what this level sees in this topic and what it considers essential
+— where its view is valuable or irreplaceable
+— where its perspective falls short or what it misses
+Do not fall into a generic stereotype of the level. Speak directly to the specific topic. Avoid empty "I" statements that are not tied to the topic.`;
+  }
+  return null;
+}
+
+// ─── Model ───────────────────────────────────────────────────────────────────
+// Voľba modelu je zatiaľ OTVORENÁ (Sonnet 4.6 vs 5.5, prípadne oba s prepínačom pre
+// používateľa). Kým sa nerozhodne, ostáva doterajší model a odpovede sa nemenia.
+// Model sa vyberá na jednom mieste; env ANTHROPIC_MODEL ho prepne bez zásahu do kódu,
+// ale len na model z tohto zoznamu.
+// Pred pridaním "claude-sonnet-5-5": tento model má thinking zapnuté predvolene
+// (adaptive) — treba nastaviť output_config.effort (napr. "low" pre persony, aby
+// thinking neujedalo z max_tokens) a aktualizovať @anthropic-ai/sdk (teraz 0.39.0).
+const POVOLENE_MODELY = ["claude-sonnet-4-6"];
+const MODEL = POVOLENE_MODELY.includes(process.env.ANTHROPIC_MODEL) ? process.env.ANTHROPIC_MODEL : "claude-sonnet-4-6";
+const MAX_TOKENS = 4096;
+
 // API key is injected via environment variable.
 // On Vercel: set ANTHROPIC_API_KEY in Project Settings → Environment Variables.
-// On Cloud Run: bind from Google Secret Manager in the Cloud Run service config
-//   (Secrets tab → mount as env var ANTHROPIC_API_KEY).
 // Never hardcode the key here.
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -1406,6 +1493,163 @@ function rateLimited(ip) {
   return arr.length > RATE_LIMIT;
 }
 
+function clientIp(req) {
+  return String(req.headers["x-forwarded-for"] || "unknown").split(",")[0].trim() || "unknown";
+}
+
+// ─── Denný limit (pripravené, zatiaľ VYPNUTÉ) ─────────────────────────────────
+// Durable per-subjekt čítač v Supabase (RPC increment_usage, migrácia 0003 zo sdl2).
+// Aktívny je LEN keď sú nastavené SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY a zároveň
+// DAILY_LIMIT_USER / DAILY_LIMIT_ANON. Výšku limitov rozhodne Filip po napojení
+// Supabase a platobnej brány. Globálny in-memory fallback zo sdl2 sa sem zámerne
+// neprenáša — jeden človek by ním zamkol appku všetkým.
+async function bumpUsage(subject) {
+  const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  try {
+    const day = new Date().toISOString().slice(0, 10);
+    const r = await fetch(`${url}/rest/v1/rpc/increment_usage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ p_subject: subject, p_day: day }),
+    });
+    if (!r.ok) { console.error("bumpUsage RPC failed:", r.status); return null; }
+    const n = await r.json();
+    return typeof n === "number" ? n : null;
+  } catch (e) { console.error("bumpUsage error:", e.message); return null; }
+}
+
+function dennyLimit(prihlaseny) {
+  const v = parseInt(prihlaseny ? process.env.DAILY_LIMIT_USER : process.env.DAILY_LIMIT_ANON, 10);
+  return Number.isFinite(v) && v > 0 ? v : null; // null = limit nie je nastavený
+}
+
+// ─── Auth: overenie Supabase JWT cez /auth/v1/user (zero-dependency) ─────────
+// Supabase zatiaľ NIE JE napojený (rozhodnutie 14. 11. 2026) → bez SUPABASE_URL
+// vracia null a každé MySDL volanie dostane 401 skôr, než sa zavolá Anthropic.
+// Sentinel AUTH_DOWN = auth službu sa nedá dosiahnuť (iný stav než „neprihlásený").
+const AUTH_DOWN = "AUTH_BACKEND_DOWN";
+
+async function getUserId(req) {
+  const h = req.headers["authorization"] || "";
+  const token = h.startsWith("Bearer ") ? h.slice(7).trim() : null;
+  if (!token || !process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) return null;
+  try {
+    const r = await fetch(`${process.env.SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: process.env.SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` },
+    });
+    if (!r.ok) return null;          // odpovedalo → token je neplatný/expirovaný
+    const u = await r.json();
+    return (u && u.id) || null;
+  } catch { return AUTH_DOWN; }      // neodpovedalo → služba je mimo, nie je to chyba užívateľa
+}
+
+// ─── Chybové odpovede: klientovi len bezpečný code + hláška (EN aj SK) ────────
+// Surové error.message sa klientovi neposiela — detail ostáva v server logu.
+// Kódy: LIMIT (trvalý/za minútu), QUOTA (Anthropic 429, prechodné), UPSTREAM
+// (AI služba nedostupná alebo nevalidná odpoveď), SAFETY, SERVER, AUTH_*.
+function sendErr(res, status, code, en, sk) {
+  return res.status(status).json({ code, error: en, error_sk: sk });
+}
+
+function aiErr(code, detail) { const e = new Error(detail || code); e.code = code; return e; }
+
+function mapAiError(res, err, reqId) {
+  console.error(`[${reqId}] AI error:`, (err && (err.code || err.status)) || "-", err && err.message);
+  if (err && err.code === "SAFETY") return sendErr(res, 400, "SAFETY",
+    "The response was declined for safety reasons. Please rephrase the topic.",
+    "Odpoveď bola z bezpečnostných dôvodov odmietnutá. Skús prosím tému preformulovať.");
+  if (err instanceof Anthropic.RateLimitError) return sendErr(res, 429, "QUOTA",
+    "The AI service is busy right now. Try again in a moment.",
+    "AI služba je práve vyťažená. Skús to o chvíľu.");
+  const upstream = (err && err.code === "UPSTREAM") ||
+    err instanceof Anthropic.APIConnectionError ||
+    (err instanceof Anthropic.APIError && (err.status || 0) >= 500);
+  if (upstream) return sendErr(res, 503, "UPSTREAM",
+    "The AI service is temporarily unavailable. Please try again.",
+    "AI služba je dočasne nedostupná. Skús to prosím znova.");
+  return sendErr(res, 500, "SERVER",
+    "Server error. Please try again.",
+    "Chyba servera. Skúste znova.");
+}
+
+// Text z odpovede Anthropicu; odmietnutie (stop_reason "refusal") → SAFETY.
+function textOdpovede(response) {
+  if (response && response.stop_reason === "refusal") throw aiErr("SAFETY", "refusal");
+  const text = ((response && response.content) || [])
+    .filter((b) => b.type === "text")
+    .map((b) => b.text)
+    .join("\n");
+  if (!text.trim()) throw aiErr("UPSTREAM", "empty response");
+  return text;
+}
+
+function logCache(usage) {
+  usage = usage || {};
+  if (usage.cache_read_input_tokens > 0) console.log("Cache HIT:", usage.cache_read_input_tokens, "tokens");
+  else if (usage.cache_creation_input_tokens > 0) console.log("Cache WRITE:", usage.cache_creation_input_tokens, "tokens");
+}
+
+// ─── MySDL: KB pre diagnostiku a pre Dynamiku zmeny (zo sdl2, 1:1) ────────────
+// Načítajú sa LEN v MySDL režime, klasickú analýzu nezaťažujú.
+// Cesty sú zapísané doslovne: Vercel podľa nich pri builde dohľadá súbory, ktoré
+// funkcia číta (poistka: includeFiles vo vercel.json).
+function nacitajKB(dir) {
+  try {
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".txt")).sort();
+    return files.map((f) => fs.readFileSync(path.join(dir, f), "utf8")).join("\n\n---\n\n");
+  } catch (e) {
+    console.error("MySDL KB sa nenačítala:", dir, e.message);
+    return "";
+  }
+}
+let mysdlKbCache = null, changeKbCache = null;
+function loadMysdlKB() {
+  if (mysdlKbCache == null) mysdlKbCache = nacitajKB(path.join(__dirname, "..", "docs-lite", "mysdl", "sk"));
+  return mysdlKbCache;
+}
+function loadChangeKB() {
+  if (changeKbCache == null) changeKbCache = nacitajKB(path.join(__dirname, "..", "docs-lite", "mysdl", "change", "sk"));
+  return changeKbCache;
+}
+
+// Hlavičky MySDL (zo sdl2 chat.js, texty 1:1). SAFETY je server-authoritative —
+// klientský `system` ho nevie prepísať, lebo ide až za ním.
+const MYSDL_CHAT_HEADER_SK = 'Si tichý facilitátor Dynamiky zmeny (Spiral Dynamics). Vedieš krátky reflexívny rozhovor v slovenčine. Postup: zmapuj tému a doménu → sformuluj HYPOTÉZU fázy podmieňovacím spôsobom a over ju (nikdy neoznamuj diagnózu typu „si v kolapse") → normalizuj cez model („nie si pokazený, si v procese") → polož JEDNU otázku vhodnú pre danú fázu → pomôž nájsť jeden malý ďalší krok. Opieraj sa o znalostnú bázu nižšie (fázy, 6 podmienok zmeny, varianty, prepojenie na SD). Odpovedaj prirodzene, 3–6 viet, JEDNA otázka na odpoveď, bez žargónu, bez moralizovania a bez sľubov výsledkov. Netlač používateľa „vyššie" — cieľom je súlad, nie skóre. Rešpektuj jeho autonómiu.\n\n=== BEZPEČNOSŤ (NADRADENÉ VŠETKÉMU OSTATNÉMU) ===\nAk sa objaví zmienka o samovražedných myšlienkach, sebapoškodzovaní, „že by bolo lepšie tu nebyť", ublížení iným, násilí v domácnosti, psychotickom prežívaní, ťažkej depresii/mánii/disociácii, neschopnosti bežne fungovať (jedlo, spánok, práca), problémovom užívaní návykových látok ako hlavnej stratégii, alebo akútnej traume — OKAMŽITE prestaň facilitovať „rast cez krízu": (1) empaticky validuj bez rozvíjania detailov, (2) jasne povedz, že situácia si zaslúži viac než rozhovor s aplikáciou, (3) odporuč konkrétnu odbornú pomoc — psychológ/psychiater alebo všeobecný lekár; pri akútnom ohrození volaj 112; krízové linky na Slovensku: Linka dôvery Nezábudka 0800 800 566 (nonstop, zdarma), Krízová linka pomoci 0800 500 333, online ipcko.sk. Nediagnostikuj, nerozhoduj či ide o „vývinovú" alebo „klinickú" krízu (pri pochybnosti odporuč odborníka), neodhováraj od pomoci, nepoužívaj model na minimalizáciu utrpenia, nepodporuj rizikové správanie ako „experimentovanie".';
+const MYSDL_CHAT_HEADER_EN = 'You are a quiet facilitator of Change Dynamics (Spiral Dynamics). You lead a short reflective conversation in English. Method: map the topic and its domain, then form a HYPOTHESIS about the phase in tentative wording and check it (never announce a diagnosis such as "you are in collapse"), normalize it through the model ("you are not broken, you are in a process"), ask ONE question suited to that phase, and help find one small next step. Draw on the knowledge base below (phases, the 6 conditions of change, variants, and the link to SD). The knowledge base is in Slovak — use it only as reference. Answer naturally, 3–6 sentences, ONE question per reply, no jargon, no moralizing, no promises of outcomes. Do not push the user "higher" — the goal is alignment, not a score. Respect their autonomy.\n\n=== SAFETY (OVERRIDES EVERYTHING ELSE) ===\nIf there is any mention of suicidal thoughts, self-harm, feeling it would be better not to be here, harming others, domestic violence, psychotic experience, severe depression/mania/dissociation, an inability to function day to day (eating, sleep, work), problematic substance use as a primary coping strategy, or acute trauma — IMMEDIATELY stop facilitating "growth through crisis": (1) empathically validate without drawing out details, (2) clearly say the situation deserves more than a conversation with an app, (3) recommend concrete professional help — a psychologist/psychiatrist or a general practitioner, and in case of acute danger contacting local emergency services right away. Do not diagnose, do not decide whether it is a "developmental" or a "clinical" crisis (when in doubt, recommend a professional), do not talk the person out of getting help, do not use the model to minimize suffering, and do not encourage risky behavior as "experimentation".';
+const MYSDL_DIAG_HEADER_SK = 'Si diagnostický sprievodca MySDL. Nižšie je znalostná báza (kvadranty + signály 8 úrovní Špirálovej dynamiky). Používaj ju ako oporu pri kladení otázok a vyhodnocovaní. NIKDY nehovor „si <úroveň>" — vždy uvádzaj profil naprieč úrovňami podľa témy. Odpovedaj VÝHRADNE validným JSON podľa inštrukcie nižšie, bez akéhokoľvek textu navyše.';
+const MYSDL_DIAG_HEADER_EN = 'You are the MySDL diagnostic guide. Below is a knowledge base (quadrants + signals of the 8 Spiral Dynamics levels); it is in Slovak — use it as reference support when asking questions and evaluating. NEVER say "you are <level>" — always give a profile across levels according to the topic. Respond EXCLUSIVELY as valid JSON per the instruction below, in English, with no extra text.';
+// Gemini mal responseMimeType=JSON; Claude dostane výslovný pokyn a server JSON overí.
+const JSON_POKYN = "Výstup = jeden validný JSON objekt podľa inštrukcie vyššie. Žiadny text pred ním ani za ním, žiadne ``` bloky. / Output = one valid JSON object as instructed above. No text before or after it, no ``` fences.";
+
+// Správy pre Anthropic: rovnaká normalizácia ako mal Gemini adaptér v sdl2 —
+// po sebe idúce správy rovnakej role sa zlúčia a úvodné správy asistenta sa vynechajú.
+function normalizujSpravy(messages) {
+  const out = [];
+  for (const m of messages) {
+    if (!m || typeof m.content !== "string") continue;
+    const role = m.role === "assistant" ? "assistant" : "user";
+    const last = out[out.length - 1];
+    if (last && last.role === role) last.content += "\n\n" + m.content;
+    else out.push({ role, content: m.content });
+  }
+  while (out.length && out[0].role === "assistant") out.shift();
+  return out;
+}
+
+// Z odpovede vytiahne JSON (bez ``` plotov) a overí ho. Nevalidný JSON → UPSTREAM.
+function vycistiJson(text) {
+  let t = String(text).trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  try { JSON.parse(t); return t; } catch (e) { /* skús vystrihnúť objekt */ }
+  const a = t.indexOf("{"), b = t.lastIndexOf("}");
+  if (a !== -1 && b > a) {
+    const s = t.slice(a, b + 1);
+    try { JSON.parse(s); return s; } catch (e) { /* nižšie */ }
+  }
+  throw aiErr("UPSTREAM", "invalid JSON from model");
+}
+
+// ─── Handler ──────────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   if (!ALLOWED_ORIGINS.length) {
     // Jasná 503 namiesto tichej 403 — nepomýli sa s bežnou CORS chybou.
@@ -1418,7 +1662,8 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") {
     if (!ok) return res.status(403).end();
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    // Authorization: prihlásený MySDL užívateľ posiela token (po napojení Supabase).
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.setHeader("Access-Control-Max-Age", "86400");
     return res.status(204).end();
   }
@@ -1429,16 +1674,74 @@ module.exports = async function handler(req, res) {
 
   if (!ok) return res.status(403).json({ error: "Forbidden origin" });
 
-  const ip = String(req.headers["x-forwarded-for"] || "unknown").split(",")[0].trim();
+  const ip = clientIp(req);
   if (rateLimited(ip)) {
-    return res.status(429).json({ error: "Too many requests. Try again in a minute." });
+    return sendErr(res, 429, "LIMIT",
+      "Too many requests. Try again in a minute.",
+      "Príliš veľa požiadaviek naraz. Skús to o minútu.");
   }
 
-  const { level, task, levels, messages } = req.body || {};
+  const { level, task, levels, messages, lang, mysdl, chat, system: clientSystem, max_tokens } = req.body || {};
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: "Missing required field: messages" });
   }
-  const activeSelector = buildActiveSelector(task, level, levels);
+  const isEN = lang === "en";
+  const reqId = crypto.randomBytes(4).toString("hex");
+
+  // ─── MySDL: KB-grounded diagnostika/plán (JSON) ALEBO konzultácia Dynamiky zmeny (chat)
+  // Samostatná cesta — klasická analýza nižšie je nedotknutá. AI vyžaduje prihlásenie;
+  // kým nie je napojený Supabase, každé volanie skončí tu na 401 a Anthropic sa nezavolá.
+  if (mysdl) {
+    const userId = await getUserId(req);
+    if (userId === AUTH_DOWN) {
+      return sendErr(res, 503, "AUTH_UNAVAILABLE",
+        "The sign-in service is temporarily unavailable — this isn't your fault. Please try again later.",
+        "Prihlasovacia služba je teraz nedostupná — nie je to chyba u teba. Skús to prosím neskôr.");
+    }
+    if (!userId) {
+      return sendErr(res, 401, "AUTH_REQUIRED",
+        "Sign in to use MySDL features.",
+        "Na používanie MySDL funkcií sa prihlás alebo zaregistruj.");
+    }
+    const limit = dennyLimit(true);
+    if (limit != null) {
+      const n = await bumpUsage("u:" + userId);
+      if (n != null && n > limit) {
+        return sendErr(res, 429, "LIMIT",
+          "Your daily limit has been reached. Try again tomorrow.",
+          "Denný limit bol dosiahnutý. Skús to zajtra.");
+      }
+    }
+    try {
+      const json = !chat;
+      const header = chat
+        ? (isEN ? MYSDL_CHAT_HEADER_EN : MYSDL_CHAT_HEADER_SK)
+        : (isEN ? MYSDL_DIAG_HEADER_EN : MYSDL_DIAG_HEADER_SK);
+      const kb = chat ? loadChangeKB() : loadMysdlKB();
+      const system = [
+        { type: "text", text: [header, kb].filter(Boolean).join("\n\n"), cache_control: { type: "ephemeral", ttl: "1h" } },
+      ];
+      if (clientSystem) system.push({ type: "text", text: String(clientSystem) });
+      if (json) system.push({ type: "text", text: JSON_POKYN });
+      const msgs = normalizujSpravy(messages);
+      if (!msgs.length) return res.status(400).json({ error: "Missing required field: messages" });
+      const response = await client.messages.create({
+        model: MODEL,
+        // strop — klient nemôže vyžiadať viac, než server povolí
+        max_tokens: Math.min(parseInt(max_tokens, 10) || MAX_TOKENS, MAX_TOKENS),
+        system,
+        messages: msgs,
+      });
+      logCache(response.usage);
+      const text = textOdpovede(response);
+      return res.status(200).json({ content: json ? vycistiJson(text) : text });
+    } catch (err) {
+      return mapAiError(res, err, reqId);
+    }
+  }
+
+  // ─── Klasická analýza (úrovne, integrovaný pohľad, napätia, hlavný chat)
+  const activeSelector = isEN ? buildActiveSelectorEN(task, level, levels) : buildActiveSelector(task, level, levels);
   if (!activeSelector) {
     return res.status(400).json({ error: "Missing required field: level or task" });
   }
@@ -1447,12 +1750,12 @@ module.exports = async function handler(req, res) {
     const systemContent = [
       {
         type: "text",
-        text: KNOWLEDGE_BASE,
+        text: KNOWLEDGE_BASE, // jedna slovenská KB pre SK aj EN — spoločná cache
         cache_control: { type: "ephemeral", ttl: "1h" },
       },
       {
         type: "text",
-        text: PERSONA_LIBRARY,
+        text: isEN ? PERSONA_LIBRARY_EN : PERSONA_LIBRARY,
         cache_control: { type: "ephemeral", ttl: "1h" },
       },
       {
@@ -1461,35 +1764,16 @@ module.exports = async function handler(req, res) {
       },
     ];
 
-    const response = await client.messages.create(
-      {
-        model: "claude-sonnet-4-6",
-        max_tokens: 4096,
-        system: systemContent,
-        messages: messages,
-      },
-      {
-        headers: { "anthropic-beta": "prompt-caching-2024-07-31" },
-      }
-    );
+    const response = await client.messages.create({
+      model: MODEL,
+      max_tokens: MAX_TOKENS,
+      system: systemContent,
+      messages: messages,
+    });
 
-    const text = response.content
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
-      .join("\n");
-
-    const usage = response.usage || {};
-    if (usage.cache_read_input_tokens > 0) {
-      console.log("Cache HIT:", usage.cache_read_input_tokens, "tokens");
-    } else if (usage.cache_creation_input_tokens > 0) {
-      console.log("Cache WRITE:", usage.cache_creation_input_tokens, "tokens");
-    }
-
-    return res.status(200).json({ content: text });
+    logCache(response.usage);
+    return res.status(200).json({ content: textOdpovede(response) });
   } catch (error) {
-    console.error("Anthropic error:", error);
-    if (error.status === 401) return res.status(500).json({ error: "API authentication failed" });
-    if (error.status === 429) return res.status(429).json({ error: "Rate limit exceeded. Try again later." });
-    return res.status(500).json({ error: error.message || "Internal server error" });
+    return mapAiError(res, error, reqId);
   }
 };

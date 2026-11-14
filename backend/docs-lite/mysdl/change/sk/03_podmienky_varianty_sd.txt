@@ -1,0 +1,43 @@
+# DYNAMIKA ZMENY — Podmienky zmeny, varianty, prepojenie na Spiral Dynamics
+
+## ŠESŤ PODMIENOK ZMENY
+Hlboká (vertikálna) zmena prebehne udržateľne len vtedy, keď sú splnené tieto podmienky. Slúžia ako diagnostický kontrolný zoznam, keď sa zmena „nehýbe" alebo opakovane zlyháva — pomôž nájsť, KTORÁ podmienka chýba, a smeruj otázky na najslabšiu z nich.
+
+1. POTENCIÁL — systém musí mať otvorenosť a kapacitu na zmenu. Tri stavy mysle: otvorený (open — pripravený na zmenu), pozastavený (arrested — zmena možná pri odstránení bariér), uzavretý (closed — zmena momentálne nemožná; tlak vyvoláva len odpor). Otázka: „Je tu vôbec ochota a kapacita meniť sa, alebo najprv treba pracovať s odporom a zdrojmi?"
+2. RIEŠENIA — základné problémy súčasnej úrovne existencie musia byť dostatočne vyriešené. Systém zavalený existenčnými problémami (bezpečie, financie, zdravie, akútne konflikty) nemá voľnú kapacitu na transformáciu. „Nestojí zmena na piesku nevyriešených základov?"
+3. DISONANCIA — musí existovať dostatočne silný pocit, že „takto to ďalej nejde". Bez disonancie niet motivácie; ochromujúca disonancia paralyzuje. Optimálne okno: dosť na pohyb, nie toľko, aby zlomila. „Je nespokojnosť dosť silná a dosť znesiteľná?"
+4. VHĽAD (INSIGHT) — porozumenie, prečo staré nefunguje, a predstava o alternatívach. Disonancia bez vhľadu = slepé metanie. „Rozumie systém príčinám a vidí aspoň obrysy alternatív?"
+5. BARIÉRY — prekážky zmeny musia byť identifikované menovite a následne odstránené, obídené alebo prerámcované. Vonkajšie (štruktúry, vzťahy, zdroje, prostredie) aj vnútorné (presvedčenia, strachy, identita, benefity starého stavu). Neidentifikované bariéry sú najčastejší dôvod stroskotania zmeny. „Čo konkrétne drží staré na mieste?"
+6. KONSOLIDÁCIA — nové nastavenie treba po prechode upevniť a podporiť: štruktúry, návyky, spojenci, prostredie žičlivé novému. Bez konsolidácie nastáva regres. „Čo bude nové fungovanie chrániť a živiť?"
+
+Typické vzorce: veľa disonancie + nula vhľadu → potreba mapovania a inšpirácie; vhľad + nezmenené bariéry → „viem, čo mám robiť, ale nerobím to"; úspešný prechod + žiadna konsolidácia → recidíva starých vzorcov.
+
+## TRAJEKTÓRIE A VARIANTY ZMENY
+Dve cesty cez cyklus:
+- Reformná (evolučná): Beta → Delta. Nesúlad sa rozpozná včas, bariéry sa odstránia pred kolapsom; systém experimentuje a mení rámec bez plnej Gammy. Nižšie náklady, menej utrpenia — vyžaduje bdelosť v Bete a ochotu meniť sa skôr, než to vynúti realita.
+- Revolučná: Beta → Prekážka → Gamma → Delta. Signály ignorované alebo podmienky priveľmi rýchle. Najčastejšia pri hlbokej zmene identity. Nie je morálne „horšia" — ale je drahšia.
+Praktický dôsledok: ak je používateľ v Bete, časť práce je ukázať, že TERAZ je najlacnejší moment na zmenu. Ak je v Gamme, spätné „mal si to riešiť skôr" je zbytočné a škodlivé — pracuje sa s tým, čo je.
+
+Zmeny 1. rádu (horizontálne, v rámci paradigmy): doladenie (fine-tune); rozšírenie (nové nástroje v starom rámci); dočasné siahnutie nadol (jednoduchšie staršie stratégie v kríze prežitia); dočasné siahnutie nahor (napodobnenie komplexnejšieho fungovania bez osvojenia — forma bez obsahu, krátkodobé).
+Zmeny 2. rádu (vertikálne, zmena paradigmy): prielom (break-out — náhle prelomenie bariér, konfliktné); posun nahor (up-shift — postupný prechod za splnenia podmienok, najzdravšia forma); kvantový skok (zriedkavá rozsiahla zmena viacerých úrovní naraz).
+Smer môže byť aj regresívny (down-shift). Pod akútnym ohrozením je dočasný regres adaptívny; problém je chronický regres po odznení ohrozenia.
+Diagnostická otázka: „Potrebuje táto situácia zmenu 1. rádu (doladiť, čo je), alebo 2. rádu (zmeniť rámec)?" Prekážka v grafe je bod, kde 1. rád prestal stačiť. Bežná chyba oboma smermi: riešiť rámec, keď stačí doladenie — a doladovať, keď treba nový rámec.
+
+Neproduktívne trajektórie (na rozpoznanie, nie na strašenie):
+- Zamrznutá Alpha — uzavretosť voči signálom, popieranie disonancie („u nás je všetko v poriadku" — a nie je).
+- Chronická Beta — roky polosúladu („raz to už vydržím… hovorím to piaty rok").
+- Gamma pasca — staré nejde, nové nemožné; cynizmus, rezignácia („nič nemá zmysel a nič sa nedá").
+- Regres do starej Alphy — útek z Gammy do falošného bezpečia; staré problémy sa vracajú.
+- Falošná Delta — prvý pokus vyhlásený za spásu, nadšenie bez overenia.
+- Večné experimentovanie — skúšanie ako únik pred záväzkom.
+- Riešenie bez integrácie — nové správanie na starej identite; regres pod stresom.
+- Oscilácia — kyvadlo medzi dvoma rámcami bez syntézy.
+
+## PREPOJENIE NA SPIRAL DYNAMICS
+1. Dynamika zmeny je motor pohybu po špirále. Prechod medzi hodnotovými systémami (béžová → purpurová → červená → modrá → oranžová → zelená → žltá → tyrkysová) prebieha týmto cyklom: stará úroveň prestáva zodpovedať podmienkam (Beta), rozpadá sa (Gamma), z hľadania sa vynára nová (Delta → New Alpha). „Z čoho do čoho sa meníme?" = ktorý hodnotový systém prestáva stačiť a ktorý sa vynára.
+2. Vlny: vstup → vrchol → odchod. Každý systém prichádza ako vlna: vynára sa v malom (entering), silnie k vrcholu (peak), ustupuje do pozadia (exiting). Nič sa nestráca — staršie systémy zostávajú dostupné a pri zmene podmienok sa môžu reaktivovať.
+3. Kyvadlo ja ↔ my. Špirála strieda systémy zamerané na vyjadrenie seba (béžová, červená, oranžová, žltá) a na obetovanie seba pre celok (purpurová, modrá, zelená, tyrkysová). Kríza často signalizuje vyčerpanie jedného pólu: prílišné „ja" volá po „my" a naopak.
+4. Nie každá kríza = posun na novú úroveň. Adaptácia môže byť vertikálna (nová úroveň komplexity) alebo horizontálna (zdravšie vyjadrenie tej istej úrovne). Podmienky života určujú, ktorá úroveň je primeraná — žiadna nie je sama osebe lepšia. AI nikdy netlačí „vyššie"; cieľom je súlad, nie skóre na špirále.
+5. Nový systém robí starý nadbytočným. V čase turbulencií je účinnejšie vytvárať nové spôsoby myslenia s vyššou komplexitou, popri ktorých staré prirodzene stráca funkciu — menej energie do boja proti starému, viac do budovania nového.
+6. Zmena sa začína vo vnútornom svete. Vonkajšie usporiadanie je výrazom vnútorných kódov. Preto graf meria SÚLAD (vnútornú zhodu s podmienkami), nie vonkajší výkon.
+7. Druhá vrstva (žltá/tyrkysová) vidí a manažuje celú špirálu vrátane vlastného procesu zmeny. Schopnosť používateľa povedať „aha, som v Gamme a viem, čo táto fáza potrebuje" je sama osebe kompetenciou druhej vrstvy (meta-pohľad).

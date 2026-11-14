@@ -1,0 +1,68 @@
+# Úrovne Špirálovej dynamiky — signály, silné stránky, slepé miesta a životné podmienky
+
+Táto sekcia dopĺňa diagnostický kľúč: pre každú z 8 úrovní uvádza jej ŽIVOTNÉ PODMIENKY (kedy je úroveň prirodzenou odpoveďou na prostredie), SILNÉ STRÁNKY (zdravé jadro), PREJAVY (ako sa prejavuje v bežnom fungovaní), SLEPÉ MIESTA a TIENE (nezdravé prejavy).
+
+Používaj to pri:
+- vyhodnotení zastúpenia úrovní v téme (mapovanie výpovedí na úrovne),
+- meraní SÚLADU úrovne so životnými podmienkami (Prostredie) — porovnaj, čo si situácia žiada, s tým, z ktorej úrovne človek reálne funguje,
+- návrhu rastu (integruj zdravé jadro, ošetri tiene).
+
+Zásada: úroveň nie je „lepšia" alebo „horšia" — každá je funkčná odpoveďou na určité životné podmienky. Diagnostikuj profil naprieč úrovňami podľa témy, nikdy „škatuľku".
+
+---
+
+## BÉŽOVÁ — Prežitie
+- Životné podmienky: Základné prežitie, telesné potreby a bezprostredné ohrozenie.
+- Silné stránky: Inštinkt pre prežitie, kontakt s telom a schopnosť reagovať na základné potreby.
+- Prejavy: V kríze sa sústredíš na to najzákladnejšie; telo reaguje skôr než myseľ.
+- Slepé miesta: Prehliadanie telesných signálov a odpájanie sa od potrieb tela pri strese.
+- Tiene: Panika, zamrznutie, prežívanie „z ruky do úst" bez výhľadu.
+
+## PURPUROVÁ — Bezpečie klanu
+- Životné podmienky: Potreba bezpečia, príslušnosti, rituálu a spoločenstva.
+- Silné stránky: Spolupatričnosť, intuícia a rešpekt k tradícii a rodine.
+- Prejavy: Bezpečie hľadáš v blízkych a známom; dôležité sú rituály a „naši ľudia".
+- Slepé miesta: Strach z vylúčenia brzdí samostatnosť; poverčivosť namiesto overenia.
+- Tiene: Uzavretosť voči cudziemu, závislosť na skupine, magické vyhýbanie sa zodpovednosti.
+
+## ČERVENÁ — Moc a vôľa
+- Životné podmienky: Potreba presadiť sa, mať moc a okamžitý dopad.
+- Silné stránky: Sebaafirmácia, odvaha, akčnosť a schopnosť chrániť hranice.
+- Prejavy: Ideš si za svojím, nebojíš sa konfliktu a rýchlo konáš.
+- Slepé miesta: Dopad na druhých a dlhodobé následky impulzívnych činov.
+- Tiene: Dominancia, výbuchy hnevu, manipulácia, bezohľadnosť.
+
+## MODRÁ — Poriadok a zmysel
+- Životné podmienky: Potreba poriadku, istoty, jasných pravidiel a zmyslu.
+- Silné stránky: Zmysel pre poriadok, morálku, disciplínu a službu vyššiemu princípu.
+- Prejavy: Držíš sa pravidiel a záväzkov a hľadáš „správny" spôsob.
+- Slepé miesta: Rigidita voči zmene a súdenie tých, čo pravidlá nedodržiavajú.
+- Tiene: Dogmatizmus, vina a trest, potláčanie vlastných potrieb v mene povinnosti.
+
+## ORANŽOVÁ — Úspech a výkon
+- Životné podmienky: Príležitosti, súťaž, merateľný úspech a individuálny rast.
+- Silné stránky: Kritické myslenie, efektivita, inovácie a dosahovanie cieľov.
+- Prejavy: Staviaš si ciele a stratégie, meriaš výsledky a optimalizuješ.
+- Slepé miesta: Cena úspechu pre vzťahy a zmysel; „viac" ako automatická odpoveď.
+- Tiene: Workoholizmus, používanie ľudí ako nástrojov, prázdnota po výkone.
+
+## ZELENÁ — Harmónia a rovnosť
+- Životné podmienky: Potreba spojenia, rovnosti, zmieru a zdieľaného významu.
+- Silné stránky: Empatia, komunita, rovnosť a vnútorný súcit.
+- Prejavy: Dbáš, aby mal každý hlas, a úprimne cítiš s druhými.
+- Slepé miesta: Rozhodnosť a hierarchia keď treba; nekonečné hľadanie konsenzu.
+- Tiene: Vyhýbanie sa konfliktu, moralizovanie, relativizmus bez smeru.
+
+## ŽLTÁ — Systémová integrácia
+- Životné podmienky: Komplexita a potreba systémového, flexibilného pohľadu.
+- Silné stránky: Systémové chápanie, flexibilita a tolerancia k rôznorodosti.
+- Prejavy: Vidíš vzorce a súvislosti a prispôsobuješ prístup kontextu.
+- Slepé miesta: Netrpezlivosť voči „nižším" úrovniam a odpojenie od emócií.
+- Tiene: Intelektuálny odstup, arogancia „už vidím viac", nečinné pozorovanie.
+
+## TYRKYSOVÁ — Celostné vedomie
+- Životné podmienky: Potreba celostnosti, zmyslu presahujúceho jednotlivca a planetárneho vedomia.
+- Silné stránky: Celostné vedomie, planetárna identita a hlboká spiritualita.
+- Prejavy: Vnímaš prepojenie celku a konáš v službe niečomu väčšiemu.
+- Slepé miesta: Uzemnenie v každodennosti a prehliadanie konkrétnych krokov.
+- Tiene: Spiritual bypassing, odpojenie od reality, vznešenosť bez činu.

@@ -1,0 +1,60 @@
+# Diagnostika — kalibrácia skórovania a ukážkové dialógy
+
+Táto sekcia zvyšuje presnosť a konzistenciu diagnostiky: ako skórovať zastúpenie úrovní, ako odlíšiť skóre od relevancie, a ukážky mapovania odpovedí na úrovne. Cieľ: profil naprieč úrovňami podľa témy — NIKDY „škatuľka".
+
+## Kalibrácia skóre (0–100 = miera zastúpenia úrovne v odpovediach k danej téme)
+- 0–15: úroveň sa prakticky neprejavila. Opatrný, krátky text.
+- 16–40: náznak / okrajovo prítomná (jedna zmienka, slabý tón).
+- 41–65: zreteľne prítomná (opakuje sa, nesie časť logiky odpovedí).
+- 66–100: dominantná (ťažisko myslenia/rozhodovania v téme).
+Zásady:
+- Skóre má odrážať, KOĽKO z danej paradigmy reálne zaznieva v odpovediach — nie čo je „správne" alebo „vyspelé".
+- Súčet nemusí byť 100 — úrovne sa prekrývajú (človek funguje z viacerých naraz).
+- Buď konzervatívny: ak dôkaz chýba, daj nízke skóre, nie stredné „pre istotu".
+- Skóre viaž na konkrétne výroky, nie na dojem.
+
+## Skóre vs. RELEVANT (dve rôzne veci)
+- skore = koľko sa úroveň PREJAVILA v odpovediach.
+- relevant = či je paradigma úrovne PODSTATNÁ pre danú tému (bez ohľadu na skóre).
+Kombinácie:
+- vysoké skóre + relevant=true → nosná úroveň témy (integrovaná alebo priestor rastu podľa integrácie).
+- nízke skóre + relevant=true → relevantná, ale neintegrovaná → príležitosť rastu.
+- akékoľvek skóre + relevant=false → objavila sa, ale pre túto tému nie je nosná → na mandale „absent".
+Ak nie je zadaná téma (všeobecná diagnostika) → relevant vždy true.
+
+## Anti-„škatuľkovanie" (dôležité)
+- Nikdy „si ČERVENÝ/ORANŽOVÝ". Vždy „v tejto téme prevažuje červená paradigma".
+- Človek je profil naprieč úrovňami; profil sa líši podľa témy a životnej oblasti.
+- Nehodnoť úroveň ako lepšiu/horšiu — každá je funkčnou odpoveďou na určité životné podmienky.
+- Text k úrovni čerpaj z konkrétnych odpovedí používateľa, nie zo všeobecných definícií.
+
+## Ukážkové mini-dialógy (téma → odpovede → mapovanie)
+
+### Príklad A — téma: „stres a konflikt v práci"
+Odpovede (skrátené): „Keď mám iný názor, poviem to priamo a stojím si za svojím, aj keď to iskrí." · „Vadí mi, keď sa nedodržia dohodnuté pravidlá a každý si robí po svojom." · „Na pochvalu od šéfa veľmi nedbám, dôležitejšie je, aby to bolo spravené poriadne."
+Mapovanie:
+- ČERVENÁ: skore ~65, relevant=true — priame presadzovanie, ochota ísť do konfliktu.
+- MODRÁ: skore ~60, relevant=true — dôraz na pravidlá, poriadok, „spraviť poriadne".
+- ORANŽOVÁ: skore ~20, relevant=false — výkon spomenutý, ale nie ako ťažisko témy.
+- ostatné: nízke, relevant=false.
+Zhrnutie: ťažisko medzi presadením sa (červená) a poriadkom (modrá); napätie červená↔modrá (vôľa vs. pravidlá).
+
+### Príklad B — téma: „necítim zmysel, aj keď sa mi darí"
+Odpovede: „Dosahujem ciele, ale je to prázdne." · „Chýba mi hlbšie spojenie s ľuďmi." · „Rozmýšľam, či to celé nerobím len pre status."
+Mapovanie:
+- ORANŽOVÁ: skore ~70, relevant=true — výkon, ciele, status; zároveň jej tieň (prázdnota).
+- ZELENÁ: skore ~45, relevant=true — túžba po spojení, vzťahoch → priestor rastu (nízka integrácia, vysoká relevancia).
+- ŽLTÁ: skore ~15, relevant=true — náznak reflexie „prečo to robím".
+Zhrnutie: klasický prechod oranžová→zelená (prázdnota úspechu → hľadanie zmyslu vo vzťahoch); second-order téma.
+
+### Príklad C — téma: „konflikt s rodičmi o tom, ako žiť"
+Odpovede: „Cítim povinnosť voči rodine, nechcem ich sklamať." · „Zároveň chcem ísť vlastnou cestou." · „Bojím sa, že ak sa vzoprem, stratím ich podporu."
+Mapovanie:
+- PURPUROVÁ: skore ~55, relevant=true — lojalita rodine, strach z vylúčenia.
+- ČERVENÁ: skore ~40, relevant=true — „vlastná cesta", prvé „ja" → priestor rastu.
+- MODRÁ: skore ~30, relevant=true — povinnosť, „nesklamať".
+Zhrnutie: prechod purpurová→červená (individualita vs. bezpečie klanu); napätie medzi patrením a autonómiou.
+
+## Použitie
+Pri generovaní otázok: otvorené, nesugestívne, prechádzajúce kvadrantmi (vnútro/správanie/kultúra/systém).
+Pri vyhodnotení: pre každú z 8 úrovní vráť skore (podľa kalibrácie), text (z odpovedí) a relevant; pridaj zhrnutie ťažiska a hlavného napätia/prechodu.
